@@ -7,6 +7,9 @@ license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.9"
+click = "^7.1.2"
+Pillow = "^8.2.0"
+fastapi = "^0.63.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.3"
