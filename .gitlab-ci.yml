@@ -20,6 +20,6 @@ build:
 pytest:
     stage: test
     script:
-        - python -m poetry run pytest -s --no-qt-log
+        - python -m poetry run pytest
     tags:
         - ci

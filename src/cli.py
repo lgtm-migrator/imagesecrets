@@ -2,7 +2,7 @@ from pathlib import Path
 
 import click
 
-from backend.image import Image
+from backend import message
 
 
 @click.group()
@@ -13,17 +13,17 @@ def cli(ctx):
 
 @cli.command()
 @click.option("--filename", type=click.Path(exists=True), prompt=True)
-@click.option("--message", type=str, prompt=True)
-def encode(filename: str, message: str):
+@click.option("--message", "text", type=str, prompt=True)
+def encode(filename: str, text: str):
     """Encode image"""
-    click.echo(Image(Path(filename)).encode(message))
+    click.echo(message.encode_text(filename, text))
 
 
 @cli.command()
 @click.option("--filename", type=click.Path(exists=True), prompt=True)
 def decode(filename):
     """Decode image"""
-    click.echo(Image(filename).decode())
+    click.echo(message.decode_text(filename))
 
 
 if __name__ == "__main__":
