@@ -2,7 +2,7 @@
 import pytest
 import numpy as np
 
-from src.backend import encode
+from src.backend import encode, util
 
 
 @pytest.fixture()
@@ -288,13 +288,8 @@ def image_arr():
         "abc123/-*" * 500,
     ],
 )
-def test_str_into_bin_array(text):
-    result = "".join(
-        map(
-            lambda char: format(char, "b").zfill(8),
-            bytearray(text, encoding="utf-8"),
-        )
-    )
+def test_str_into_bin_array(text) -> None:
+    result = util.str_to_binary(text)
 
     arr = encode.str_into_bin_array(text)
     data = "".join(
@@ -320,16 +315,16 @@ def test_str_into_bin_array(text):
         "a4" * 30,
     ],
 )
-def test_encode_message(image_arr, text):
+def test_encode_message(image_arr, text) -> None:
     new_arr = encode.encode_message(image_arr, text)
     extracted_text = ""
     for rgb_vals, _ in zip(new_arr.reshape(-1, 8), range(len(text))):
         binary = (bin(num)[-1] for num in rgb_vals)
-        extracted_text += chr(int("".join(binary), base=2))
+        extracted_text += util.binary_to_char("".join(binary))
 
     assert text == extracted_text
 
 
-def test_encode_limit(image_arr):
+def test_encode_limit(image_arr) -> None:
     with pytest.raises(ValueError):
         encode.encode_message(image_arr, "'extremely long text'" * 5000)

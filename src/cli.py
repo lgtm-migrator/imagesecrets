@@ -33,7 +33,7 @@ def encode(filename: str, text: str, inplace: bool):
 
     """
     try:
-        click.echo(enc.main(Path(filename).absolute(), text, inplace))
+        click.echo(f"\n{enc.main(Path(filename).absolute(), text, inplace)}")
     except ValueError as e:
         click.echo(e)
 

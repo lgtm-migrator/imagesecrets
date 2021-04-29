@@ -1,7 +1,6 @@
 """Module with functions to encode text into images."""
 from __future__ import annotations
 
-import itertools as it
 from typing import Optional, TYPE_CHECKING
 from pathlib import Path
 
@@ -9,66 +8,34 @@ import numpy as np
 from PIL import Image
 
 from src.backend.settings import MESSAGE_DELIMETER
-from src.backend.util import image_array
+from src.backend import util
 
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
 
-def str_into_bin_array(text_: str) -> ArrayLike:
-    """Return numpy array of the given text.
-
-    The text is joined with the MESSAGE_DELIMETER.
-    Three columns are create so later encryption into pixels is easy.
-    Extra bits are added to the text so it fits into the three columns
-
-    :param text_: The text to turn into the binary array
-
-    """
-    # times 8 because we need binary amount
-    # no need to add the delimeter here because it's divisible by 3 without any reminder
-    str_len = len(text_ * 8)
-    binary = iter(
-        "".join(
-            map(
-                lambda char: format(char, "b").zfill(8),
-                bytearray(text_ + MESSAGE_DELIMETER, encoding="utf-8"),
-            )
-        )
-    )
-
-    if str_len % 3 == 2:
-        binary = it.chain(binary, "0")
-    elif str_len % 3 == 1:
-        binary = it.chain(binary, "00")
-
-    return np.fromiter(binary, dtype=int).reshape(-1, 3)
-
-
-def encode_message(arr: ArrayLike, message: str) -> ArrayLike:
+def encode_message(file: Path, message: str) -> ArrayLike:
     """Encode a message into given array.
 
-    :param arr: The array of pixels
+    :param file: Path to the source image
     :param message: The message to encode
 
     :raises ValueError: If the image array is not large enough for the message
 
     """
-    msg_arr = str_into_bin_array(message)
+    binary_msg = util.str_to_binary(message + MESSAGE_DELIMETER)
+    shape, data = util.image_data(Path(file).absolute())
 
-    if arr.size < msg_arr.size:
+    if data.size < len(binary_msg):
         raise ValueError(
-            f"The message (size: {msg_arr.size}) is too long for the given image (size: {arr.size}."
+            f"The message (size: {len(binary_msg)}) is too long for the given image (size: {data.size}."
         )
 
-    for pixel, msg_bit in zip(arr, msg_arr):
-        for index in range(0, 3):
-            binary = format(pixel[index], "08b")
-            # encode into the least significant bit
-            binary = binary[:-1] + str(msg_bit[index])
-            pixel[index] = int(binary, base=2)
+    for index, bit in enumerate(binary_msg):
+        data[index] = int(format(data[index], "08b")[:-1] + bit, base=2)
 
-    return arr
+    encoded_arr = np.array(data).reshape(shape)
+    return encoded_arr
 
 
 def encoded_img_name(file: Path) -> Path:
@@ -88,8 +55,7 @@ def save_image(arr: ArrayLike, filepath: Path) -> None:
     :param filepath: The path where the image should be saved
 
     """
-    img = Image.fromarray(arr)
-    img.save(filepath)
+    Image.fromarray(np.uint8(arr)).convert("RGB").save(filepath)
 
 
 def main(file: Path, message: str, inplace: bool = False) -> Optional[str]:
@@ -101,11 +67,10 @@ def main(file: Path, message: str, inplace: bool = False) -> Optional[str]:
         or if a copy of the image should be created, defaults to False
 
     """
-    arr = image_array(file)
-    new_arr = encode_message(arr, message)
+    arr = encode_message(file, message)
 
     if not inplace:
         file = encoded_img_name(file)
 
-    save_image(new_arr, file)
-    return f"\nEncoded message {message!r} into {file.name!r}"
+    save_image(arr, file)
+    return f"Encoded message {message!r} into {file.name!r}"
