@@ -54,27 +54,6 @@ def str_into_bin_array(text_: str) -> ArrayLike:
     return np.fromiter(binary, dtype=int).reshape(-1, 3)
 
 
-def encoded_img_name(file: Path) -> Path:
-    """Return a new filename with the 'encoded_ prefix'.
-
-    :param file: The filepath to the image
-
-    """
-    name = f"encoded_{file.stem}.png"
-    return Path(file.parent, name)
-
-
-def save_image(arr: ArrayLike, filepath: Path) -> None:
-    """Save a new image.
-
-    :param arr: The numpy array with the pixel data
-    :param filepath: The path where the image should be saved
-
-    """
-    img = Image.fromarray(arr)
-    img.save(filepath)
-
-
 def encode_message(arr: ArrayLike, message: str) -> ArrayLike:
     """Encode a message into given array.
 
@@ -101,13 +80,34 @@ def encode_message(arr: ArrayLike, message: str) -> ArrayLike:
     return arr
 
 
+def encoded_img_name(file: Path) -> Path:
+    """Return a new filename with the 'encoded_ prefix'.
+
+    :param file: The filepath to the image
+
+    """
+    name = f"encoded_{file.stem}.png"
+    return Path(file.parent, name)
+
+
+def save_image(arr: ArrayLike, filepath: Path) -> None:
+    """Save a new image.
+
+    :param arr: The numpy array with the pixel data
+    :param filepath: The path where the image should be saved
+
+    """
+    img = Image.fromarray(arr)
+    img.save(filepath)
+
+
 def main(file: Path, message: str, inplace: bool = False) -> Optional[str]:
     """Main encoding function.
 
     :param file: Path to the source file
     :param message: The message to encode
     :param inplace: Whether the message should be encoded into the given image
-        or if a copy of the image should be created
+        or if a copy of the image should be created, defaults to False
 
     """
     arr = image_array(file)

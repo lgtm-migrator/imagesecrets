@@ -9,6 +9,12 @@ from backend.regex import PNG_EXT
 
 
 def validate_png(_, file: str):
+    """Validate that the file has as png extension.
+
+    :param _: Dump the context passed in by click
+    :param file: The file to check
+
+    """
     if re.match(PNG_EXT, file):
         return file
     raise click.BadParameter("PNG is required.")
@@ -17,7 +23,7 @@ def validate_png(_, file: str):
 @click.group()
 @click.pass_context
 def cli(ctx):
-    """CLI tool used for encoding and decoding messages from images."""
+    """CLI tool used for encoding and decoding messages into/from images."""
 
 
 @cli.command()
@@ -30,8 +36,18 @@ def cli(ctx):
 @click.option("--message", "text", type=str, prompt=True)
 @click.option("--inplace", type=bool, default=False, show_default=True)
 def encode(filename: str, text: str, inplace: bool):
-    """Encode image"""
-    click.echo(enc.main(Path(filename).absolute(), text, inplace))
+    """Encode image command.
+
+    :param filename: The filename of the source image, must have a .png extension
+    :param text: The text to encode
+    :param inplace: Whether the message should be encoded into the given image
+        or if a copy of the image should be created, defaults to False
+
+    """
+    try:
+        click.echo(enc.main(Path(filename).absolute(), text, inplace))
+    except ValueError as e:
+        click.echo(e)
 
 
 @cli.command()

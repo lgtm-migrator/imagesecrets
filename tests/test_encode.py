@@ -11,29 +11,29 @@ def image_arr():
     # TODO: Figure out how to read files in GitLab CI/CD
     return np.array(
         [
+            [45, 0, 0],
             [0, 0, 0],
-            [0, 0, 0],
-            [0, 0, 0],
-            [0, 0, 0],
-            [0, 0, 0],
-            [0, 0, 0],
-            [0, 0, 0],
-            [0, 0, 0],
-            [0, 0, 0],
-            [0, 0, 0],
-            [0, 0, 0],
-            [0, 0, 0],
-            [0, 0, 0],
-            [0, 0, 0],
-            [0, 0, 0],
-            [0, 0, 0],
-            [0, 0, 0],
-            [0, 51, 255],
+            [0, 23, 0],
+            [123, 0, 0],
+            [0, 7, 0],
+            [87, 0, 0],
+            [0, 9, 204],
+            [68, 0, 0],
+            [0, 44, 0],
+            [11, 0, 205],
+            [8, 0, 0],
+            [0, 147, 115],
+            [66, 56, 0],
+            [46, 0, 0],
+            [0, 1, 0],
+            [0, 123, 0],
             [0, 0, 0],
             [0, 51, 255],
+            [0, 0, 0],
+            [0, 51, 255],
             [0, 51, 255],
             [0, 0, 0],
-            [0, 0, 0],
+            [165, 0, 0],
             [0, 51, 255],
             [0, 51, 255],
             [0, 0, 0],
@@ -332,4 +332,4 @@ def test_encode_message(image_arr, text):
 
 def test_encode_limit(image_arr):
     with pytest.raises(ValueError):
-        encode.encode_message(image_arr, "extremely long text" * 5000)
+        encode.encode_message(image_arr, "'extremely long text'" * 5000)
