@@ -8,7 +8,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
-from settings import MESSAGE_DELIMETER
+from src.backend.settings import MESSAGE_DELIMETER
 
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
@@ -20,20 +20,20 @@ def image_array(file: Path) -> ArrayLike:
 
 
 def str_into_bin_array(text_: str) -> ArrayLike:
-    str_len = len(text_)
+    str_len = len(text_ * 8)
     binary = iter(
         "".join(
             map(
-                lambda char: bin(char)[2:],
+                lambda char: format(char, "b").zfill(8),
                 bytearray(text_ + MESSAGE_DELIMETER, encoding="utf-8"),
             )
         )
     )
 
     if str_len % 3 == 2:
-        it.chain(binary, ("0",))
+        binary = it.chain(binary, "0")
     elif str_len % 3 == 1:
-        it.chain(binary, ("00",))
+        binary = it.chain(binary, "00")
 
     return np.fromiter(binary, dtype=int).reshape(-1, 3)
 
