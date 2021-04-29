@@ -3,21 +3,9 @@ from pathlib import Path
 
 import click
 
-from backend import encode as enc
-from backend import decode as dec
-from backend.regex import PNG_EXT
-
-
-def validate_png(_, file: str):
-    """Validate that the file has as png extension.
-
-    :param _: Dump the context passed in by click
-    :param file: The file to check
-
-    """
-    if re.match(PNG_EXT, file):
-        return file
-    raise click.BadParameter("PNG is required.")
+from src.backend import encode as enc
+from src.backend import decode as dec
+from src.backend.util import validate_png
 
 
 @click.group()
@@ -54,7 +42,7 @@ def encode(filename: str, text: str, inplace: bool):
 @click.option("--filename", type=click.Path(exists=True), prompt=True)
 def decode(filename):
     """Decode image"""
-    click.echo(dec.text(filename))
+    click.echo(dec.main(filename))
 
 
 if __name__ == "__main__":

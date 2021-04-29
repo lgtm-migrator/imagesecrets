@@ -9,19 +9,10 @@ import numpy as np
 from PIL import Image
 
 from src.backend.settings import MESSAGE_DELIMETER
+from src.backend.util import image_array
 
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
-
-
-def image_array(file: Path) -> ArrayLike:
-    """Return numpy array of the given image.
-
-    :param file: The path to the image from which to extract the data
-
-    """
-    with Image.open(file).convert("RGB") as img:
-        return np.asarray(img.getdata(), dtype=np.uint8)
 
 
 def str_into_bin_array(text_: str) -> ArrayLike:
