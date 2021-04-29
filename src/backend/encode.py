@@ -73,17 +73,4 @@ def text(file: Path, message: str, inplace: bool = False) -> Optional[str]:
         file = encoded_img_name(file)
 
     save_image(new_arr, file)
-
     return f"\nEncoded message {message!r} into {file.name!r}"
-
-
-if __name__ == "__main__":
-
-    print(
-        text(
-            Path(
-                "F:\\Luky\\Programy\\programovani\\imagesecrets-api\\src\\cb.png"
-            ).absolute(),
-            "fvfvdfvv",
-        )
-    )

@@ -328,3 +328,8 @@ def test_encode_message(image_arr, text):
         extracted_text += chr(int("".join(binary), base=2))
 
     assert text == extracted_text
+
+
+def test_encode_limit(image_arr):
+    with pytest.raises(ValueError):
+        encode.encode_message(image_arr, "extremely long text" * 5000)
