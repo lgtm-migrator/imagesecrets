@@ -31,7 +31,7 @@ def cli(ctx):
 @click.option("--inplace", type=bool, default=False, show_default=True)
 def encode(filename: str, text: str, inplace: bool):
     """Encode image"""
-    click.echo(enc.text(Path(filename).absolute(), text, inplace))
+    click.echo(enc.main(Path(filename).absolute(), text, inplace))
 
 
 @cli.command()
