@@ -1,8 +1,17 @@
+import re
 from pathlib import Path
 
 import click
 
-from backend import message
+from backend import encode as enc
+from backend import decode as dec
+from backend.regex import PNG_EXT
+
+
+def validate_png(_, file: str):
+    if re.match(PNG_EXT, file):
+        return file
+    raise click.BadParameter("PNG is required.")
 
 
 @click.group()
@@ -12,18 +21,24 @@ def cli(ctx):
 
 
 @cli.command()
-@click.option("--filename", type=click.Path(exists=True), prompt=True)
+@click.option(
+    "--filename",
+    type=click.Path(exists=True, resolve_path=True),
+    prompt=True,
+    callback=validate_png,
+)
 @click.option("--message", "text", type=str, prompt=True)
-def encode(filename: str, text: str):
+@click.option("--inplace", type=bool, default=False, show_default=True)
+def encode(filename: str, text: str, inplace: bool):
     """Encode image"""
-    click.echo(message.encode_text(filename, text))
+    click.echo(enc.text(Path(filename).absolute(), text, inplace))
 
 
 @cli.command()
 @click.option("--filename", type=click.Path(exists=True), prompt=True)
 def decode(filename):
     """Decode image"""
-    click.echo(message.decode_text(filename))
+    click.echo(dec.text(filename))
 
 
 if __name__ == "__main__":
