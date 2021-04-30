@@ -1,8 +1,8 @@
 """Test the module used for encoding."""
-import pytest
 import numpy as np
+import pytest
 
-from src.backend import encode, util
+from image_secrets.backend import encode, util
 
 
 @pytest.fixture()

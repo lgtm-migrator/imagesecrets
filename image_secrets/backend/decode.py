@@ -3,8 +3,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from src.backend import util
-from src.backend.settings import MESSAGE_DELIMETER
+from image_secrets.backend import util
+from image_secrets.backend.settings import MESSAGE_DELIMETER
 
 
 def decode_text(file: Path) -> str:
@@ -18,9 +18,14 @@ def decode_text(file: Path) -> str:
         binary = "".join(map(lambda x: bin(x)[-1], data))
         message += util.binary_to_char(binary)
     else:
-        raise StopIteration("No message found.")
+        raise StopIteration(f"No message found in {file!s}")
 
 
 def main(file: Path) -> str:
-    text = decode_text(file)
-    return f"Message decoded from {file!s}:\n{text[:-len(MESSAGE_DELIMETER)]!r}"
+    """Main decoding function.
+
+    :param file: The Path to the source file
+
+    """
+    text = decode_text(file.absolute())
+    return text[: -len(MESSAGE_DELIMETER)]

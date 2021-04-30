@@ -1,21 +1,21 @@
 """Module with functions to encode text into images."""
 from __future__ import annotations
 
-from typing import Optional, TYPE_CHECKING
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import numpy as np
 from PIL import Image
 
-from src.backend.settings import MESSAGE_DELIMETER
-from src.backend import util
+from image_secrets.backend import util
+from image_secrets.backend.settings import MESSAGE_DELIMETER
 
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
 
 def encode_message(file: Path, message: str) -> ArrayLike:
-    """Encode a message into given array.
+    """Encode a message into the source image.
 
     :param file: Path to the source image
     :param message: The message to encode
@@ -24,11 +24,11 @@ def encode_message(file: Path, message: str) -> ArrayLike:
 
     """
     binary_msg = util.str_to_binary(message + MESSAGE_DELIMETER)
-    shape, data = util.image_data(Path(file).absolute())
+    shape, data = util.image_data(Path(file))
 
     if data.size < len(binary_msg):
         raise ValueError(
-            f"The message (size: {len(binary_msg)}) is too long for the given image (size: {data.size}."
+            f"The message size ({len(binary_msg)}) is too long for the given image ({data.size}.",
         )
 
     for index, bit in enumerate(binary_msg):
@@ -58,7 +58,7 @@ def save_image(arr: ArrayLike, filepath: Path) -> None:
     Image.fromarray(np.uint8(arr)).convert("RGB").save(filepath)
 
 
-def main(file: Path, message: str, inplace: bool = False) -> Optional[str]:
+def main(file: Path, message: str, inplace: bool = False) -> str:
     """Main encoding function.
 
     :param file: Path to the source file
@@ -67,10 +67,11 @@ def main(file: Path, message: str, inplace: bool = False) -> Optional[str]:
         or if a copy of the image should be created, defaults to False
 
     """
+    file = file.absolute()
     arr = encode_message(file, message)
 
     if not inplace:
         file = encoded_img_name(file)
 
     save_image(arr, file)
-    return f"Encoded message {message!r} into {file.name!r}"
+    return file.name

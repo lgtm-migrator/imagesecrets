@@ -2,14 +2,14 @@
 from __future__ import annotations
 
 import re
-from typing import TYPE_CHECKING
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import click
 import numpy as np
 from PIL import Image
 
-from src.backend.regex import PNG_EXT
+from image_secrets.backend.regex import PNG_EXT
 
 if TYPE_CHECKING:
     from numpy.typing import DTypeLike
@@ -25,7 +25,7 @@ def str_to_binary(string: str) -> str:
         map(
             lambda char: format(char, "b").zfill(8),
             bytearray(string, encoding="utf-8"),
-        )
+        ),
     )
 
 
@@ -47,17 +47,3 @@ def image_data(file: Path) -> tuple[tuple[int, int, int], DTypeLike]:
     with Image.open(file).convert("RGB") as img:
         arr = np.asarray(img, dtype=np.uint8)
     return arr.shape, arr.flatten()
-
-
-def validate_png(_, file: str):
-    """Validate that the file has as png extension.
-
-    :param _: Dump the context passed in by click
-    :param file: The file to check
-
-    :raises BadParameter: If the pattern does not match
-
-    """
-    if re.match(PNG_EXT, file):
-        return file
-    raise click.BadParameter(f"The {file!s} is not a .PNG image.")
