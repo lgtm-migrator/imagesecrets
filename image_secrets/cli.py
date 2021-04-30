@@ -1,3 +1,4 @@
+"""Command line interface."""
 import re
 from typing import Optional
 
@@ -19,26 +20,47 @@ def validate_png(_, file: str) -> Optional[str]:
     """
     if re.match(regex.PNG_EXT, file):
         return file
-    raise click.BadParameter(f"The {file!s} is not a .PNG image.")
+    raise click.BadParameter(f"The file {file!s} is not a .PNG image.")
 
 
 @click.group()
 @click.pass_context
 def image_secrets(ctx):
-    """CLI tool used for encoding and decoding messages into/from images."""
+    """Encode and decode messages into/from images."""
 
 
-@image_secrets.command()
+@image_secrets.command(options_metavar="<file> <message>")
 @click.option(
     "--filename",
     type=click.Path(exists=True, resolve_path=True),
     prompt=True,
     callback=validate_png,
+    help="the path to the source image, .PNG image is required",
+    metavar="<file>",
 )
-@click.option("--message", "message", type=str, prompt=True)
-@click.option("--inplace", type=bool, default=False, show_default=True)
+@click.option(
+    "--message",
+    "message",
+    type=str,
+    prompt=True,
+    help="the message to encode",
+    metavar="<message>",
+)
+@click.option(
+    "--inplace",
+    type=bool,
+    default=False,
+    show_default=True,
+    help="whether the message should be encoded into the original image or not",
+    metavar="<bool>",
+)
 def encode(filename: str, text: str, inplace: bool):
-    """Encode image command.
+    """
+    \b
+    Encode a <message> into a copy of the given <file>.
+    Encode inplace if <inplace> is True.
+
+    \f
 
     :param filename: The filename of the source image, must have a .png extension
     :param text: The text to encode
@@ -56,10 +78,20 @@ def encode(filename: str, text: str, inplace: bool):
         click.echo(f"\nEncoded message {text!r} into {filename!r}")
 
 
-@image_secrets.command()
-@click.option("--filename", type=click.Path(exists=True), prompt=True)
+@image_secrets.command(options_metavar="<file>")
+@click.option(
+    "--filename",
+    type=click.Path(exists=True),
+    prompt=True,
+    callback=validate_png,
+    help="the path to the source image, .PNG image is required",
+    metavar="<file>",
+)
 def decode(filename):
-    """Decode image command.
+    """
+    Decode a message from <file>.
+
+    \f
 
     :param filename: The filename of the source image to decode
 
