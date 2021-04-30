@@ -1,5 +1,4 @@
 import re
-from pathlib import Path
 from typing import Optional
 
 import click
@@ -50,14 +49,11 @@ def encode(filename: str, text: str, inplace: bool):
 
     """
     try:
-        filename = encode_.main(Path(filename), text, inplace)
+        filename = encode_.main(filename, text, inplace)
     except ValueError as e:
         raise click.BadParameter from e
     else:
-        click.echo(
-            f"""\nEncoded message {text!r} into
-            {encode_.main(Path(filename), text, inplace)!r}""",
-        )
+        click.echo(f"\nEncoded message {text!r} into {filename!r}")
 
 
 @image_secrets.command()

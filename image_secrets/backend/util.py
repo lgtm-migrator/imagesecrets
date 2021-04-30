@@ -1,15 +1,11 @@
 """Utility functions."""
 from __future__ import annotations
 
-import re
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-import click
 import numpy as np
 from PIL import Image
-
-from image_secrets.backend.regex import PNG_EXT
 
 if TYPE_CHECKING:
     from numpy.typing import DTypeLike
