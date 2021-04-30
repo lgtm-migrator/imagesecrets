@@ -21,15 +21,14 @@ def decode_text(array: DTypeLike) -> str:
     """
     message = ""
     for data in array.reshape(-1, 8):
-
         if message[-len(MESSAGE_DELIMETER) :] == MESSAGE_DELIMETER:
-            return message
+            return message[: -len(MESSAGE_DELIMETER)]
 
         # join the 8 least significant bits in the current array of pixel data
         binary = "".join((bin(num)[-1] for num in data))
         message += util.binary_to_char(binary)
     else:
-        raise StopIteration(f"No message found.")
+        raise StopIteration(f"No message found after scanning the whole image.")
 
 
 def main(file: str) -> str:
@@ -41,4 +40,4 @@ def main(file: str) -> str:
     file = Path(file.strip()).absolute()
     _, arr = util.image_data(file)
     text = decode_text(arr)
-    return text[: -len(MESSAGE_DELIMETER)]
+    return text

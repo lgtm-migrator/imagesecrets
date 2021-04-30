@@ -7,7 +7,7 @@ from image_secrets.backend import regex
 
 
 @pytest.mark.parametrize(
-    "file, result",
+    "file, expected",
     [
         ("pic.png", True),
         ("png.png", True),
@@ -22,11 +22,11 @@ from image_secrets.backend import regex
         ("pictures/image .png", False),
     ],
 )
-def test_png_ext(file: str, result: bool) -> None:
+def test_png_ext(file: str, expected: bool) -> None:
     """Test that the regex PNG_EXT pattern works as expected.
 
     :param file: The filepath to be checked by the regex pattern
-    :param result: Whether the check should be True or False
+    :param expected: Whether the check should be True or False
 
     """
-    assert bool(re.fullmatch(regex.PNG_EXT, file)) is result
+    assert bool(re.fullmatch(regex.PNG_EXT, file)) is expected
