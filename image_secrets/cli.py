@@ -10,7 +10,7 @@ from image_secrets.backend import regex
 
 
 def validate_png(_, file: str) -> Optional[str]:
-    """Validate that the file has as png extension.
+    """Validate that the file has a png extension.
 
     :param _: Dump the context passed in by click
     :param file: The file to check
@@ -25,22 +25,21 @@ def validate_png(_, file: str) -> Optional[str]:
 
 @click.group()
 @click.pass_context
-def image_secrets(ctx):
+def image_secrets(ctx) -> None:
     """Encode and decode messages into/from images."""
 
 
-@image_secrets.command(options_metavar="<file> <message>")
+@image_secrets.command(options_metavar="<filename> <message>")
 @click.option(
     "--filename",
     type=click.Path(exists=True, resolve_path=True),
     prompt=True,
     callback=validate_png,
     help="the path to the source image, .PNG image is required",
-    metavar="<file>",
+    metavar="<filename>",
 )
 @click.option(
     "--message",
-    "message",
     type=str,
     prompt=True,
     help="the message to encode",
@@ -54,7 +53,7 @@ def image_secrets(ctx):
     help="whether the message should be encoded into the original image or not",
     metavar="<bool>",
 )
-def encode(filename: str, text: str, inplace: bool):
+def encode(filename: str, message: str, inplace: bool) -> None:
     """
     \b
     Encode a <message> into a copy of the given <file>.
@@ -63,7 +62,7 @@ def encode(filename: str, text: str, inplace: bool):
     \f
 
     :param filename: The filename of the source image, must have a .png extension
-    :param text: The text to encode
+    :param message: The text to encode
     :param inplace: Whether the message should be encoded into the given image
         or if a copy of the image should be created, defaults to False
 
@@ -71,23 +70,23 @@ def encode(filename: str, text: str, inplace: bool):
 
     """
     try:
-        filename = encode_.main(filename, text, inplace)
+        filename = encode_.main(filename, message, inplace)
     except ValueError as e:
-        raise click.BadParameter from e
+        raise click.BadParameter(e)
     else:
-        click.echo(f"\nEncoded message {text!r} into {filename!r}")
+        click.echo(f"\nEncoded message {message!r} into {filename!r}")
 
 
-@image_secrets.command(options_metavar="<file>")
+@image_secrets.command(options_metavar="<filename>")
 @click.option(
     "--filename",
     type=click.Path(exists=True),
     prompt=True,
     callback=validate_png,
     help="the path to the source image, .PNG image is required",
-    metavar="<file>",
+    metavar="<filename>",
 )
-def decode(filename):
+def decode(filename: str) -> None:
     """
     Decode a message from <file>.
 
@@ -101,6 +100,6 @@ def decode(filename):
     try:
         decoded = decode_.main(filename)
     except StopIteration as e:
-        raise click.BadParameter from e
+        raise click.BadParameter(e)
     else:
         click.echo(f"Message decoded from {filename!s}:\n{decoded!r}")

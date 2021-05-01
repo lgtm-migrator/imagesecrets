@@ -30,7 +30,7 @@ def encode_message(
     """
     if data.size < len(binary_message):
         raise ValueError(
-            f"The message size ({len(binary_message)}) is too long for the given image ({data.size}.",
+            f"The message size {len(binary_message):,1f} is too long for the given image {data.size:,1f}.",
         )
 
     for index, bit in enumerate(binary_message):

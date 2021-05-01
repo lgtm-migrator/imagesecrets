@@ -25,15 +25,6 @@ def str_to_binary(string: str) -> str:
     )
 
 
-def binary_to_char(binary: str) -> str:
-    """Turn the given binary string into a character.
-
-    :param binary: The string containing the binary value to be converted
-
-    """
-    return chr(int(binary, base=2))
-
-
 def image_data(file: Path) -> tuple[tuple[int, int, int], DTypeLike]:
     """Return numpy array of the given image.
 

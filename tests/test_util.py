@@ -26,25 +26,3 @@ def test_str_to_binary(string: str, expected: str) -> None:
 
     """
     assert util.str_to_binary(string) == expected
-
-
-@pytest.mark.parametrize(
-    "binary, expected",
-    [
-        ("01100001", "a"),
-        ("01100010", "b"),
-        ("00110001", "1"),
-        ("00110000", "0"),
-        ("00101010", "*"),
-        ("01111110", "~"),
-        ("01011100", "\\"),
-    ],
-)
-def test_binary_to_char(binary: str, expected: str) -> None:
-    """Test binary_to_char function.
-
-    :param binary: The character in its' binary representation
-    :param expected: The expected result
-
-    """
-    assert util.binary_to_char(binary) == expected
