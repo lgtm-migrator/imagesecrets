@@ -36,8 +36,7 @@ def encode_message(
     for index, bit in enumerate(binary_message):
         data[index] = int(format(data[index], "08b")[:-1] + bit, base=2)
 
-    encoded_arr = np.array(data).reshape(shape)
-    return encoded_arr
+    return data.reshape(shape)
 
 
 def encoded_image_name(file: Path) -> Path:

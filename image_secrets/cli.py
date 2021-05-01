@@ -75,6 +75,7 @@ def encode(filename: str, message: str, inplace: bool) -> None:
         raise click.BadParameter(e)
     else:
         click.echo(f"\nEncoded message {message!r} into {filename!r}")
+        click.launch(filename, locate=True)
 
 
 @image_secrets.command(options_metavar="<filename>")
@@ -102,4 +103,4 @@ def decode(filename: str) -> None:
     except StopIteration as e:
         raise click.BadParameter(e)
     else:
-        click.echo(f"Message decoded from {filename!s}:\n{decoded!r}")
+        click.echo(f"\nMessage decoded from {filename!s}:\n{decoded!r}")
