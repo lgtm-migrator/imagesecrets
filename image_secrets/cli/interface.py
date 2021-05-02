@@ -1,26 +1,9 @@
 """Command line interface."""
-import re
-from typing import Optional
-
 import click
 
 from image_secrets.backend import decode as decode_
 from image_secrets.backend import encode as encode_
-from image_secrets.backend import regex
-
-
-def validate_png(_, file: str) -> Optional[str]:
-    """Validate that the file has a png extension.
-
-    :param _: Dump the context passed in by click
-    :param file: The file to check
-
-    :raises BadParameter: If the pattern does not match
-
-    """
-    if re.match(regex.PNG_EXT, file):
-        return file
-    raise click.BadParameter(f"The file {file!s} is not a .PNG image.")
+from image_secrets.cli.cli_util import validate_png
 
 
 @click.group()
@@ -104,3 +87,10 @@ def decode(filename: str) -> None:
         raise click.BadParameter(e)
     else:
         click.echo(f"\nMessage decoded from {filename!s}:\n{decoded!r}")
+
+
+__all__ = [
+    "decode",
+    "encode",
+    "image_secrets",
+]

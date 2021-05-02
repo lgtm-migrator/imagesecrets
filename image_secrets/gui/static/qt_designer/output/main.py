@@ -18,7 +18,7 @@ class Ui_ImageSecrets(object):
         self.central_widget = QtWidgets.QWidget(ImageSecrets)
         self.central_widget.setObjectName("central_widget")
         self.stacked_widget = QtWidgets.QStackedWidget(self.central_widget)
-        self.stacked_widget.setGeometry(QtCore.QRect(0, 0, 361, 141))
+        self.stacked_widget.setGeometry(QtCore.QRect(0, 0, 391, 141))
         self.stacked_widget.setObjectName("stacked_widget")
         self.home = QtWidgets.QWidget()
         self.home.setObjectName("home")
@@ -32,9 +32,17 @@ class Ui_ImageSecrets(object):
         self.main_lbl.setObjectName("main_lbl")
         self.gridLayout.addWidget(self.main_lbl, 0, 0, 1, 2)
         self.encode_btn = QtWidgets.QPushButton(self.home)
+        font = QtGui.QFont()
+        font.setFamily("Nirmala UI Semilight")
+        font.setPointSize(14)
+        self.encode_btn.setFont(font)
         self.encode_btn.setObjectName("encode_btn")
         self.gridLayout.addWidget(self.encode_btn, 1, 0, 1, 1)
         self.decode_btn = QtWidgets.QPushButton(self.home)
+        font = QtGui.QFont()
+        font.setFamily("Nirmala UI Semilight")
+        font.setPointSize(14)
+        self.decode_btn.setFont(font)
         self.decode_btn.setObjectName("decode_btn")
         self.gridLayout.addWidget(self.decode_btn, 1, 1, 1, 1)
         self.stacked_widget.addWidget(self.home)
@@ -48,8 +56,8 @@ class Ui_ImageSecrets(object):
         self.menubar = QtWidgets.QMenuBar(ImageSecrets)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 421, 26))
         self.menubar.setObjectName("menubar")
-        self.menu_main_menu = QtWidgets.QMenu(self.menubar)
-        self.menu_main_menu.setObjectName("menu_main_menu")
+        self.menu_general = QtWidgets.QMenu(self.menubar)
+        self.menu_general.setObjectName("menu_general")
         ImageSecrets.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(ImageSecrets)
         self.statusbar.setObjectName("statusbar")
@@ -58,9 +66,9 @@ class Ui_ImageSecrets(object):
         self.action_encode.setObjectName("action_encode")
         self.action_decode = QtWidgets.QAction(ImageSecrets)
         self.action_decode.setObjectName("action_decode")
-        self.menu_main_menu.addAction(self.action_encode)
-        self.menu_main_menu.addAction(self.action_decode)
-        self.menubar.addAction(self.menu_main_menu.menuAction())
+        self.menu_general.addAction(self.action_encode)
+        self.menu_general.addAction(self.action_decode)
+        self.menubar.addAction(self.menu_general.menuAction())
 
         self.retranslateUi(ImageSecrets)
         self.stacked_widget.setCurrentIndex(0)
@@ -68,10 +76,15 @@ class Ui_ImageSecrets(object):
 
     def retranslateUi(self, ImageSecrets):
         _translate = QtCore.QCoreApplication.translate
-        ImageSecrets.setWindowTitle(_translate("ImageSecrets", "MainWindow"))
+        ImageSecrets.setWindowTitle(_translate("ImageSecrets", "ImageSecrets"))
         self.main_lbl.setText(_translate("ImageSecrets", "ImageSecrets"))
         self.encode_btn.setText(_translate("ImageSecrets", "Encode"))
         self.decode_btn.setText(_translate("ImageSecrets", "Decode"))
-        self.menu_main_menu.setTitle(_translate("ImageSecrets", "main menu"))
+        self.menu_general.setTitle(_translate("ImageSecrets", "general"))
         self.action_encode.setText(_translate("ImageSecrets", "encode"))
         self.action_decode.setText(_translate("ImageSecrets", "decode"))
+
+
+__all__ = [
+    "Ui_ImageSecrets",
+]

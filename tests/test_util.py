@@ -26,3 +26,8 @@ def test_str_to_binary(string: str, expected: str) -> None:
 
     """
     assert util.str_to_binary(string) == expected
+
+
+__all__ = [
+    "test_str_to_binary",
+]

@@ -4,7 +4,7 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).parent.parent))
 
-from image_secrets import cli
+from image_secrets.cli import interface
 
 if __name__ == "__main__":
-    cli.image_secrets()
+    interface.image_secrets()

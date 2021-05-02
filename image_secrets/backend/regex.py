@@ -12,3 +12,9 @@ _png_ext = """
 PNG_EXT = re.compile(_png_ext, re.IGNORECASE | re.VERBOSE)
 
 CHARS_8 = re.compile(r"........")
+
+
+__all__ = [
+    "CHARS_8",
+    "PNG_EXT",
+]

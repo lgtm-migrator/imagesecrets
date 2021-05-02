@@ -79,3 +79,11 @@ def main(file: str, message: str, inplace: bool = False) -> str:
 
     save_image(arr, file)
     return file.name
+
+
+__all__ = [
+    "encode_message",
+    "encoded_image_name",
+    "main",
+    "save_image",
+]

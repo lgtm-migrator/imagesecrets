@@ -33,7 +33,7 @@ def decode_text(array: DTypeLike) -> str:
         num = np.packbits(np.bitwise_and(data, 0b1))[0]
         message += chr(num)
     else:
-        raise StopIteration(f"No message found after scanning the whole image.")
+        raise StopIteration("No message found after scanning the whole image.")
 
 
 def main(file: str) -> str:
@@ -46,3 +46,9 @@ def main(file: str) -> str:
     _, arr = util.image_data(file)
     text = decode_text(arr)
     return text
+
+
+__all__ = [
+    "decode_text",
+    "main",
+]

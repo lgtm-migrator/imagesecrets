@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>ImageSecrets</string>
   </property>
   <widget class="QWidget" name="central_widget">
    <widget class="QStackedWidget" name="stacked_widget">
@@ -19,7 +19,7 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>361</width>
+      <width>391</width>
       <height>141</height>
      </rect>
     </property>
@@ -43,6 +43,12 @@
       </item>
       <item row="1" column="0">
        <widget class="QPushButton" name="encode_btn">
+        <property name="font">
+         <font>
+          <family>Nirmala UI Semilight</family>
+          <pointsize>14</pointsize>
+         </font>
+        </property>
         <property name="text">
          <string>Encode</string>
         </property>
@@ -50,6 +56,12 @@
       </item>
       <item row="1" column="1">
        <widget class="QPushButton" name="decode_btn">
+        <property name="font">
+         <font>
+          <family>Nirmala UI Semilight</family>
+          <pointsize>14</pointsize>
+         </font>
+        </property>
         <property name="text">
          <string>Decode</string>
         </property>
@@ -70,14 +82,14 @@
      <height>26</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menu_main_menu">
+   <widget class="QMenu" name="menu_general">
     <property name="title">
-     <string>menu</string>
+     <string>general</string>
     </property>
     <addaction name="action_encode"/>
     <addaction name="action_decode"/>
    </widget>
-   <addaction name="menu_main_menu"/>
+   <addaction name="menu_general"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action_encode">

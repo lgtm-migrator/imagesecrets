@@ -1,8 +1,8 @@
-"""Test the command line interface."""
+"""Test command line image_secrets."""
 import pytest
 from click.testing import CliRunner
 
-from image_secrets.cli import image_secrets
+from image_secrets.cli.interface import image_secrets
 
 
 @pytest.fixture()
@@ -48,3 +48,13 @@ def test_decode_file(runner: CliRunner) -> None:
 
         result = runner.invoke(image_secrets, ["decode", "--filename", "test.txt"])
         assert "is not a .PNG image." in result.stdout
+
+
+__all__ = [
+    "runner",
+    "test_decode",
+    "test_decode_file",
+    "test_encode",
+    "test_encode_file",
+    "test_main",
+]

@@ -88,3 +88,12 @@ def test_decode_fail(array: ArrayLike) -> None:
     """Test that the decode function raises StopIteration if it can't find any message."""
     with pytest.raises(StopIteration):
         decode.decode_text(array)
+
+
+__all__ = [
+    "encoded_array",
+    "random_image_array",
+    "random_word",
+    "test_decode",
+    "test_decode_fail",
+]

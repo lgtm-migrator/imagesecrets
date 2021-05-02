@@ -34,3 +34,9 @@ def image_data(file: Path) -> tuple[tuple[int, int, int], DTypeLike]:
     with Image.open(file).convert("RGB") as img:
         arr = np.asarray(img, dtype=np.uint8)
     return arr.shape, arr.flatten()
+
+
+__all__ = [
+    "image_data",
+    "str_to_binary",
+]

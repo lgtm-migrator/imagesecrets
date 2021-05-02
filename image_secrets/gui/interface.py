@@ -7,14 +7,14 @@ from typing import TYPE_CHECKING
 import qdarkstyle
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from image_secrets.gui.qt_designer.output.main import Ui_ImageSecrets
+from image_secrets.gui.static.qt_designer.output.main import Ui_ImageSecrets
 from image_secrets.settings import ICON
 
 if TYPE_CHECKING:
     from PyQt5.QtWidgets import QApplication
 
 
-def run_gui() -> None:
+def image_secrets() -> None:
     """Execute the main window."""
     QtCore.QCoreApplication.setApplicationName("ImageSecrets")
     app = QtWidgets.QApplication(sys.argv)
@@ -66,6 +66,7 @@ class ImageSecretsWindow(QtWidgets.QMainWindow):
         self.main_win = QtWidgets.QMainWindow()
         self.main_win.setWindowIcon(QtGui.QIcon(str(ICON)))
         self.main_win.setStyleSheet(qdarkstyle.load_stylesheet(qt_api="pyqt5"))
+        self.main_win.setWindowTitle("ImageSecrets")
 
         self.ui = Ui_ImageSecrets()
         self.ui.setupUi(self.main_win)
@@ -85,3 +86,10 @@ class ImageSecretsWindow(QtWidgets.QMainWindow):
         cp = QtWidgets.QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
+
+
+__all__ = [
+    "ImageSecretsWindow",
+    "image_secrets",
+    "tray_menu",
+]

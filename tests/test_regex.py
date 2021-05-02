@@ -30,3 +30,8 @@ def test_png_ext(file: str, expected: bool) -> None:
 
     """
     assert bool(re.fullmatch(regex.PNG_EXT, file)) is expected
+
+
+__all__ = [
+    "test_png_ext",
+]
