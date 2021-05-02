@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>ImageSecrets</class>
+ <widget class="QMainWindow" name="ImageSecrets">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -72,7 +72,7 @@
    </property>
    <widget class="QMenu" name="menu_main_menu">
     <property name="title">
-     <string>main menu</string>
+     <string>menu</string>
     </property>
     <addaction name="action_encode"/>
     <addaction name="action_decode"/>

@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 from image_secrets.backend import util
-from image_secrets.backend.settings import MESSAGE_DELIMETER
+from image_secrets.settings import MESSAGE_DELIMETER
 
 if TYPE_CHECKING:
     from numpy.typing import DTypeLike

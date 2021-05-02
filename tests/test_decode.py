@@ -12,7 +12,7 @@ import pytest
 
 from image_secrets.backend import decode
 from image_secrets.backend.regex import CHARS_8
-from image_secrets.backend.settings import MESSAGE_DELIMETER
+from image_secrets.settings import MESSAGE_DELIMETER
 
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike

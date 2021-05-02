@@ -8,7 +8,7 @@ import numpy as np
 from PIL import Image
 
 from image_secrets.backend import util
-from image_secrets.backend.settings import MESSAGE_DELIMETER
+from image_secrets.settings import MESSAGE_DELIMETER
 
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike, DTypeLike

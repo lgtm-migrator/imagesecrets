@@ -1,5 +1,5 @@
 """Test the settings module."""
-from image_secrets.backend.settings import MESSAGE_DELIMETER
+from image_secrets.settings import MESSAGE_DELIMETER
 
 
 def test_delimeter():
