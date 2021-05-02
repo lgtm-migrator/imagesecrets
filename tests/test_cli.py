@@ -36,3 +36,15 @@ def test_encode_file(runner: CliRunner) -> None:
 def test_decode(runner: CliRunner) -> None:
     result = runner.invoke(image_secrets, ["decode", "--help"])
     assert "Decode a message from <file>." in result.stdout
+
+
+def test_decode_file(runner: CliRunner) -> None:
+    result = runner.invoke(image_secrets, ["decode", "--filename", "image.png"])
+    assert "Path 'image.png' does not exist." in result.stdout
+
+    with runner.isolated_filesystem():
+        with open("test.txt", "w") as f:
+            f.write("testing...")
+
+        result = runner.invoke(image_secrets, ["decode", "--filename", "test.txt"])
+        assert "is not a .PNG image." in result.stdout
