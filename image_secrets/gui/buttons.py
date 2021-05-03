@@ -53,7 +53,7 @@ def push_buttons(parent: QMainWindow) -> None:
 
     # encode
     ui.encode_image_btn.clicked.connect(parent.events.encode_file_dialog)
-    ui.encode_submit_btn.clicked.connect
+    ui.encode_submit_btn.clicked.connect(parent.events.encode_submit_event)
 
     # decode
     ui.decode_image_btn.clicked.connect(parent.events.decode_file_dialog)
