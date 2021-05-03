@@ -75,7 +75,7 @@ class Ui_ImageSecrets(object):
         self.encode_plain_text_edit.setOverwriteMode(True)
         self.encode_plain_text_edit.setObjectName("encode_plain_text_edit")
         self.encode_main_lbl = QtWidgets.QLabel(self.encode)
-        self.encode_main_lbl.setGeometry(QtCore.QRect(9, 9, 145, 81))
+        self.encode_main_lbl.setGeometry(QtCore.QRect(9, 9, 411, 81))
         font = QtGui.QFont()
         font.setFamily("Reem Kufi")
         font.setPointSize(26)
@@ -107,11 +107,6 @@ class Ui_ImageSecrets(object):
         self.encode_pixmap_lbl.setStyleSheet("border: 2px dashed")
         self.encode_pixmap_lbl.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.encode_pixmap_lbl.setFrameShadow(QtWidgets.QFrame.Plain)
-        self.encode_pixmap_lbl.setPixmap(
-            QtGui.QPixmap(
-                "../../../../../../../Android/DCIM_all/Camera/IMG_20210114_092147.jpg",
-            ),
-        )
         self.encode_pixmap_lbl.setScaledContents(False)
         self.encode_pixmap_lbl.setObjectName("encode_pixmap_lbl")
         self.encode_submit_btn = QtWidgets.QPushButton(self.encode)
@@ -124,39 +119,51 @@ class Ui_ImageSecrets(object):
         self.stacked_widget.addWidget(self.encode)
         self.decode = QtWidgets.QWidget()
         self.decode.setObjectName("decode")
-        self.gridLayout_3 = QtWidgets.QGridLayout(self.decode)
-        self.gridLayout_3.setObjectName("gridLayout_3")
         self.decode_main_lbl = QtWidgets.QLabel(self.decode)
+        self.decode_main_lbl.setGeometry(QtCore.QRect(9, 9, 431, 81))
         font = QtGui.QFont()
         font.setFamily("Reem Kufi")
         font.setPointSize(26)
         self.decode_main_lbl.setFont(font)
         self.decode_main_lbl.setObjectName("decode_main_lbl")
-        self.gridLayout_3.addWidget(self.decode_main_lbl, 0, 0, 1, 3)
-        self.decode_image_btn = QtWidgets.QPushButton(self.decode)
+        self.decode_plain_text_edit = QtWidgets.QPlainTextEdit(self.decode)
+        self.decode_plain_text_edit.setGeometry(QtCore.QRect(166, 131, 276, 131))
         font = QtGui.QFont()
-        font.setPointSize(9)
-        self.decode_image_btn.setFont(font)
-        self.decode_image_btn.setObjectName("decode_image_btn")
-        self.gridLayout_3.addWidget(self.decode_image_btn, 1, 0, 1, 1)
+        font.setPointSize(8)
+        self.decode_plain_text_edit.setFont(font)
+        self.decode_plain_text_edit.setVerticalScrollBarPolicy(
+            QtCore.Qt.ScrollBarAlwaysOn,
+        )
+        self.decode_plain_text_edit.setHorizontalScrollBarPolicy(
+            QtCore.Qt.ScrollBarAlwaysOff,
+        )
+        self.decode_plain_text_edit.setReadOnly(True)
+        self.decode_plain_text_edit.setObjectName("decode_plain_text_edit")
         self.decode_submit_btn = QtWidgets.QPushButton(self.decode)
+        self.decode_submit_btn.setGeometry(QtCore.QRect(166, 96, 221, 29))
         font = QtGui.QFont()
         font.setPointSize(9)
         self.decode_submit_btn.setFont(font)
         self.decode_submit_btn.setObjectName("decode_submit_btn")
-        self.gridLayout_3.addWidget(self.decode_submit_btn, 1, 1, 1, 1)
+        self.decode_image_btn = QtWidgets.QPushButton(self.decode)
+        self.decode_image_btn.setGeometry(QtCore.QRect(9, 96, 151, 29))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.decode_image_btn.setFont(font)
+        self.decode_image_btn.setObjectName("decode_image_btn")
         self.decode_copy_tool_btn = QtWidgets.QToolButton(self.decode)
+        self.decode_copy_tool_btn.setGeometry(QtCore.QRect(393, 97, 49, 26))
         font = QtGui.QFont()
         font.setPointSize(9)
         self.decode_copy_tool_btn.setFont(font)
         self.decode_copy_tool_btn.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
         self.decode_copy_tool_btn.setAutoRaise(True)
         self.decode_copy_tool_btn.setObjectName("decode_copy_tool_btn")
-        self.gridLayout_3.addWidget(self.decode_copy_tool_btn, 1, 2, 1, 1)
         self.decode_pixmap_lbl = QtWidgets.QLabel(self.decode)
+        self.decode_pixmap_lbl.setGeometry(QtCore.QRect(10, 130, 151, 131))
         sizePolicy = QtWidgets.QSizePolicy(
             QtWidgets.QSizePolicy.Fixed,
-            QtWidgets.QSizePolicy.Minimum,
+            QtWidgets.QSizePolicy.Fixed,
         )
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -171,20 +178,6 @@ class Ui_ImageSecrets(object):
         self.decode_pixmap_lbl.setStyleSheet("border: 2px dashed")
         self.decode_pixmap_lbl.setScaledContents(True)
         self.decode_pixmap_lbl.setObjectName("decode_pixmap_lbl")
-        self.gridLayout_3.addWidget(self.decode_pixmap_lbl, 2, 0, 1, 1)
-        self.decode_plain_text_edit = QtWidgets.QPlainTextEdit(self.decode)
-        font = QtGui.QFont()
-        font.setPointSize(8)
-        self.decode_plain_text_edit.setFont(font)
-        self.decode_plain_text_edit.setVerticalScrollBarPolicy(
-            QtCore.Qt.ScrollBarAlwaysOn,
-        )
-        self.decode_plain_text_edit.setHorizontalScrollBarPolicy(
-            QtCore.Qt.ScrollBarAlwaysOff,
-        )
-        self.decode_plain_text_edit.setReadOnly(True)
-        self.decode_plain_text_edit.setObjectName("decode_plain_text_edit")
-        self.gridLayout_3.addWidget(self.decode_plain_text_edit, 2, 1, 1, 2)
         self.stacked_widget.addWidget(self.decode)
         ImageSecrets.setCentralWidget(self.central_widget)
         self.menubar = QtWidgets.QMenuBar(ImageSecrets)
@@ -223,7 +216,7 @@ class Ui_ImageSecrets(object):
         self.menubar.addAction(self.menu_themes.menuAction())
 
         self.retranslateUi(ImageSecrets)
-        self.stacked_widget.setCurrentIndex(2)
+        self.stacked_widget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(ImageSecrets)
 
     def retranslateUi(self, ImageSecrets):
@@ -242,14 +235,14 @@ class Ui_ImageSecrets(object):
         )
         self.encode_submit_btn.setText(_translate("ImageSecrets", "Submit"))
         self.decode_main_lbl.setText(_translate("ImageSecrets", "Decode"))
-        self.decode_image_btn.setText(_translate("ImageSecrets", "Choose image"))
+        self.decode_plain_text_edit.setPlaceholderText(
+            _translate("ImageSecrets", "Decoded message will appear here."),
+        )
         self.decode_submit_btn.setText(_translate("ImageSecrets", "Submit"))
+        self.decode_image_btn.setText(_translate("ImageSecrets", "Choose image"))
         self.decode_copy_tool_btn.setText(_translate("ImageSecrets", "Copy"))
         self.decode_pixmap_lbl.setText(
             _translate("ImageSecrets", "No preview available"),
-        )
-        self.decode_plain_text_edit.setPlaceholderText(
-            _translate("ImageSecrets", "Decoded message will appear here."),
         )
         self.menu_general.setTitle(_translate("ImageSecrets", "general"))
         self.menu_themes.setTitle(_translate("ImageSecrets", "themes"))

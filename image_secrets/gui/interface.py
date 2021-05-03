@@ -44,7 +44,9 @@ def tray_menu(app: QApplication, main_window: ImageSecretsWindow) -> None:
     menu = QtWidgets.QMenu(main_window.main_win)
 
     decode_option = menu.addAction("Decode")
-    decode_option.triggered.connect(quit)
+    decode_option.triggered.connect(
+        lambda: main_window.ui.stacked_widget.setCurrentIndex(2),
+    )
 
     encode_option = menu.addAction("Encode")
     encode_option.triggered.connect(
@@ -53,7 +55,7 @@ def tray_menu(app: QApplication, main_window: ImageSecretsWindow) -> None:
 
     exit_action = menu.addAction("Exit ImageSecrets")
     exit_action.triggered.connect(
-        lambda: main_window.ui.stacked_widget.setCurrentIndex(2),
+        lambda: main_window.ui.stacked_widget.setCurrentIndex(quit),
     )
 
     tray_icon.setContextMenu(menu)
@@ -70,7 +72,7 @@ class ImageSecretsWindow(QtWidgets.QMainWindow):
         self.main_win = QtWidgets.QMainWindow()
         self.main_win.setWindowIcon(QtGui.QIcon(str(ICON)))
         self.main_win.setWindowTitle("ImageSecrets")
-        self.main_win.setMinimumSize(450, 300)
+        self.main_win.setMinimumSize(470, 350)
 
         self.ui = Ui_ImageSecrets()
         self.ui.setupUi(self.main_win)

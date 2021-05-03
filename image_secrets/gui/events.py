@@ -68,6 +68,11 @@ class ImageSecretsEvents:
             raise ValueError("Only png images are supported.")
         self._working_image_path = Path(new)
 
+    @working_image.deleter
+    def working_image(self) -> None:
+        """Delete the current working image"""
+        del self._working_image_path
+
     def file_dialog(self, action: str) -> str:
         """Ask the user to choose an image.
 
@@ -85,6 +90,7 @@ class ImageSecretsEvents:
 
     def message_box(self, label: str) -> QMessageBox:
         """Return a partially initialized messaged box object."""
+        # inherit main window to follow current stylesheet
         box = QMessageBox(self.parent.main_win)
         box.setWindowTitle(
             f"{self.parent.main_win.windowTitle()} - {label.capitalize()}",
@@ -103,9 +109,7 @@ class ImageSecretsEvents:
 
     def encode_submit_event(self) -> None:
         """Verify that a message can be encoded."""
-        try:
-            _ = self.working_image
-        except AttributeError:
+        if not hasattr(self, "working_image"):
             box = self.message_box("encode")
             box.setText("Can't encode message when there isn't any image chosen.")
             box.setIcon(QMessageBox.Warning)
@@ -171,8 +175,10 @@ class ImageSecretsEvents:
     def clear_encode_widget(self) -> None:
         """Clear all widgets on the encode widget on the main stacked widget."""
         ui = self.parent.ui
-        ui.encode_pixmap_lbl.clear()
+        ui.encode_pixmap_lbl.pixmap().swap(QPixmap())
+        ui.encode_pixmap_lbl.setText("No preview available")
         ui.encode_plain_text_edit.clear()
+        del self.working_image
 
     ##########
     # Decode #
@@ -186,9 +192,7 @@ class ImageSecretsEvents:
 
     def decode_submit_event(self) -> None:
         """Verify that a message can be decoded."""
-        try:
-            _ = self.working_image
-        except AttributeError:
+        if not hasattr(self, "working_image"):
             box = self.message_box("decode")
             box.setText(
                 "Can't decode a message when there isn't any source image chosen.",
@@ -216,5 +220,7 @@ class ImageSecretsEvents:
     def clear_decode_widget(self) -> None:
         """Clear all widgets on the decode widget on the main stacked widget."""
         ui = self.parent.ui
-        ui.decode_pixmap_lbl.clear()
+        ui.decode_pixmap_lbl.pixmap().swap(QPixmap())
+        ui.decode_pixmap_lbl.setText("No preview available")
         ui.decode_plain_text_edit.clear()
+        del self.working_image
