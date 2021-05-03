@@ -4,9 +4,9 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING
 
-import qdarkstyle
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+from image_secrets.gui import buttons
 from image_secrets.gui.static.qt_designer.output.main import Ui_ImageSecrets
 from image_secrets.settings import ICON
 
@@ -23,14 +23,13 @@ def image_secrets() -> None:
     tray_menu(app, main_window)
 
     main_window.show()
-
     app.exec()
 
 
 def tray_menu(app: QApplication, main_window: ImageSecretsWindow) -> None:
     """Setup a tray icon for the ImageSecretsWindow.
 
-    :param app: The currently running``QApplication`` instance
+    :param app: The currently running ``QApplication`` instance
     :param main_window: The window which will be shown
 
     """
@@ -47,10 +46,14 @@ def tray_menu(app: QApplication, main_window: ImageSecretsWindow) -> None:
     decode_option.triggered.connect(quit)
 
     encode_option = menu.addAction("Encode")
-    encode_option.triggered.connect(quit)
+    encode_option.triggered.connect(
+        lambda: main_window.ui.stacked_widget.setCurrentIndex(1),
+    )
 
-    quit_action = menu.addAction("Quit ImageSecrets")
-    quit_action.triggered.connect(quit)
+    exit_action = menu.addAction("Exit ImageSecrets")
+    exit_action.triggered.connect(
+        lambda: main_window.ui.stacked_widget.setCurrentIndex(2),
+    )
 
     tray_icon.setContextMenu(menu)
     tray_icon.show()
@@ -65,11 +68,14 @@ class ImageSecretsWindow(QtWidgets.QMainWindow):
 
         self.main_win = QtWidgets.QMainWindow()
         self.main_win.setWindowIcon(QtGui.QIcon(str(ICON)))
-        self.main_win.setStyleSheet(qdarkstyle.load_stylesheet(qt_api="pyqt5"))
         self.main_win.setWindowTitle("ImageSecrets")
+        self.main_win.setMinimumSize(450, 300)
 
         self.ui = Ui_ImageSecrets()
         self.ui.setupUi(self.main_win)
+
+        buttons.setup(self)
+        self.ui.action_dark.trigger()  # set dark theme
 
     def __repr__(self) -> str:
         """Provide information about this class."""
