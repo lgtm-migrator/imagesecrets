@@ -57,7 +57,7 @@ def push_buttons(parent: QMainWindow) -> None:
 
     # decode
     ui.decode_image_btn.clicked.connect(parent.events.decode_file_dialog)
-    ui.decode_submit_btn.clicked.connect
+    ui.decode_submit_btn.clicked.connect(parent.events.decode_submit_event)
     ui.decode_copy_tool_btn.clicked.connect(
         lambda: pyperclip.copy(ui.decode_plain_text_edit.toPlainText()),
     )

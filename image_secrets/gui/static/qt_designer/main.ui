@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>436</width>
-    <height>304</height>
+    <width>489</width>
+    <height>340</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -28,8 +28,8 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>421</width>
-      <height>251</height>
+      <width>451</width>
+      <height>271</height>
      </rect>
     </property>
     <property name="font">
@@ -38,7 +38,7 @@
      </font>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="home">
      <layout class="QGridLayout" name="gridLayout">
@@ -84,111 +84,139 @@
      </layout>
     </widget>
     <widget class="QWidget" name="encode">
-     <layout class="QGridLayout" name="gridLayout_2">
-      <item row="0" column="0" colspan="2">
-       <widget class="QLabel" name="encode_main_lbl">
-        <property name="font">
-         <font>
-          <family>Reem Kufi</family>
-          <pointsize>26</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Encode</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QPushButton" name="encode_image_btn">
-        <property name="font">
-         <font>
-          <family>Nirmala UI</family>
-          <pointsize>9</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Choose image</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QPushButton" name="encode_submit_btn">
-        <property name="font">
-         <font>
-          <family>Nirmala UI</family>
-          <pointsize>9</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Submit</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="encode_pixmap_lbl">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="font">
-         <font>
-          <family>Nirmala UI</family>
-          <pointsize>9</pointsize>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">border: 2px dashed</string>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>No preview available</string>
-        </property>
-        <property name="pixmap">
-         <pixmap>../../../../../../../Android/DCIM_all/Camera/IMG_20210114_092147.jpg</pixmap>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QPlainTextEdit" name="encode_plain_text_edit">
-        <property name="font">
-         <font>
-          <family>Nirmala UI</family>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::StyledPanel</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Sunken</enum>
-        </property>
-        <property name="verticalScrollBarPolicy">
-         <enum>Qt::ScrollBarAlwaysOn</enum>
-        </property>
-        <property name="documentTitle">
-         <string/>
-        </property>
-        <property name="plainText">
-         <string/>
-        </property>
-        <property name="overwriteMode">
-         <bool>true</bool>
-        </property>
-        <property name="placeholderText">
-         <string>Type in the message to encode</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
+     <widget class="QPlainTextEdit" name="encode_plain_text_edit">
+      <property name="geometry">
+       <rect>
+        <x>170</x>
+        <y>130</y>
+        <width>256</width>
+        <height>121</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Nirmala UI</family>
+       </font>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Sunken</enum>
+      </property>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOn</enum>
+      </property>
+      <property name="documentTitle">
+       <string/>
+      </property>
+      <property name="plainText">
+       <string/>
+      </property>
+      <property name="overwriteMode">
+       <bool>true</bool>
+      </property>
+      <property name="placeholderText">
+       <string>Type in the message to encode</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="encode_main_lbl">
+      <property name="geometry">
+       <rect>
+        <x>9</x>
+        <y>9</y>
+        <width>145</width>
+        <height>81</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Reem Kufi</family>
+        <pointsize>26</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Encode</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="encode_image_btn">
+      <property name="geometry">
+       <rect>
+        <x>9</x>
+        <y>96</y>
+        <width>151</width>
+        <height>29</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Nirmala UI</family>
+        <pointsize>9</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Choose image</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="encode_pixmap_lbl">
+      <property name="geometry">
+       <rect>
+        <x>9</x>
+        <y>129</y>
+        <width>151</width>
+        <height>121</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="font">
+       <font>
+        <family>Nirmala UI</family>
+        <pointsize>9</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border: 2px dashed</string>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::NoFrame</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Plain</enum>
+      </property>
+      <property name="text">
+       <string>No preview available</string>
+      </property>
+      <property name="pixmap">
+       <pixmap>../../../../../../../Android/DCIM_all/Camera/IMG_20210114_092147.jpg</pixmap>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="encode_submit_btn">
+      <property name="geometry">
+       <rect>
+        <x>166</x>
+        <y>96</y>
+        <width>261</width>
+        <height>29</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Nirmala UI</family>
+        <pointsize>9</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Submit</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="decode">
      <layout class="QGridLayout" name="gridLayout_3">
@@ -285,6 +313,9 @@
         <property name="horizontalScrollBarPolicy">
          <enum>Qt::ScrollBarAlwaysOff</enum>
         </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
         <property name="placeholderText">
          <string>Decoded message will appear here.</string>
         </property>
@@ -299,7 +330,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>436</width>
+     <width>489</width>
      <height>26</height>
     </rect>
    </property>

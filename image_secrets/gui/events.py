@@ -8,13 +8,14 @@ from typing import TYPE_CHECKING, Callable
 
 from PyQt5 import QtWidgets
 from PyQt5.QtGui import QPixmap
+from PyQt5.QtWidgets import QMessageBox
 
 from image_secrets.backend.decode import main as decode_main
 from image_secrets.backend.encode import main as encode_main
 from image_secrets.backend.regex import PNG_EXT
 
 if TYPE_CHECKING:
-    from PyQt5.QtWidgets import QMainWindow, QMessageBox, QPushButton
+    from PyQt5.QtWidgets import QMainWindow, QPushButton
 
 
 def event_handler_factory(options: dict[str, Callable[[], None]]) -> Callable[[], None]:
@@ -84,7 +85,7 @@ class ImageSecretsEvents:
 
     def message_box(self, label: str) -> QMessageBox:
         """Return a partially initialized messaged box object."""
-        box = QtWidgets.QMessageBox(self.parent.main_win)
+        box = QMessageBox(self.parent.main_win)
         box.setWindowTitle(
             f"{self.parent.main_win.windowTitle()} - {label.capitalize()}",
         )
@@ -107,14 +108,14 @@ class ImageSecretsEvents:
         except AttributeError:
             box = self.message_box("encode")
             box.setText("Can't encode message when there isn't any image chosen.")
-            box.setIcon(QtWidgets.QMessageBox.Warning)
+            box.setIcon(QMessageBox.Warning)
             box.setInformativeText("Specify the image and try again.")
             box.exec()
         else:
             if not self.parent.ui.encode_plain_text_edit.toPlainText():
                 box = self.message_box("encode")
                 box.setText("There is no text to encode.")
-                box.setIcon(QtWidgets.QMessageBox.Warning)
+                box.setIcon(QMessageBox.Warning)
                 box.setInformativeText(
                     "Enter some text into the text field and try again.",
                 )
@@ -129,10 +130,10 @@ class ImageSecretsEvents:
         box.setIcon(QMessageBox.Question)
         box.setInformativeText(
             "Message can either be encoded into the original image"
-            "or into a copy of the original image.",
+            " or into a copy of the original image.",
         )
         box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-        box.setDetailedText(QMessageBox.No)
+        box.setDefaultButton(QMessageBox.No)
         box.buttonClicked.connect(
             event_handler_factory(
                 {
@@ -150,13 +151,28 @@ class ImageSecretsEvents:
 
         """
         try:
-            encode_main(
+            fname = encode_main(
                 str(self.working_image),
                 self.parent.ui.encode_plain_text_edit.toPlainText(),
                 inplace,
             )
-        except ValueError:
-            print("message too long.")
+        except ValueError as e:
+            box = self.message_box("encode")
+            box.setText(*e.args)
+            box.setIcon(QMessageBox.Warning)
+            box.exec()
+        else:
+            box = self.message_box("encode")
+            box.setText(f"The message was successfully encoded into {fname}.")
+            box.exec()
+
+            self.clear_encode_widget()
+
+    def clear_encode_widget(self) -> None:
+        """Clear all widgets on the encode widget on the main stacked widget."""
+        ui = self.parent.ui
+        ui.encode_pixmap_lbl.clear()
+        ui.encode_plain_text_edit.clear()
 
     ##########
     # Decode #
@@ -168,11 +184,37 @@ class ImageSecretsEvents:
             self.working_image = f
             self.parent.ui.decode_pixmap_lbl.setPixmap(QPixmap(f))
 
-    def decode_submit(self) -> None:
+    def decode_submit_event(self) -> None:
+        """Verify that a message can be decoded."""
+        try:
+            _ = self.working_image
+        except AttributeError:
+            box = self.message_box("decode")
+            box.setText(
+                "Can't decode a message when there isn't any source image chosen.",
+            )
+            box.setIcon(QMessageBox.Warning)
+            box.setInformativeText("Specify the image and try again.")
+            box.exec()
+        else:
+            self.decode_message()
+
+    def decode_message(self) -> None:
         """Decode a message from the current image."""
         try:
-            self.parent.ui.decode_plain_text_edit.setPlainText(
-                decode_main(str(self.working_image)),
-            )
-        except StopIteration:
-            print("no msg")
+            decoded = decode_main(str(self.working_image))
+        except StopIteration as e:
+            box = self.message_box("decode")
+            box.setText(*e.args)
+            box.setIcon(QMessageBox.NoIcon)
+            box.exec()
+
+            self.clear_decode_widget()
+        else:
+            self.parent.ui.decode_plain_text_edit.setPlainText(decoded)
+
+    def clear_decode_widget(self) -> None:
+        """Clear all widgets on the decode widget on the main stacked widget."""
+        ui = self.parent.ui
+        ui.decode_pixmap_lbl.clear()
+        ui.decode_plain_text_edit.clear()

@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_ImageSecrets(object):
     def setupUi(self, ImageSecrets):
         ImageSecrets.setObjectName("ImageSecrets")
-        ImageSecrets.resize(436, 304)
+        ImageSecrets.resize(489, 340)
         sizePolicy = QtWidgets.QSizePolicy(
             QtWidgets.QSizePolicy.Minimum,
             QtWidgets.QSizePolicy.Minimum,
@@ -27,7 +27,7 @@ class Ui_ImageSecrets(object):
         self.central_widget = QtWidgets.QWidget(ImageSecrets)
         self.central_widget.setObjectName("central_widget")
         self.stacked_widget = QtWidgets.QStackedWidget(self.central_widget)
-        self.stacked_widget.setGeometry(QtCore.QRect(0, 0, 421, 251))
+        self.stacked_widget.setGeometry(QtCore.QRect(0, 0, 451, 271))
         font = QtGui.QFont()
         font.setFamily("Nirmala UI")
         self.stacked_widget.setFont(font)
@@ -60,33 +60,39 @@ class Ui_ImageSecrets(object):
         self.stacked_widget.addWidget(self.home)
         self.encode = QtWidgets.QWidget()
         self.encode.setObjectName("encode")
-        self.gridLayout_2 = QtWidgets.QGridLayout(self.encode)
-        self.gridLayout_2.setObjectName("gridLayout_2")
+        self.encode_plain_text_edit = QtWidgets.QPlainTextEdit(self.encode)
+        self.encode_plain_text_edit.setGeometry(QtCore.QRect(170, 130, 256, 121))
+        font = QtGui.QFont()
+        font.setFamily("Nirmala UI")
+        self.encode_plain_text_edit.setFont(font)
+        self.encode_plain_text_edit.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.encode_plain_text_edit.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.encode_plain_text_edit.setVerticalScrollBarPolicy(
+            QtCore.Qt.ScrollBarAlwaysOn,
+        )
+        self.encode_plain_text_edit.setDocumentTitle("")
+        self.encode_plain_text_edit.setPlainText("")
+        self.encode_plain_text_edit.setOverwriteMode(True)
+        self.encode_plain_text_edit.setObjectName("encode_plain_text_edit")
         self.encode_main_lbl = QtWidgets.QLabel(self.encode)
+        self.encode_main_lbl.setGeometry(QtCore.QRect(9, 9, 145, 81))
         font = QtGui.QFont()
         font.setFamily("Reem Kufi")
         font.setPointSize(26)
         self.encode_main_lbl.setFont(font)
         self.encode_main_lbl.setObjectName("encode_main_lbl")
-        self.gridLayout_2.addWidget(self.encode_main_lbl, 0, 0, 1, 2)
         self.encode_image_btn = QtWidgets.QPushButton(self.encode)
+        self.encode_image_btn.setGeometry(QtCore.QRect(9, 96, 151, 29))
         font = QtGui.QFont()
         font.setFamily("Nirmala UI")
         font.setPointSize(9)
         self.encode_image_btn.setFont(font)
         self.encode_image_btn.setObjectName("encode_image_btn")
-        self.gridLayout_2.addWidget(self.encode_image_btn, 1, 0, 1, 1)
-        self.encode_submit_btn = QtWidgets.QPushButton(self.encode)
-        font = QtGui.QFont()
-        font.setFamily("Nirmala UI")
-        font.setPointSize(9)
-        self.encode_submit_btn.setFont(font)
-        self.encode_submit_btn.setObjectName("encode_submit_btn")
-        self.gridLayout_2.addWidget(self.encode_submit_btn, 1, 1, 1, 1)
         self.encode_pixmap_lbl = QtWidgets.QLabel(self.encode)
+        self.encode_pixmap_lbl.setGeometry(QtCore.QRect(9, 129, 151, 121))
         sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Minimum,
-            QtWidgets.QSizePolicy.Minimum,
+            QtWidgets.QSizePolicy.Fixed,
+            QtWidgets.QSizePolicy.Fixed,
         )
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -108,21 +114,13 @@ class Ui_ImageSecrets(object):
         )
         self.encode_pixmap_lbl.setScaledContents(False)
         self.encode_pixmap_lbl.setObjectName("encode_pixmap_lbl")
-        self.gridLayout_2.addWidget(self.encode_pixmap_lbl, 2, 0, 1, 1)
-        self.encode_plain_text_edit = QtWidgets.QPlainTextEdit(self.encode)
+        self.encode_submit_btn = QtWidgets.QPushButton(self.encode)
+        self.encode_submit_btn.setGeometry(QtCore.QRect(166, 96, 261, 29))
         font = QtGui.QFont()
         font.setFamily("Nirmala UI")
-        self.encode_plain_text_edit.setFont(font)
-        self.encode_plain_text_edit.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.encode_plain_text_edit.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.encode_plain_text_edit.setVerticalScrollBarPolicy(
-            QtCore.Qt.ScrollBarAlwaysOn,
-        )
-        self.encode_plain_text_edit.setDocumentTitle("")
-        self.encode_plain_text_edit.setPlainText("")
-        self.encode_plain_text_edit.setOverwriteMode(True)
-        self.encode_plain_text_edit.setObjectName("encode_plain_text_edit")
-        self.gridLayout_2.addWidget(self.encode_plain_text_edit, 2, 1, 1, 1)
+        font.setPointSize(9)
+        self.encode_submit_btn.setFont(font)
+        self.encode_submit_btn.setObjectName("encode_submit_btn")
         self.stacked_widget.addWidget(self.encode)
         self.decode = QtWidgets.QWidget()
         self.decode.setObjectName("decode")
@@ -184,12 +182,13 @@ class Ui_ImageSecrets(object):
         self.decode_plain_text_edit.setHorizontalScrollBarPolicy(
             QtCore.Qt.ScrollBarAlwaysOff,
         )
+        self.decode_plain_text_edit.setReadOnly(True)
         self.decode_plain_text_edit.setObjectName("decode_plain_text_edit")
         self.gridLayout_3.addWidget(self.decode_plain_text_edit, 2, 1, 1, 2)
         self.stacked_widget.addWidget(self.decode)
         ImageSecrets.setCentralWidget(self.central_widget)
         self.menubar = QtWidgets.QMenuBar(ImageSecrets)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 436, 26))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 489, 26))
         self.menubar.setObjectName("menubar")
         self.menu_general = QtWidgets.QMenu(self.menubar)
         self.menu_general.setObjectName("menu_general")
@@ -224,7 +223,7 @@ class Ui_ImageSecrets(object):
         self.menubar.addAction(self.menu_themes.menuAction())
 
         self.retranslateUi(ImageSecrets)
-        self.stacked_widget.setCurrentIndex(1)
+        self.stacked_widget.setCurrentIndex(2)
         QtCore.QMetaObject.connectSlotsByName(ImageSecrets)
 
     def retranslateUi(self, ImageSecrets):
@@ -233,15 +232,15 @@ class Ui_ImageSecrets(object):
         self.main_lbl.setText(_translate("ImageSecrets", "ImageSecrets"))
         self.encode_btn.setText(_translate("ImageSecrets", "Encode"))
         self.decode_btn.setText(_translate("ImageSecrets", "Decode"))
-        self.encode_main_lbl.setText(_translate("ImageSecrets", "Encode"))
-        self.encode_image_btn.setText(_translate("ImageSecrets", "Choose image"))
-        self.encode_submit_btn.setText(_translate("ImageSecrets", "Submit"))
-        self.encode_pixmap_lbl.setText(
-            _translate("ImageSecrets", "No preview available"),
-        )
         self.encode_plain_text_edit.setPlaceholderText(
             _translate("ImageSecrets", "Type in the message to encode"),
         )
+        self.encode_main_lbl.setText(_translate("ImageSecrets", "Encode"))
+        self.encode_image_btn.setText(_translate("ImageSecrets", "Choose image"))
+        self.encode_pixmap_lbl.setText(
+            _translate("ImageSecrets", "No preview available"),
+        )
+        self.encode_submit_btn.setText(_translate("ImageSecrets", "Submit"))
         self.decode_main_lbl.setText(_translate("ImageSecrets", "Decode"))
         self.decode_image_btn.setText(_translate("ImageSecrets", "Choose image"))
         self.decode_submit_btn.setText(_translate("ImageSecrets", "Submit"))
