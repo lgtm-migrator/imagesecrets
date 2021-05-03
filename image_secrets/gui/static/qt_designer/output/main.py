@@ -85,8 +85,8 @@ class Ui_ImageSecrets(object):
         self.gridLayout_2.addWidget(self.encode_submit_btn, 1, 1, 1, 1)
         self.encode_pixmap_lbl = QtWidgets.QLabel(self.encode)
         sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.MinimumExpanding,
-            QtWidgets.QSizePolicy.MinimumExpanding,
+            QtWidgets.QSizePolicy.Minimum,
+            QtWidgets.QSizePolicy.Minimum,
         )
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -115,6 +115,9 @@ class Ui_ImageSecrets(object):
         self.encode_plain_text_edit.setFont(font)
         self.encode_plain_text_edit.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.encode_plain_text_edit.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.encode_plain_text_edit.setVerticalScrollBarPolicy(
+            QtCore.Qt.ScrollBarAlwaysOn,
+        )
         self.encode_plain_text_edit.setDocumentTitle("")
         self.encode_plain_text_edit.setPlainText("")
         self.encode_plain_text_edit.setOverwriteMode(True)
@@ -153,6 +156,16 @@ class Ui_ImageSecrets(object):
         self.decode_copy_tool_btn.setObjectName("decode_copy_tool_btn")
         self.gridLayout_3.addWidget(self.decode_copy_tool_btn, 1, 2, 1, 1)
         self.decode_pixmap_lbl = QtWidgets.QLabel(self.decode)
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Fixed,
+            QtWidgets.QSizePolicy.Minimum,
+        )
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(
+            self.decode_pixmap_lbl.sizePolicy().hasHeightForWidth(),
+        )
+        self.decode_pixmap_lbl.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setFamily("Nirmala UI")
         font.setPointSize(9)
@@ -165,6 +178,12 @@ class Ui_ImageSecrets(object):
         font = QtGui.QFont()
         font.setPointSize(8)
         self.decode_plain_text_edit.setFont(font)
+        self.decode_plain_text_edit.setVerticalScrollBarPolicy(
+            QtCore.Qt.ScrollBarAlwaysOn,
+        )
+        self.decode_plain_text_edit.setHorizontalScrollBarPolicy(
+            QtCore.Qt.ScrollBarAlwaysOff,
+        )
         self.decode_plain_text_edit.setObjectName("decode_plain_text_edit")
         self.gridLayout_3.addWidget(self.decode_plain_text_edit, 2, 1, 1, 2)
         self.stacked_widget.addWidget(self.decode)
@@ -205,7 +224,7 @@ class Ui_ImageSecrets(object):
         self.menubar.addAction(self.menu_themes.menuAction())
 
         self.retranslateUi(ImageSecrets)
-        self.stacked_widget.setCurrentIndex(2)
+        self.stacked_widget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(ImageSecrets)
 
     def retranslateUi(self, ImageSecrets):
@@ -218,17 +237,17 @@ class Ui_ImageSecrets(object):
         self.encode_image_btn.setText(_translate("ImageSecrets", "Choose image"))
         self.encode_submit_btn.setText(_translate("ImageSecrets", "Submit"))
         self.encode_pixmap_lbl.setText(
-            _translate("ImageSecrets", "No preview available."),
+            _translate("ImageSecrets", "No preview available"),
         )
         self.encode_plain_text_edit.setPlaceholderText(
-            _translate("ImageSecrets", "Message to encode."),
+            _translate("ImageSecrets", "Type in the message to encode"),
         )
         self.decode_main_lbl.setText(_translate("ImageSecrets", "Decode"))
         self.decode_image_btn.setText(_translate("ImageSecrets", "Choose image"))
         self.decode_submit_btn.setText(_translate("ImageSecrets", "Submit"))
         self.decode_copy_tool_btn.setText(_translate("ImageSecrets", "Copy"))
         self.decode_pixmap_lbl.setText(
-            _translate("ImageSecrets", "No preview available."),
+            _translate("ImageSecrets", "No preview available"),
         )
         self.decode_plain_text_edit.setPlaceholderText(
             _translate("ImageSecrets", "Decoded message will appear here."),

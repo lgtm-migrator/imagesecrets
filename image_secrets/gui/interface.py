@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from image_secrets.gui import buttons
+from image_secrets.gui.events import ImageSecretsEvents
 from image_secrets.gui.static.qt_designer.output.main import Ui_ImageSecrets
 from image_secrets.settings import ICON
 
@@ -74,6 +75,8 @@ class ImageSecretsWindow(QtWidgets.QMainWindow):
         self.ui = Ui_ImageSecrets()
         self.ui.setupUi(self.main_win)
 
+        self.events = ImageSecretsEvents(self)
+
         buttons.setup(self)
         self.ui.action_dark.trigger()  # set dark theme
 
@@ -84,6 +87,7 @@ class ImageSecretsWindow(QtWidgets.QMainWindow):
     def show(self) -> None:
         """Show the main window."""
         self.center()
+        self.ui.stacked_widget.setCurrentIndex(0)
         self.main_win.show()
 
     def center(self) -> None:
