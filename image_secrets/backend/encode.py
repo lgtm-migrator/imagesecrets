@@ -11,12 +11,12 @@ from image_secrets.backend import util
 from image_secrets.settings import MESSAGE_DELIMETER
 
 if TYPE_CHECKING:
-    from numpy.typing import ArrayLike, DTypeLike
+    from numpy.typing import ArrayLike
 
 
 def encode_message(
     shape: tuple[int, int, int],
-    data: DTypeLike,
+    data: ArrayLike,
     binary_message: str,
 ) -> ArrayLike:
     """Encode a message into the source image.
@@ -33,6 +33,7 @@ def encode_message(
             f"The message size {len(binary_message):,1f} is too long for the given image {data.size:,1f}.",
         )
 
+    data = data.flatten()
     for index, bit in enumerate(binary_message):
         data[index] = int(format(data[index], "08b")[:-1] + bit, base=2)
 

@@ -1,14 +1,7 @@
 """Test the module used for encoding."""
-import numpy as np
 import pytest
 
 from image_secrets.backend import encode, util
-
-
-@pytest.fixture()
-def image_arr():
-    """Return array containing data about a random image."""
-    return np.random.randint(0, 255, size=(256, 3), dtype=np.uint8)
 
 
 @pytest.mark.parametrize(
@@ -48,7 +41,6 @@ def test_encode_limit(image_arr) -> None:
 
 
 __all__ = [
-    "image_arr",
     "test_encode_limit",
     "test_encode_message",
 ]

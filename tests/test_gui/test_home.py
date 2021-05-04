@@ -6,19 +6,9 @@ from typing import TYPE_CHECKING
 import pytest
 from PyQt5.QtCore import Qt
 
-from image_secrets.gui.interface import ImageSecretsWindow
-
 if TYPE_CHECKING:
     from PyQt5.QtWidgets import QMainWindow
     from pytestqt.qtbot import QtBot
-
-
-@pytest.fixture()
-def application(qtbot: QtBot) -> QMainWindow:
-    """Return the main window."""
-    test_app = ImageSecretsWindow()
-    qtbot.addWidget(test_app)
-    return test_app
 
 
 @pytest.mark.parametrize(

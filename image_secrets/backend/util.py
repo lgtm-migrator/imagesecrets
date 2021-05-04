@@ -8,7 +8,7 @@ import numpy as np
 from PIL import Image
 
 if TYPE_CHECKING:
-    from numpy.typing import DTypeLike
+    from numpy.typing import ArrayLike
 
 
 def str_to_binary(string: str) -> str:
@@ -25,7 +25,7 @@ def str_to_binary(string: str) -> str:
     )
 
 
-def image_data(file: Path) -> tuple[tuple[int, int, int], DTypeLike]:
+def image_data(file: Path) -> tuple[tuple[int, int, int], ArrayLike]:
     """Return numpy array of the given image.
 
     :param file: The path to the image from which to extract the data
@@ -33,7 +33,7 @@ def image_data(file: Path) -> tuple[tuple[int, int, int], DTypeLike]:
     """
     with Image.open(file).convert("RGB") as img:
         arr = np.asarray(img, dtype=np.uint8)
-    return arr.shape, arr.flatten()
+    return arr.shape, arr
 
 
 __all__ = [

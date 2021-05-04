@@ -10,20 +10,10 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from image_secrets.gui.interface import ImageSecretsWindow
-from image_secrets.gui.settings import DARK_STYLESHEET, LIGHT_STYLESHEET
+from image_secrets.gui.settings import dark_stylesheet, light_stylesheet
 
 if TYPE_CHECKING:
     from PyQt5.QtWidgets import QMainWindow
-    from pytestqt.qtbot import QtBot
-
-
-@pytest.fixture()
-def application(qtbot: QtBot) -> QMainWindow:
-    """Return the main window."""
-    test_app = ImageSecretsWindow()
-    qtbot.addWidget(test_app)
-    return test_app
 
 
 @pytest.mark.parametrize(
@@ -60,8 +50,8 @@ def test_exit_action(application: QMainWindow) -> None:
 @pytest.mark.parametrize(
     "action, sheet",
     [
-        ("action_light", LIGHT_STYLESHEET[:100]),
-        ("action_dark", DARK_STYLESHEET[:100]),
+        ("action_light", light_stylesheet()[:100]),
+        ("action_dark", dark_stylesheet()[:100]),
     ],
 )
 def test_theme_action(

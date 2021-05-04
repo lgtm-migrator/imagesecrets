@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 
 import pyperclip
 
-from image_secrets.gui.settings import DARK_STYLESHEET, LIGHT_STYLESHEET
+from image_secrets.gui.settings import dark_stylesheet, light_stylesheet
 
 if TYPE_CHECKING:
     from PyQt5.QtWidgets import QMainWindow
@@ -37,10 +37,10 @@ def actions(parent: QMainWindow) -> None:
 
     # menu theme
     ui.action_light.triggered.connect(
-        lambda: parent.main_win.setStyleSheet(LIGHT_STYLESHEET),
+        lambda: parent.main_win.setStyleSheet(light_stylesheet()),
     )
     ui.action_dark.triggered.connect(
-        lambda: parent.main_win.setStyleSheet(DARK_STYLESHEET),
+        lambda: parent.main_win.setStyleSheet(dark_stylesheet()),
     )
 
 
