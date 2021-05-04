@@ -1,1 +1,1 @@
-"""Application Programming Interface."""
+"""Application Programming Interface package."""

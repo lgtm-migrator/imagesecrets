@@ -1,14 +1,12 @@
-"""Test command line image_secrets."""
-import pytest
-from click.testing import CliRunner
+"""Test the interface module."""
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from image_secrets.cli.interface import image_secrets
 
-
-@pytest.fixture()
-def runner() -> CliRunner:
-    """Return the CLI runner instance."""
-    return CliRunner()
+if TYPE_CHECKING:
+    from click.testing import CliRunner
 
 
 def test_main(runner: CliRunner) -> None:
@@ -51,7 +49,6 @@ def test_decode_file(runner: CliRunner) -> None:
 
 
 __all__ = [
-    "runner",
     "test_decode",
     "test_decode_file",
     "test_encode",
