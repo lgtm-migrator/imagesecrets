@@ -19,10 +19,3 @@ def test_home(route: str):
     response = client.get(route)
     assert response.status_code == 200
     assert response.json() == {"home": "ImageSecrets Home Page"}
-
-
-def test_decode():
-    response = client.post("/decode", data="F:/Luky/Hry/chart.png")
-
-    assert response.status_code == 200
-    assert response == {"home": "ImageSecrets Home Page"}
