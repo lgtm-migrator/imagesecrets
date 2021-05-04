@@ -24,7 +24,7 @@ def image_secrets() -> None:
     tray_menu(app, main_window)
 
     main_window.show()
-    app.exec()
+    sys.exit(app.exec())
 
 
 def tray_menu(app: QApplication, main_window: ImageSecretsWindow) -> None:

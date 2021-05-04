@@ -38,7 +38,7 @@
      </font>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="home">
      <layout class="QGridLayout" name="gridLayout">
@@ -115,6 +115,9 @@
       </property>
       <property name="overwriteMode">
        <bool>true</bool>
+      </property>
+      <property name="backgroundVisible">
+       <bool>false</bool>
       </property>
       <property name="placeholderText">
        <string>Type in the message to encode</string>
@@ -315,11 +318,14 @@
       <property name="text">
        <string>Copy</string>
       </property>
+      <property name="popupMode">
+       <enum>QToolButton::DelayedPopup</enum>
+      </property>
       <property name="toolButtonStyle">
        <enum>Qt::ToolButtonTextUnderIcon</enum>
       </property>
       <property name="autoRaise">
-       <bool>true</bool>
+       <bool>false</bool>
       </property>
      </widget>
      <widget class="QLabel" name="decode_pixmap_lbl">

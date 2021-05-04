@@ -73,6 +73,7 @@ class Ui_ImageSecrets(object):
         self.encode_plain_text_edit.setDocumentTitle("")
         self.encode_plain_text_edit.setPlainText("")
         self.encode_plain_text_edit.setOverwriteMode(True)
+        self.encode_plain_text_edit.setBackgroundVisible(False)
         self.encode_plain_text_edit.setObjectName("encode_plain_text_edit")
         self.encode_main_lbl = QtWidgets.QLabel(self.encode)
         self.encode_main_lbl.setGeometry(QtCore.QRect(9, 9, 411, 81))
@@ -156,8 +157,9 @@ class Ui_ImageSecrets(object):
         font = QtGui.QFont()
         font.setPointSize(9)
         self.decode_copy_tool_btn.setFont(font)
+        self.decode_copy_tool_btn.setPopupMode(QtWidgets.QToolButton.DelayedPopup)
         self.decode_copy_tool_btn.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
-        self.decode_copy_tool_btn.setAutoRaise(True)
+        self.decode_copy_tool_btn.setAutoRaise(False)
         self.decode_copy_tool_btn.setObjectName("decode_copy_tool_btn")
         self.decode_pixmap_lbl = QtWidgets.QLabel(self.decode)
         self.decode_pixmap_lbl.setGeometry(QtCore.QRect(10, 130, 151, 131))
@@ -216,7 +218,7 @@ class Ui_ImageSecrets(object):
         self.menubar.addAction(self.menu_themes.menuAction())
 
         self.retranslateUi(ImageSecrets)
-        self.stacked_widget.setCurrentIndex(1)
+        self.stacked_widget.setCurrentIndex(2)
         QtCore.QMetaObject.connectSlotsByName(ImageSecrets)
 
     def retranslateUi(self, ImageSecrets):

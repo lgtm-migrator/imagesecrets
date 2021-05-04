@@ -169,7 +169,6 @@ class ImageSecretsEvents:
             box = self.message_box("encode")
             box.setText(f"The message was successfully encoded into {fname}.")
             box.exec()
-
             self.clear_encode_widget()
 
     def clear_encode_widget(self) -> None:
@@ -191,7 +190,7 @@ class ImageSecretsEvents:
             self.parent.ui.decode_pixmap_lbl.setPixmap(QPixmap(f))
 
     def decode_submit_event(self) -> None:
-        """Verify that a message can be decoded."""
+        """Verify that a message can be decoded and clear the previous one."""
         if not hasattr(self, "working_image"):
             box = self.message_box("decode")
             box.setText(
@@ -212,7 +211,6 @@ class ImageSecretsEvents:
             box.setText(*e.args)
             box.setIcon(QMessageBox.NoIcon)
             box.exec()
-
             self.clear_decode_widget()
         else:
             self.parent.ui.decode_plain_text_edit.setPlainText(decoded)

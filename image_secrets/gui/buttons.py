@@ -4,7 +4,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import pyperclip
-import qdarkstyle
+
+from image_secrets.gui.settings import DARK_STYLESHEET, LIGHT_STYLESHEET
 
 if TYPE_CHECKING:
     from PyQt5.QtWidgets import QMainWindow
@@ -27,15 +28,19 @@ def actions(parent: QMainWindow) -> None:
 
     """
     ui = parent.ui
+
+    # menu general
     ui.action_home.triggered.connect(lambda: ui.stacked_widget.setCurrentIndex(0))
     ui.action_encode.triggered.connect(lambda: ui.stacked_widget.setCurrentIndex(1))
     ui.action_decode.triggered.connect(lambda: ui.stacked_widget.setCurrentIndex(2))
-    ui.action_exit.triggered.connect(quit)
-    ui.action_light.triggered.connect(lambda: parent.main_win.setStyleSheet(""))
+    ui.action_exit.triggered.connect(lambda: parent.main_win.close())
+
+    # menu theme
+    ui.action_light.triggered.connect(
+        lambda: parent.main_win.setStyleSheet(LIGHT_STYLESHEET),
+    )
     ui.action_dark.triggered.connect(
-        lambda: parent.main_win.setStyleSheet(
-            qdarkstyle.load_stylesheet(qt_api="pyqt5"),
-        ),
+        lambda: parent.main_win.setStyleSheet(DARK_STYLESHEET),
     )
 
 
