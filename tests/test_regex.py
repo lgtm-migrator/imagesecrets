@@ -7,29 +7,28 @@ from image_secrets.backend import regex
 
 
 @pytest.mark.parametrize(
-    "file, expected",
+    "file",
     [
-        ("pic.png", True),
-        ("png.png", True),
-        (" image.png", True),
-        ("dir/subdir/img.png", True),
-        ("    image.png    ", True),
-        ("", False),
-        (" ", False),
-        ("directory/file.py", False),
-        ("test/asdf.ng  ", False),
-        (__file__, False),
-        ("pictures/image .png", False),
+        "pic.png",
+        "png.png",
+        " image.png",
+        "dir/subdir/img.png",
+        "    image.png    ",
+        "",
+        __file__,
+        "C:pic.png",
+        "F:/directory/file.py",
+        "F:\\directory/file.py",
+        "pictures/image .png",
     ],
 )
-def test_png_ext(file: str, expected: bool) -> None:
+def test_png_ext(file: str) -> None:
     """Test that the regex PNG_EXT pattern works as expected.
 
     :param file: The filepath to be checked by the regex pattern
-    :param expected: Whether the check should be True or False
 
     """
-    assert bool(re.fullmatch(regex.PNG_EXT, file)) is expected
+    assert not re.fullmatch(regex.PNG_EXT, file)
 
 
 __all__ = [

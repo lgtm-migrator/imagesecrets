@@ -86,6 +86,7 @@ class ImageSecretsEvents:
             str(Path.home()),
             "Image files (*.png)",
         )
+        print(fname)
         return fname
 
     def message_box(self, label: str) -> QMessageBox:
