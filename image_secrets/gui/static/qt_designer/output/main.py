@@ -218,7 +218,7 @@ class Ui_ImageSecrets(object):
         self.menubar.addAction(self.menu_themes.menuAction())
 
         self.retranslateUi(ImageSecrets)
-        self.stacked_widget.setCurrentIndex(2)
+        self.stacked_widget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(ImageSecrets)
 
     def retranslateUi(self, ImageSecrets):

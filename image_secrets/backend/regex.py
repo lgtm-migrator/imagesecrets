@@ -16,7 +16,7 @@ _png_ext = """
 """
 PNG_EXT = re.compile(_png_ext, re.IGNORECASE | re.VERBOSE)
 
-CHARS_8 = re.compile(r"........")
+CHARS_8 = re.compile(r"........")  # any 8 characters
 
 
 __all__ = [

@@ -10,10 +10,10 @@ from image_secrets.backend import util
 from image_secrets.settings import MESSAGE_DELIMETER
 
 if TYPE_CHECKING:
-    from numpy.typing import DTypeLike
+    from numpy.typing import ArrayLike
 
 
-def decode_text(array: DTypeLike) -> str:
+def decode_text(array: ArrayLike) -> str:
     """Decode text.
 
     :param array: The array which should contain the message
