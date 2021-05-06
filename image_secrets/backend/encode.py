@@ -68,20 +68,18 @@ def api_encode(
     delimeter: str,
     lsb_n: int,
     reverse: bool,
-):
+) -> ArrayLike:
+    """Encode."""
     b_msg = util.str_to_binary(message + delimeter)
     if lsb_n != 1:
         b_msg = "".join(util.split_seq(tuple(b_msg), lsb_n))
 
     shape, arr = util.image_data(file)
     if reverse:
-        np.flip(arr)
-        b_msg = reversed(b_msg)
+        b_msg, arr = util.reverse_data(b_msg, arr)
 
     enc_arr = encode_message(shape, arr, b_msg)
-
-    if reverse:
-        np.flip(enc_arr)
+    return enc_arr if not reverse else np.flip(enc_arr)
 
 
 def cli_encode():

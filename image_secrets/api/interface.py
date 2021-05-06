@@ -1,60 +1,35 @@
 """Application Programming Interface"""
+import shutil
 from pathlib import Path
 
-from fastapi import FastAPI, File, UploadFile
-from fastapi.exceptions import HTTPException
-from fastapi.responses import FileResponse
+from fastapi import Depends, FastAPI
 
-from image_secrets.backend.encode import api_encode
-from image_secrets.backend.util import image_data
-from image_secrets.settings import MESSAGE_DELIMETER
+from image_secrets.api import config
+from image_secrets.api.dependencies import get_settings
+from image_secrets.api.routers import decode, encode
 
-app = FastAPI()
+app = FastAPI(dependencies=[Depends(get_settings)])
+app.include_router(decode.router)
+app.include_router(encode.router)
+
+
+@app.on_event("startup")
+async def startup() -> None:
+    """Startup event."""
+    images = Path(f"images/").absolute()
+    images.mkdir(exist_ok=True)
+
+
+@app.on_event("shutdown")
+async def shutdown() -> None:
+    """Shutdown event."""
+    images = Path(f"images/").absolute()
+    shutil.rmtree(images)
+    images.unlink(missing_ok=True)
 
 
 @app.get("/")
 @app.get("/home")
-async def home() -> dict:
-    """The home route."""
-    return {"home": "ImageSecrets Home Page"}
-
-
-@app.post("/encode")
-async def encode(
-    message: str,
-    file: UploadFile = File(...),
-    custom_delimeter: str = MESSAGE_DELIMETER,
-    lsb_n: int = 1,
-    reverse: bool = False,
-) -> FileResponse:
-    """Encode a message into the source image.
-
-    :param message: Message to encode
-    :param file: Source image
-
-    """
-    try:
-        file = api_encode(message, file, custom_delimeter, lsb_n, reverse)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=e.args) from e
-
-    images = Path(f"images/").absolute()
-    images.mkdir(exist_ok=True)
-    fp = images / file.filename
-    save_image(data, fp)
-    return FileResponse(fp)
-
-
-@app.post("/decode")
-async def decode(file: UploadFile = File(...)) -> dict[str:str, str:str]:
-    """Decode a message from the given file.
-
-    :param file: The uploaded file
-
-    """
-    _, arr = image_data(file.file)
-
-    try:
-        return {"file": file.filename, "message": decode_text(arr)}
-    except StopIteration as e:
-        raise HTTPException(status_code=400, detail=e.args) from e
+async def home(settings: config.Settings = Depends(get_settings)) -> dict:
+    """Return basic info about the home route."""
+    return {"app-name": settings.app_name}
