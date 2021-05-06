@@ -1,5 +1,4 @@
-"""API routers."""
-
+"""Router for the encoding endpoint."""
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 from fastapi.responses import FileResponse
 
@@ -20,7 +19,9 @@ router = APIRouter(
     response_model=dict[str, str],
     summary="Information about the encode route",
 )
-async def encode_home(settings: config.Settings = Depends(get_settings)) -> dict:
+async def encode_home(
+    settings: config.Settings = Depends(get_settings),
+) -> dict[str, str]:
     return {"app-name": settings.app_name}
 
 
@@ -56,13 +57,21 @@ async def encode_message(
         description="Message will be encoded starting from the last pixel instead of the first one.",
     ),
 ) -> FileResponse:
-    """Encode a message into the source image.
+    """Encode a message into an image.
 
+    - **message**: The message to encode into the image
+    - **file**: The image
+    - **custom-delimeter**: String which is going to be appended to the end of your message
+        so that the message can be decoded later.
+    - **least-significant-bit-amount**: Number of least significant bits to alter.
+    - **reversed-encoding**: Message will be encoded starting from the last pixel instead of the first one.
+
+    \f
     :param message: Message to encode
     :param file: Source image
-    :param delim: ...
-    :param lsb_n: ...
-    :param rev: ...
+    :param delim: Message delimeter, defaults to 'MESSAGE_DELIMETER'
+    :param lsb_n: Number of lsb to use, defaults to 1
+    :param rev: Reverse encoding bool, defaults to False
 
     """
     try:

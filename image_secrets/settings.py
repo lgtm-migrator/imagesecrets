@@ -4,7 +4,7 @@ from pathlib import Path
 ICON = Path(__file__).parent / "static/favicon.ico"
 
 # must be divisible by 3 without any reminder
-MESSAGE_DELIMETER = "</*end*\\>"
+MESSAGE_DELIMETER = "<{~stop_here~}>"
 
 
 __all__ = [
