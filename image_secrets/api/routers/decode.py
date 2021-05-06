@@ -13,7 +13,7 @@ router = APIRouter(
 
 
 @router.get("/decode/")
-async def encode_home(settings: config.Settings = Depends(get_settings)) -> dict:
+async def decode_home(settings: config.Settings = Depends(get_settings)) -> dict:
     return {"app-name": settings.app_name}
 
 
