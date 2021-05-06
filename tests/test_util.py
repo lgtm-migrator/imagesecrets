@@ -25,7 +25,7 @@ def test_str_to_binary(string: str, expected: str) -> None:
     :param expected: The expected result
 
     """
-    assert util.str_to_binary(string) == expected
+    assert "".join(util.str_to_binary(string)) == expected
 
 
 __all__ = [

@@ -37,7 +37,11 @@ def test_encode_limit(image_arr) -> None:
 
     """
     with pytest.raises(ValueError):
-        encode.encode_message(..., image_arr, util.str_to_binary("'long'") * 1000)
+        encode.encode_message(
+            ...,
+            image_arr,
+            "".join(util.str_to_binary("'long'")) * 1000,
+        )
 
 
 __all__ = [

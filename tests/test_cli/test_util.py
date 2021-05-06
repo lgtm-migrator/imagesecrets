@@ -14,7 +14,6 @@ from image_secrets.cli.cli_util import validate_png
         " file ",
         "file.image",
         "path/dir/image.jpg",
-        "dir/png.png.png",
         "X:/abc/png",
     ],
 )

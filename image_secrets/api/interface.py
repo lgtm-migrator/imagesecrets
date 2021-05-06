@@ -5,9 +5,8 @@ from fastapi import FastAPI, File, UploadFile
 from fastapi.exceptions import HTTPException
 from fastapi.responses import FileResponse
 
-from image_secrets.backend.decode import decode_text
-from image_secrets.backend.encode import encode_message, save_image
-from image_secrets.backend.util import image_data, str_to_binary
+from image_secrets.backend.encode import api_encode
+from image_secrets.backend.util import image_data
 from image_secrets.settings import MESSAGE_DELIMETER
 
 app = FastAPI()
@@ -21,21 +20,21 @@ async def home() -> dict:
 
 
 @app.post("/encode")
-async def encode(message: str, file: UploadFile = File(...)) -> FileResponse:
+async def encode(
+    message: str,
+    file: UploadFile = File(...),
+    custom_delimeter: str = MESSAGE_DELIMETER,
+    lsb_n: int = 1,
+    reverse: bool = False,
+) -> FileResponse:
     """Encode a message into the source image.
 
     :param message: Message to encode
     :param file: Source image
 
     """
-    _, arr = image_data(file.file)
-
     try:
-        data = encode_message(
-            arr.shape,
-            arr,
-            str_to_binary(message + MESSAGE_DELIMETER),
-        )
+        file = api_encode(message, file, custom_delimeter, lsb_n, reverse)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=e.args) from e
 

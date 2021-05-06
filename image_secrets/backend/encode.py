@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Iterator
 
 import numpy as np
 from PIL import Image
@@ -28,9 +28,9 @@ def encode_message(
     :raises ValueError: If the image array is not large enough for the message
 
     """
-    if data.size < len(binary_message):
+    if data.size < (length := len(binary_message)):
         raise ValueError(
-            f"The message size {len(binary_message):,1f} is too long for the given image {data.size:,1f}.",
+            f"The message size {length:,1f} is too long for the given image {data.size:,1f}.",
         )
 
     data = data.flatten()
@@ -38,26 +38,6 @@ def encode_message(
         data[index] = int(format(data[index], "08b")[:-1] + bit, base=2)
 
     return data.reshape(shape)
-
-
-def encoded_image_name(file: Path) -> Path:
-    """Return a new filename with the 'encoded_ prefix'.
-
-    :param file: The filepath to the image
-
-    """
-    name = f"encoded_{file.stem}.png"
-    return Path(file.parent, name)
-
-
-def save_image(arr: ArrayLike, filepath: Path) -> None:
-    """Save a new image.
-
-    :param arr: The numpy array with the pixel data
-    :param filepath: The path where the image should be saved
-
-    """
-    Image.fromarray(np.uint8(arr)).convert("RGB").save(filepath)
 
 
 def main(file: str, message: str, inplace: bool = False) -> str:
@@ -82,9 +62,27 @@ def main(file: str, message: str, inplace: bool = False) -> str:
     return file.name
 
 
-__all__ = [
-    "encode_message",
-    "encoded_image_name",
-    "main",
-    "save_image",
-]
+def api_encode(
+    message: str,
+    file: Path,
+    delimeter: str,
+    lsb_n: int,
+    reverse: bool,
+):
+    b_msg = util.str_to_binary(message + delimeter)
+    if lsb_n != 1:
+        b_msg = "".join(util.split_seq(tuple(b_msg), lsb_n))
+
+    shape, arr = util.image_data(file)
+    if reverse:
+        np.flip(arr)
+        b_msg = reversed(b_msg)
+
+    enc_arr = encode_message(shape, arr, b_msg)
+
+    if reverse:
+        np.flip(enc_arr)
+
+
+def cli_encode():
+    ...
