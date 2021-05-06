@@ -12,7 +12,6 @@ from PyQt5.QtWidgets import QMessageBox
 
 from image_secrets.backend.decode import main as decode_main
 from image_secrets.backend.encode import main as encode_main
-from image_secrets.backend.regex import PNG_EXT
 
 if TYPE_CHECKING:
     from PyQt5.QtWidgets import QMainWindow, QPushButton
@@ -64,9 +63,11 @@ class ImageSecretsEvents:
         :param new: The path to the new image
 
         """
-        if not re.match(PNG_EXT, str(new)):
+        fp = Path(new)
+        if fp.suffix.casefold() == ".png":
+            self._working_image_path = fp
+        else:
             raise ValueError("Only png images are supported.")
-        self._working_image_path = Path(new)
 
     @working_image.deleter
     def working_image(self) -> None:

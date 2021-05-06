@@ -37,7 +37,7 @@ async def encode(message: str, file: UploadFile = File(...)) -> FileResponse:
             str_to_binary(message + MESSAGE_DELIMETER),
         )
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=e.args)
+        raise HTTPException(status_code=400, detail=e.args) from e
 
     images = Path(f"images/").absolute()
     images.mkdir(exist_ok=True)
@@ -58,4 +58,4 @@ async def decode(file: UploadFile = File(...)) -> dict[str:str, str:str]:
     try:
         return {"file": file.filename, "message": decode_text(arr)}
     except StopIteration as e:
-        raise HTTPException(status_code=400, detail=e.args)
+        raise HTTPException(status_code=400, detail=e.args) from e

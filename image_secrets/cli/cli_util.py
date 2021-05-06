@@ -1,10 +1,8 @@
 """Utility functions for cli."""
-import re
+from pathlib import Path
 from typing import Optional
 
 import click
-
-from image_secrets.backend import regex
 
 
 def validate_png(_, file: str) -> Optional[str]:
@@ -16,7 +14,8 @@ def validate_png(_, file: str) -> Optional[str]:
     :raises BadParameter: If the pattern does not match
 
     """
-    if re.match(regex.PNG_EXT, file):
+    fp = Path(file)
+    if fp.suffix.casefold() == ".png":
         return file
     raise click.BadParameter(f"The file {file!s} is not a .PNG image.")
 
