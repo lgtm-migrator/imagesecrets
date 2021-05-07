@@ -21,7 +21,12 @@ def test_encode_message(image_arr, binary_text) -> None:
     :param binary_text: The text to be encoded into the image array
 
     """
-    new_arr = encode.encode_message(image_arr.shape, image_arr.flatten(), binary_text)
+    new_arr = encode.encode_message(
+        image_arr.shape,
+        image_arr.flatten(),
+        binary_text,
+        1,
+    )
 
     extracted_bits = ""
     for pixel, bit in zip(new_arr.flat, range(len(binary_text))):
@@ -41,6 +46,7 @@ def test_encode_limit(image_arr) -> None:
             ...,
             image_arr,
             "".join(util.str_to_binary("'long'")) * 1000,
+            1,
         )
 
 

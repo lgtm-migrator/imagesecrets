@@ -48,7 +48,7 @@ async def encode_message(
         1,
         title="Number of least significant bits to alter.",
         ge=1,
-        le=8,
+        le=2,
         alias="least-significant-bit-amount",
     ),
     rev: bool = Query(
