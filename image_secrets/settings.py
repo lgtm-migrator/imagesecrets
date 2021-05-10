@@ -3,9 +3,10 @@ from pathlib import Path
 
 ICON = Path(__file__).parent / "static/favicon.ico"
 
-# must be divisible by 3 without any reminder
-MESSAGE_DELIMETER = "<{~stop_here~}>"
+MESSAGE_DELIMETER = "<{~stop-here~}>"
 
+API_IMAGES = Path(__file__).parent / "static/images/"
+API_IMAGES.mkdir(parents=True, exist_ok=True)
 
 __all__ = [
     "ICON",

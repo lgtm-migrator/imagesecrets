@@ -1,12 +1,8 @@
 """Test the settings module."""
-from image_secrets.settings import MESSAGE_DELIMETER
+from image_secrets.settings import API_IMAGES, ICON
 
 
-def test_delimeter():
-    """Test that the delimiter is divisible by 3 without any remainder."""
-    assert len(MESSAGE_DELIMETER) % 3 == 0
-
-
-__all__ = [
-    "test_delimeter",
-]
+def test_constants():
+    """Test that the Path constants in settings actually exist."""
+    assert API_IMAGES.is_dir()
+    assert ICON.is_file()

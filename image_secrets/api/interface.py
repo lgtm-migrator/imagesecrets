@@ -7,6 +7,7 @@ from fastapi import Depends, FastAPI
 from image_secrets.api import config
 from image_secrets.api.dependencies import get_settings
 from image_secrets.api.routers import decode, encode
+from image_secrets.settings import API_IMAGES
 
 app = FastAPI(
     dependencies=[Depends(get_settings)],
@@ -22,16 +23,14 @@ app.include_router(encode.router)
 @app.on_event("startup")
 async def startup() -> None:
     """Startup event."""
-    images = Path(f"images/").absolute()
-    images.mkdir(exist_ok=True)
+    API_IMAGES.mkdir(parents=True, exist_ok=True)
 
 
 @app.on_event("shutdown")
 async def shutdown() -> None:
     """Shutdown event."""
-    images = Path(f"images/").absolute()
-    shutil.rmtree(images)
-    images.unlink(missing_ok=True)
+    shutil.rmtree(API_IMAGES)
+    API_IMAGES.unlink(missing_ok=True)
 
 
 @app.get(

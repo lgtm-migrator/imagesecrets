@@ -1,11 +1,18 @@
 """Router for the encoding endpoint."""
-from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    Depends,
+    File,
+    HTTPException,
+    Query,
+    UploadFile,
+)
 from fastapi.responses import FileResponse
 
 from image_secrets.api import config
 from image_secrets.api.dependencies import get_settings
-from image_secrets.backend.encode import api_encode
-from image_secrets.backend.util import save_image
+from image_secrets.backend import encode
 from image_secrets.settings import MESSAGE_DELIMETER
 
 router = APIRouter(
@@ -27,7 +34,7 @@ async def encode_home(
 
 @router.post("/encode/", summary="Encode a message into an image")
 async def encode_message(
-    settings: config.Settings = Depends(get_settings),
+    background_tasks: BackgroundTasks,
     *,
     message: str = Query(
         ...,
@@ -74,14 +81,11 @@ async def encode_message(
     :param rev: Reverse encoding bool, defaults to False
 
     """
+    data = await file.read()
     try:
-        data = api_encode(message, file, delim, lsb_n, rev)
+        fp = encode.api(message, data, delim, lsb_n, rev)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=e.args) from e
 
-    fp = settings.image_folder / file.filename
-    save_image(data, fp)
-    try:
-        return FileResponse(fp)
-    finally:
-        fp.unlink()
+    background_tasks.add_task(fp.unlink)
+    return FileResponse(fp)
