@@ -119,7 +119,7 @@ def main(
 
 
 def prepare_image(
-    file: Path,
+    file,
     message_len: int,
 ) -> tuple[tuple[int, int, int], ArrayLike, ArrayLike]:
     """Prepare an image for encoding.

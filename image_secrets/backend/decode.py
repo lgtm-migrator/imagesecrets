@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Generator
 
 import numpy as np
 
@@ -41,16 +41,60 @@ def decode_text(
         raise StopIteration("No message found after scanning the whole image.")
 
 
-def main(file: str) -> str:
+def main(
+    file,
+    delimeter: str,
+    lsb_n: int,
+    reverse: bool,
+) -> str:
     """Main decoding function.
 
     :param file: The Path to the source file
 
     """
-    file = Path(file.strip()).absolute()
-    _, arr = util.image_data(file)
-    text = decode_text(arr)
+    img = util.read_coroutine(file)
+    _, arr = util.image_data(img)
+
+    arr = prepare_array(arr, lsb_n, reverse)
+
+    text = decode_text(arr, delimeter, lsb_n)
     return text
+
+
+def api():
+    ...
+
+
+def prepare_array(array: ArrayLike, lsb_n: int, reverse: bool) -> ArrayLike:
+    shape = (-1, 8)
+    if reverse:
+        array = np.flip(array)
+    arr = np.unpackbits(array).reshape(shape)
+    # cut unnecessary bits and pack the rest
+    arr = np.packbits(arr[:, -lsb_n:])
+    return arr
+
+
+def delimeter_check(delimeter) -> Generator:
+    delim_len = len(delimeter)
+    while 1:
+        string = yield
+        if string[-delim_len:] == delimeter:
+            return string[:-delim_len]
+        yield False
+
+
+def decode_text_(array: ArrayLike, delimeter):
+    message = ""
+    delim_coro = delimeter(delimeter)
+    next(delim_coro)
+
+    for num in array:
+        if m := delim_coro.send(message):
+            return m
+        message += chr(num)
+    else:
+        raise StopIteration("No message found after scanning the whole image.")
 
 
 __all__ = [
