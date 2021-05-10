@@ -11,3 +11,8 @@ class Settings(BaseSettings):
 
     app_name: str = "ImageSecrets"
     image_folder: Path = API_IMAGES
+
+
+__all__ = [
+    "Settings",
+]

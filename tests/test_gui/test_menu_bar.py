@@ -70,3 +70,10 @@ def test_theme_action(
     action = getattr(application.ui, action)
     action.trigger()
     assert application.main_win.styleSheet()[:100] == sheet
+
+
+__all__ = [
+    "test_exit_action",
+    "test_switch_action",
+    "test_theme_action",
+]

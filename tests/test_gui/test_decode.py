@@ -32,3 +32,8 @@ def test_copy_tool_btn(qtbot: QtBot, application: QMainWindow, text: str) -> Non
     application.ui.decode_plain_text_edit.setPlainText(text)
     qtbot.mouseClick(application.ui.decode_copy_tool_btn, Qt.LeftButton)
     assert pyperclip.paste() == text
+
+
+__all__ = [
+    "test_copy_tool_btn",
+]

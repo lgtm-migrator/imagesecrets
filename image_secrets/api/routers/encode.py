@@ -89,3 +89,10 @@ async def encode_message(
 
     background_tasks.add_task(fp.unlink)
     return FileResponse(fp)
+
+
+__all__ = [
+    "encode_home",
+    "encode_message",
+    "router",
+]

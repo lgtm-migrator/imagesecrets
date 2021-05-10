@@ -42,3 +42,11 @@ async def shutdown() -> None:
 async def home(settings: config.Settings = Depends(get_settings)) -> dict[str, str]:
     """Return basic info about the home route."""
     return {"app-name": settings.app_name}
+
+
+__all__ = [
+    "app",
+    "home",
+    "shutdown",
+    "startup",
+]

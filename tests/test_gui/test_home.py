@@ -35,3 +35,8 @@ def test_button(
     button = getattr(application.ui, button)
     qtbot.mouseClick(button, Qt.LeftButton)
     assert application.ui.stacked_widget.currentIndex() == index
+
+
+__all__ = [
+    "test_button",
+]

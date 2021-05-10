@@ -1,8 +1,7 @@
 """Module with functions to decode text from images."""
 from __future__ import annotations
 
-from pathlib import Path
-from typing import TYPE_CHECKING, Generator
+from typing import TYPE_CHECKING, Optional, Union
 
 import numpy as np
 
@@ -10,94 +9,86 @@ from image_secrets.backend import util
 from image_secrets.settings import MESSAGE_DELIMETER
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
+    from _io import BytesIO
     from numpy.typing import ArrayLike
 
 
-def decode_text(
-    array: ArrayLike,
+def main(
+    data: Union[BytesIO, Path],
     delimeter: str = MESSAGE_DELIMETER,
     lsb_n: int = 1,
+    reverse: bool = False,
 ) -> str:
-    """Decode text.
+    """Decode text from an image.
 
-    :param array: The array which should contain the message
-    :param delimeter: ...
-    :param lsb_n: ...
-
-    :raises StopIteration: If the whole array has been checked and nothing was found
+    :param data: Pixel image data which can be converted to numpy array by PIL
+    :param delimeter: Message end identifier, defaults to the one in .settings
+    :param lsb_n: Number of least significant bits to decode, defaults to 1
+    :param reverse: Reverse decoding bool, defaults to False
 
     """
-    message = ""
-    delim_len = len(delimeter)
+    _, arr = util.image_data(data)
+    arr = prepare_array(arr, lsb_n, reverse)
 
-    for data in array.reshape(-1, 8 // lsb_n):
-        if message[-delim_len:] == delimeter:
-            return message[:-delim_len]
-
-        # turn the 8 least significant bits in the current array to an integer
-        num = np.packbits(np.bitwise_and(data, 0b1))[0]
-        message += chr(num)
-    else:
-        raise StopIteration("No message found after scanning the whole image.")
+    text = decode_text(arr, delimeter)
+    return text
 
 
-def main(
-    file,
+def api(
+    data: bytes,
     delimeter: str,
     lsb_n: int,
     reverse: bool,
 ) -> str:
-    """Main decoding function.
+    """Function to be used by the corresponding decode API endpoint.
 
-    :param file: The Path to the source file
+    :param data: Data of the image uploaded by user
+    :param delimeter: Message end identifier
+    :param lsb_n: Number of least significant bits to decode
+    :param reverse: Reverse decoding bool
 
     """
-    img = util.read_coroutine(file)
-    _, arr = util.image_data(img)
-
-    arr = prepare_array(arr, lsb_n, reverse)
-
-    text = decode_text(arr, delimeter, lsb_n)
+    data = util.read_coroutine(data)
+    text = main(data, delimeter, lsb_n, reverse)
     return text
 
 
-def api():
-    ...
-
-
 def prepare_array(array: ArrayLike, lsb_n: int, reverse: bool) -> ArrayLike:
+    """Prepare an array into a form from which it is easy to decode text.
+
+    :param array: The array to work with
+    :param lsb_n: How many lsbs to use
+    :param reverse: Whether the array should be flipped or not
+
+    """
     shape = (-1, 8)
     if reverse:
         array = np.flip(array)
     arr = np.unpackbits(array).reshape(shape)
-    # cut unnecessary bits and pack the rest
-    arr = np.packbits(arr[:, -lsb_n:])
+    arr = np.packbits(arr[:, -lsb_n:])  # cut unnecessary bits and pack the rest
     return arr
 
 
-def delimeter_check(delimeter) -> Generator:
+def decode_text(array: ArrayLike, delimeter) -> Optional[str]:
+    """Decode text from the given array.
+
+    :param array: The array from which to decode the text
+    :param delimeter: Identifier that whole message has been extracted
+
+    :raises StopIteration: if nothing was found in the array
+
+    """
+    text = ""
     delim_len = len(delimeter)
-    while 1:
-        string = yield
-        if string[-delim_len:] == delimeter:
-            return string[:-delim_len]
-        yield False
 
-
-def decode_text_(array: ArrayLike, delimeter):
-    message = ""
-    delim_coro = delimeter(delimeter)
-    next(delim_coro)
-
+    # iterating is faster than vectorizing 'chr' on the whole array,
+    # many slow string operation are avoided
     for num in array:
-        if m := delim_coro.send(message):
-            return m
-        message += chr(num)
+        char = chr(num)
+        text += char
+        if text[-delim_len:] == delimeter:
+            return text[:-delim_len]
     else:
         raise StopIteration("No message found after scanning the whole image.")
-
-
-__all__ = [
-    "decode_text",
-    "main",
-]

@@ -8,3 +8,8 @@ from image_secrets.api import config
 def get_settings():
     """Return the api settings."""
     return config.Settings()
+
+
+__all__ = [
+    "get_settings",
+]

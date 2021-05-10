@@ -4,7 +4,7 @@ from __future__ import annotations
 import secrets
 from io import BytesIO
 from pathlib import Path
-from typing import TYPE_CHECKING, TypeVar
+from typing import TYPE_CHECKING, TypeVar, Union
 
 import numpy as np
 from PIL import Image
@@ -75,3 +75,13 @@ def encoded_image_name(file: Path, /) -> Path:
     """
     name = f"encoded_{file.stem}.png"
     return Path(file.parent, name)
+
+
+__all__ = [
+    "encoded_image_name",
+    "image_data",
+    "message_bit_array",
+    "read_coroutine",
+    "save_image",
+    "token_hex",
+]

@@ -254,3 +254,8 @@ class Ui_ImageSecrets(object):
         self.action_home.setText(_translate("ImageSecrets", "home"))
         self.action_light.setText(_translate("ImageSecrets", "light"))
         self.action_dark.setText(_translate("ImageSecrets", "dark"))
+
+
+__all__ = [
+    "Ui_ImageSecrets",
+]

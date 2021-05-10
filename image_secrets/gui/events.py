@@ -224,3 +224,9 @@ class ImageSecretsEvents:
         ui.decode_pixmap_lbl.setText("No preview available")
         ui.decode_plain_text_edit.clear()
         del self.working_image
+
+
+__all__ = [
+    "ImageSecretsEvents",
+    "event_handler_factory",
+]

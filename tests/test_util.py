@@ -49,3 +49,8 @@ def test_message_bit_array(
     # numpy testing for better visual array differences, raises AssertionError same way like assert
     np.testing.assert_array_equal(array, expected_arr)
     assert length == expected_arr.size // bits
+
+
+__all__ = [
+    "test_message_bit_array",
+]

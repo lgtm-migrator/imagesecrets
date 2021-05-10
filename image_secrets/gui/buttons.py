@@ -66,3 +66,10 @@ def push_buttons(parent: QMainWindow) -> None:
     ui.decode_copy_tool_btn.clicked.connect(
         lambda: pyperclip.copy(ui.decode_plain_text_edit.toPlainText()),
     )
+
+
+__all__ = [
+    "actions",
+    "push_buttons",
+    "setup",
+]

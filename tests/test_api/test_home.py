@@ -19,3 +19,9 @@ def test_home(route: str):
     response = client.get(route)
     assert response.status_code == 200
     assert response.json() == {"home": "ImageSecrets Home Page"}
+
+
+__all__ = [
+    "client",
+    "test_home",
+]
