@@ -41,7 +41,7 @@ def encode_message(
     return data
 
 
-def main(file: str, message: str, inplace: bool = False) -> str:
+def main_(file: str, message: str, inplace: bool = False) -> str:
     """Main encoding function.
 
     :param file: Path to the source file
@@ -100,13 +100,13 @@ def cli_encode():
     ...
 
 
-def api_encode__Sub(
+def main(
     message: str,
     file: Path,
     delimeter: str,
     lsb_n: int,
     reverse: bool,
-) -> DTypeLike:
+):
     """Encoding function to be used by the corresponding API endpoint.
 
     :param message: Message to encode
@@ -116,17 +116,30 @@ def api_encode__Sub(
     :param reverse: Reverse encoding bool
 
     """
-    msg_arr, msg_len = prepare_message(message, delimeter, lsb_n)
-    shape, img_arr, parent_arr = prepare_image(file, msg_len)
+    msg_arr, msg_len = message_bit_array(message, delimeter, lsb_n)
+    shape, img_arr, unpacked_arr = prepare_image(file, msg_len)
 
-    enc_arr = encode_into_image(parent_arr, msg_arr)
-    final_arr = concatenate_arrays(enc_arr, parent_arr[msg_len:], shape)
+    if reverse:
+        # flips all axe data
+        msg_arr = np.flip(msg_arr)
+        img_arr = np.flip(img_arr)
 
-    util.save_image(final_arr, util.encoded_image_name(file))
+    enc_arr = encode_into_array(unpacked_arr, msg_arr)
+    final_arr = concatenate_array(
+        enc_arr,
+        # starting image part supplied by encoding
+        img_arr[msg_len:],
+        shape,
+    )
+
+    util.save_image(
+        final_arr if not reverse else np.flip(final_arr),
+        util.encoded_image_name(file),
+    )
 
 
-def prepare_message(message: str, delimeter: str, bits: int) -> tuple[DTypeLike, int]:
-    """Prepare a message for encoding.
+def message_bit_array(message: str, delimeter: str, bits: int) -> tuple[DTypeLike, int]:
+    """Return a message turned into bits in an array.
 
     :param message: Main message to encode
     :param delimeter: Message end identifier
@@ -136,7 +149,11 @@ def prepare_message(message: str, delimeter: str, bits: int) -> tuple[DTypeLike,
     message = (message + delimeter).encode("utf-8")
 
     msg_arr = np.frombuffer(message, dtype=np.uint8)
-    lsbits_arr = np.unpackbits(msg_arr).reshape((-1, bits))
+    lsbits_arr = np.unpackbits(msg_arr)
+    lsbits_arr.resize(
+        (np.ceil(lsbits_arr.size / bits).astype(int), bits),
+        refcheck=False,
+    )
     msg_len, _ = lsbits_arr.shape
 
     return lsbits_arr, msg_len
@@ -163,7 +180,7 @@ def prepare_image(
     return shape, arr, unpacked_arr.reshape(-1, 8)
 
 
-def encode_into_image(main: DTypeLike, new: DTypeLike) -> DTypeLike:
+def encode_into_array(main: DTypeLike, new: DTypeLike) -> DTypeLike:
     """Encode an array into the parent array.
 
     :param main: The main array, encoding will happen here
@@ -175,7 +192,7 @@ def encode_into_image(main: DTypeLike, new: DTypeLike) -> DTypeLike:
     return main
 
 
-def concatenate_arrays(
+def concatenate_array(
     packed: DTypeLike,
     main: DTypeLike,
     final_shape: tuple,

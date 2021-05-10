@@ -69,3 +69,33 @@ def encoded_image_name(file: Path, /) -> Path:
     """
     name = f"encoded_{file.stem}.png"
     return Path(file.parent, name)
+
+
+if __name__ == "__main__":
+    from timeit import default_timer
+
+    a = np.array([1, 3, 0, 18], dtype=np.uint8)
+    secret = b"hello"
+    b = ["0", "1"]
+
+    times = []
+    for _ in range(100000):
+        now = default_timer()
+
+        a[0] |= int("".join(b), 2)
+
+        times.append(default_timer() - now)
+    print("format", min(times))
+
+    a = np.array([1, 3, 0, 18], dtype=np.uint8)
+    times = []
+    for _ in range(100000):
+        now = default_timer()
+
+        a[0] = int(format(a[0], "08b")[:-2] + bin(int(*b, 2)), base=2)
+
+        times.append(default_timer() - now)
+    print("bitwise", min(times))
+
+    _ = chr(int("".join(format(i, "08b")[-2:] for i in a), base=2))
+    _ = chr(np.packbits(np.bitwise_and(a, 0b1))[0])
