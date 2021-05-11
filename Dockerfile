@@ -8,6 +8,8 @@ COPY poetry.lock pyproject.toml /app/
 RUN poetry config virtualenvs.create false
 RUN poetry install --no-interaction --no-ansi
 
+EXPOSE 80
+
 COPY . /app/
 
 CMD ["python", "bin/run_api.py"]

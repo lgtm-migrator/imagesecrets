@@ -1,6 +1,7 @@
 """Session wide fixtures."""
 from __future__ import annotations
 
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -11,12 +12,18 @@ if TYPE_CHECKING:
 
 
 @pytest.fixture(scope="session")
-def image_arr():
+def test_image_path() -> Path:
+    """Return the path to the test.png image."""
+    return Path("tests/test.png").absolute()
+
+
+@pytest.fixture(scope="session")
+def random_image_arr():
     """Return array containing data about a random image."""
     return np.random.randint(0, 255, size=(256, 3), dtype=np.uint8)
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def delimeter_array() -> ArrayLike:
     """Return a delimeter array, string form = 'dlm'."""
     return np.array(

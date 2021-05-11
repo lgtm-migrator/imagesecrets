@@ -67,23 +67,16 @@ def save_image(arr: ArrayLike, filepath: Path, /) -> None:
     Image.fromarray(np.uint8(arr)).convert("RGB").save(filepath)
 
 
-def token_hex() -> str:
-    """Return a random token hex with length of 16 chars."""
-    return secrets.token_hex(8)
+def token_hex(length: int = 16) -> str:
+    """Return a random token hex.
 
-
-def encoded_image_name(file: Path, /) -> Path:
-    """Return a new filename with 'encoded_' prefix.
-
-    :param file: The filepath to the image
+    :param length: How many chars should the final token have
 
     """
-    name = f"encoded_{file.stem}.png"
-    return Path(file.parent, name)
+    return secrets.token_hex(np.ceil(abs(length) / 2).astype(int))
 
 
 __all__ = [
-    "encoded_image_name",
     "image_data",
     "message_bit_array",
     "save_image",
