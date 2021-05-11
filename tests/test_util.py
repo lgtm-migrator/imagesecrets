@@ -1,4 +1,6 @@
 """Test the util module."""
+from __future__ import annotations
+
 import functools as fn
 from typing import TYPE_CHECKING
 

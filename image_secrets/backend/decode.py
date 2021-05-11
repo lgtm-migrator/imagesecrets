@@ -17,14 +17,14 @@ if TYPE_CHECKING:
 
 def main(
     data: Union[BytesIO, Path],
-    delimeter: str = MESSAGE_DELIMITER,
+    delimiter: str = MESSAGE_DELIMITER,
     lsb_n: int = 1,
     reverse: bool = False,
 ) -> str:
     """Decode text from an image.
 
     :param data: Pixel image data which can be converted to numpy array by PIL
-    :param delimeter: Message end identifier, defaults to the one in .settings
+    :param delimiter: Message end identifier, defaults to the one in .settings
     :param lsb_n: Number of least significant bits to decode, defaults to 1
     :param reverse: Reverse decoding bool, defaults to False
 
@@ -32,26 +32,26 @@ def main(
     _, arr = util.image_data(data)
     arr = prepare_array(arr, lsb_n, reverse)
 
-    text = decode_text(arr, delimeter)
+    text = decode_text(arr, delimiter)
     return text
 
 
 def api(
     data: bytes,
-    delimeter: str,
+    delimiter: str,
     lsb_n: int,
     reverse: bool,
 ) -> str:
     """Function to be used by the corresponding decode API endpoint.
 
     :param data: Data of the image uploaded by user
-    :param delimeter: Message end identifier
+    :param delimiter: Message end identifier
     :param lsb_n: Number of least significant bits to decode
     :param reverse: Reverse decoding bool
 
     """
     data = util.read_image_bytes(data)
-    text = main(data, delimeter, lsb_n, reverse)
+    text = main(data, delimiter, lsb_n, reverse)
     return text
 
 
@@ -59,7 +59,7 @@ def prepare_array(array: ArrayLike, lsb_n: int, reverse: bool) -> ArrayLike:
     """Prepare an array into a form from which it is easy to decode text.
 
     :param array: The array to work with
-    :param lsb_n: How many lsbs to use
+    :param lsb_n: How many lsb to use
     :param reverse: Whether the array should be flipped or not
 
     """
@@ -71,23 +71,23 @@ def prepare_array(array: ArrayLike, lsb_n: int, reverse: bool) -> ArrayLike:
     return arr
 
 
-def decode_text(array: ArrayLike, delimeter) -> Optional[str]:
+def decode_text(array: ArrayLike, delimiter) -> Optional[str]:
     """Decode text from the given array.
 
     :param array: The array from which to decode the text
-    :param delimeter: Identifier that whole message has been extracted
+    :param delimiter: Identifier that whole message has been extracted
 
     :raises StopIteration: if nothing was found in the array
 
     """
     text = ""
-    delim_len = len(delimeter)
+    delim_len = len(delimiter)
 
     # iterating is faster than vectorizing 'chr' on the whole array,
     # many slow string operation are avoided
     for num in array:
         text += chr(num)
-        if text.endswith(delimeter):
+        if text.endswith(delimiter):
             return text[:-delim_len]
     else:
         raise StopIteration("No message found after scanning the whole image.")

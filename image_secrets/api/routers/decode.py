@@ -2,6 +2,7 @@
 from typing import Union
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
+from starlette.responses import JSONResponse
 
 from image_secrets.api import config
 from image_secrets.api.dependencies import get_settings
@@ -16,8 +17,10 @@ router = APIRouter(
 
 
 @router.get("/decode/", response_model=dict, summary="Information about decode route")
-async def decode_home(settings: config.Settings = Depends(get_settings)) -> dict:
-    return {"app-name": settings.app_name}
+async def decode_home(
+    settings: config.Settings = Depends(get_settings),
+) -> JSONResponse:
+    return JSONResponse({"app-name": settings.app_name})
 
 
 @router.post(
@@ -33,6 +36,7 @@ async def decode_home(settings: config.Settings = Depends(get_settings)) -> dict
                     "example": {
                         "message": "Secret message!",
                         "decode-arguments": {
+                            "filename": "image.png",
                             "custom-delimiter": MESSAGE_DELIMITER,
                             "least-significant-bit-amount": 1,
                             "reversed-encoding": False,
@@ -105,10 +109,7 @@ async def decode(
         raise HTTPException(
             status_code=400,
             detail=e.args,
-            headers={
-                key.replace("_", "-"): repr(value)
-                for key, value in schema  # bool and int are not hashable
-            },
+            headers=schema.header_dict(),
         ) from e
     return {"message": decoded, "decode-arguments": schema}
 

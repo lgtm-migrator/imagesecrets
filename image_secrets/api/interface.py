@@ -1,6 +1,5 @@
 """Application Programming Interface"""
 import shutil
-from pathlib import Path
 
 from fastapi import Depends, FastAPI
 
@@ -12,7 +11,7 @@ from image_secrets.settings import API_IMAGES
 app = FastAPI(
     dependencies=[Depends(get_settings)],
     title="ImageSecrets",
-    description="Encode and decode message from images!",
+    description="Encode and decode messages from images!",
     version="0.1.0",
     redoc_url=None,
 )

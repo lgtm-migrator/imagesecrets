@@ -8,17 +8,10 @@ from image_secrets.api.interface import app
 client = TestClient(app)
 
 
-@pytest.mark.parametrize(
-    "route",
-    [
-        "",
-        "home",
-    ],
-)
-def test_home(route: str):
-    response = client.get(route)
+def test_home():
+    response = client.get("/")
     assert response.status_code == 200
-    assert response.json() == {"home": "ImageSecrets Home Page"}
+    assert response.json() == {"app-name": "ImageSecrets"}
 
 
 __all__ = [

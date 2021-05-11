@@ -5,13 +5,9 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
-from click.testing import CliRunner
-
-from image_secrets.gui.interface import ImageSecretsWindow
 
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
-    from PyQt5.QtWidgets import QMainWindow
 
 
 @pytest.fixture(scope="session")
@@ -51,25 +47,3 @@ def delimeter_array() -> ArrayLike:
             [1],
         ),
     )
-
-
-@pytest.fixture()
-def runner() -> CliRunner:
-    """Return the CLI runner instance."""
-    return CliRunner()
-
-
-@pytest.fixture()
-def application(qtbot) -> QMainWindow:
-    """Return the main window."""
-    test_app = ImageSecretsWindow()
-    qtbot.addWidget(test_app)
-    return test_app
-
-
-__all__ = [
-    "application",
-    "delimeter_array",
-    "image_arr",
-    "runner",
-]

@@ -25,13 +25,20 @@ def main(
 
     :param message: Message to encode
     :param data: Pixel image data which can be converted to numpy array by PIL
-    :param delimiter: Message end identifier, defaults to the one in .settings
+    :param delimiter: Message end identifier, defaults to 'MESSAGE_DELIMITER'
     :param lsb_n: Number of least significant bits to decode, defaults to 1
     :param reverse: Reverse decoding bool, defaults to False
+
+    :raises ValueError: if the message is too long for the image
 
     """
     msg_arr, msg_len = util.message_bit_array(message, delimiter, lsb_n)
     shape, img_arr, unpacked_arr = prepare_image(data, msg_len)
+
+    if (size := img_arr.size * lsb_n) < (msg_len := len(message)):
+        raise ValueError(
+            f"The image size ({size:,.0f}) is not enough for the message ({msg_len:,.0f}).",
+        )
 
     if reverse:
         msg_arr, img_arr = np.flip(msg_arr), np.flip(img_arr)  # all axes get flipped
@@ -58,7 +65,6 @@ def api(
     :param reverse: Reverse encoding bool
 
     """
-    raise ValueError
     data = util.read_image_bytes(file)
     arr = main(message, data, delimiter, lsb_n, reverse)
 
@@ -130,3 +136,8 @@ __all__ = [
     "merge_into_image_array",
     "prepare_image",
 ]
+
+if __name__ == "__main__":
+    pat = Path("f:/Download/from_api.png")
+    dec = main("helo", pat)
+    print(dec)

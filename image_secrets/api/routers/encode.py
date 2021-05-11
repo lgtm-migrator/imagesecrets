@@ -1,6 +1,4 @@
 """Router for the encoding endpoint."""
-from typing import Union
-
 from fastapi import (
     APIRouter,
     BackgroundTasks,
@@ -11,10 +9,10 @@ from fastapi import (
     UploadFile,
 )
 from fastapi.responses import FileResponse
-from starlette.responses import JSONResponse
 
 from image_secrets.api import config
 from image_secrets.api.dependencies import get_settings
+from image_secrets.api.schemas import EncodeSchema
 from image_secrets.backend import encode
 from image_secrets.settings import MESSAGE_DELIMITER
 
@@ -44,7 +42,16 @@ async def encode_home(
             "content": {"image/png": {}},
             "description": "Return an image with the encoded message.",
         },
-        400: {"content": {"none": {}}, "description": "failed"},
+        400: {
+            "description": "Encoding Failure",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "detail": ["Something went wrong while encoding."],
+                    },
+                },
+            },
+        },
     },
 )
 async def encode_message(
@@ -96,13 +103,32 @@ async def encode_message(
     :param rev: Reverse encoding bool, defaults to False
 
     """
+    schema = EncodeSchema(
+        message=message,
+        filename=file.filename,
+        delimiter=delim,
+        least_significant_bits=lsb_n,
+        reverse_decoding=rev,
+    )
+    header_dict = schema.header_dict()
+
     data = await file.read()
     try:
         fp = encode.api(message, data, delim, lsb_n, rev)
     except ValueError as e:
-        raise HTTPException(status_code=404, detail=e.args) from e
+        raise HTTPException(
+            status_code=400,
+            detail=e.args,
+            headers=header_dict,
+        ) from e
+
     background_tasks.add_task(fp.unlink)
-    return FileResponse(fp, media_type="image/png", filename=file.filename)
+    return FileResponse(
+        fp,
+        media_type="image/png",
+        filename=file.filename,
+        headers=header_dict,
+    )
 
 
 __all__ = [
