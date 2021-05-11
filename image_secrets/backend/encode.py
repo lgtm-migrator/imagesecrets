@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 def main(
     message: str,
     data: Union[BytesIO, Path],
-    delimeter: str = MESSAGE_DELIMITER,
+    delimiter: str = MESSAGE_DELIMITER,
     lsb_n: int = 1,
     reverse: bool = False,
 ) -> ArrayLike:
@@ -25,12 +25,12 @@ def main(
 
     :param message: Message to encode
     :param data: Pixel image data which can be converted to numpy array by PIL
-    :param delimeter: Message end identifier, defaults to the one in .settings
+    :param delimiter: Message end identifier, defaults to the one in .settings
     :param lsb_n: Number of least significant bits to decode, defaults to 1
     :param reverse: Reverse decoding bool, defaults to False
 
     """
-    msg_arr, msg_len = util.message_bit_array(message, delimeter, lsb_n)
+    msg_arr, msg_len = util.message_bit_array(message, delimiter, lsb_n)
     shape, img_arr, unpacked_arr = prepare_image(data, msg_len)
 
     if reverse:
@@ -45,7 +45,7 @@ def main(
 def api(
     message: str,
     file: bytes,
-    delimeter: str,
+    delimiter: str,
     lsb_n: int,
     reverse: bool,
 ) -> Path:
@@ -53,13 +53,14 @@ def api(
 
     :param message: Message to encode
     :param file: Data of the image uploaded by user
-    :param delimeter: Message end identifier
+    :param delimiter: Message end identifier
     :param lsb_n: Number of least significant bits to use
     :param reverse: Reverse encoding bool
 
     """
+    raise ValueError
     data = util.read_image_bytes(file)
-    arr = main(message, data, delimeter, lsb_n, reverse)
+    arr = main(message, data, delimiter, lsb_n, reverse)
 
     fp = API_IMAGES / f"{util.token_hex()}.png"
     util.save_image(arr, fp)
@@ -101,7 +102,7 @@ def encode_into_bit_array(base: ArrayLike, new: ArrayLike) -> ArrayLike:
     """
     lsb_n = new.shape[1]
     base[:, -lsb_n:] = new
-    return main
+    return base
 
 
 def merge_into_image_array(

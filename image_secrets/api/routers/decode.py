@@ -1,5 +1,7 @@
 """Decode router."""
-from fastapi import APIRouter, Depends, File, Query, UploadFile
+from typing import Union
+
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 
 from image_secrets.api import config
 from image_secrets.api.dependencies import get_settings
@@ -13,12 +15,44 @@ router = APIRouter(
 )
 
 
-@router.get("/decode/")
+@router.get("/decode/", response_model=dict, summary="Information about decode route")
 async def decode_home(settings: config.Settings = Depends(get_settings)) -> dict:
     return {"app-name": settings.app_name}
 
 
-@router.post("/decode")
+@router.post(
+    "/decode",
+    response_model=dict[str, Union[str, DecodeSchema]],
+    summary="Decode a message from an image",
+    responses={
+        200: {
+            "model": dict[str, Union[str, DecodeSchema]],
+            "description": "Successful Response",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "message": "Secret message!",
+                        "decode-arguments": {
+                            "custom-delimiter": MESSAGE_DELIMITER,
+                            "least-significant-bit-amount": 1,
+                            "reversed-encoding": False,
+                        },
+                    },
+                },
+            },
+        },
+        400: {
+            "description": "Decoding Failure",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "detail": ["Something went wrong while decoding."],
+                    },
+                },
+            },
+        },
+    },
+)
 async def decode(
     *,
     file: UploadFile = File(
@@ -42,13 +76,13 @@ async def decode(
         alias="reversed-encoding",
         description="Whether the message was encoded in reverse.",
     ),
-) -> DecodeSchema:
+) -> dict[str, Union[str, DecodeSchema]]:
     """Decode a message from an image.
 
     - **file**: The image
     - **custom-delimiter**: String which identifies the end of the encoded message.
     - **least-significant-bit-amount**: Number of least significant bits which was used to encode the message.
-    - **reversed-encoding**: Whether the message was encoded in reverse.
+    - **reversed-decoding**: Whether the message was encoded in reverse.
 
     \f
     :param file: Source image
@@ -57,18 +91,26 @@ async def decode(
     :param rev: Reverse encoding bool, defaults to False
 
     """
-    data = await file.read()
-    try:
-        decoded = b_decode.api(data, delim, lsb_n, rev)
-    except StopIteration:
-        decoded = None
-    return DecodeSchema(
-        message=decoded,
+    schema = DecodeSchema(
         filename=file.filename,
         delimiter=delim,
         least_significant_bits=lsb_n,
         reverse_decoding=rev,
     )
+
+    data = await file.read()
+    try:
+        decoded = b_decode.api(data, delim, lsb_n, rev)
+    except StopIteration as e:
+        raise HTTPException(
+            status_code=400,
+            detail=e.args,
+            headers={
+                key.replace("_", "-"): repr(value)
+                for key, value in schema  # bool and int are not hashable
+            },
+        ) from e
+    return {"message": decoded, "decode-arguments": schema}
 
 
 __all__ = ["decode", "decode_home", "router"]

@@ -1,4 +1,6 @@
 """Router for the encoding endpoint."""
+from typing import Union
+
 from fastapi import (
     APIRouter,
     BackgroundTasks,
@@ -9,6 +11,7 @@ from fastapi import (
     UploadFile,
 )
 from fastapi.responses import FileResponse
+from starlette.responses import JSONResponse
 
 from image_secrets.api import config
 from image_secrets.api.dependencies import get_settings
@@ -24,7 +27,7 @@ router = APIRouter(
 @router.get(
     "/encode/",
     response_model=dict[str, str],
-    summary="Information about the encode route",
+    summary="Information about encode route",
 )
 async def encode_home(
     settings: config.Settings = Depends(get_settings),
@@ -32,7 +35,18 @@ async def encode_home(
     return {"app-name": settings.app_name}
 
 
-@router.post("/encode/", summary="Encode a message into an image")
+@router.post(
+    "/encode/",
+    response_class=FileResponse,
+    summary="Encode a message into an image",
+    responses={
+        200: {
+            "content": {"image/png": {}},
+            "description": "Return an image with the encoded message.",
+        },
+        400: {"content": {"none": {}}, "description": "failed"},
+    },
+)
 async def encode_message(
     background_tasks: BackgroundTasks,
     *,
@@ -49,7 +63,7 @@ async def encode_message(
         MESSAGE_DELIMITER,
         description="""String which is going to be appended to the end of your message
         so that the message can be decoded later.""",
-        alias="custom-delimeter",
+        alias="custom-delimiter",
     ),
     lsb_n: int = Query(
         1,
@@ -63,7 +77,7 @@ async def encode_message(
         alias="reversed-encoding",
         description="Message will be encoded starting from the last pixel instead of the first one.",
     ),
-) -> FileResponse:
+):
     """Encode a message into an image.
 
     - **message**: The message to encode into the image
@@ -74,6 +88,7 @@ async def encode_message(
     - **reversed-encoding**: Message will be encoded starting from the last pixel instead of the first one.
 
     \f
+    :param background_tasks: background tasks instance to delete the newly created file after response
     :param message: Message to encode
     :param file: Source image
     :param delim: Message delimiter, defaults to 'MESSAGE_DELIMITER'
@@ -85,10 +100,9 @@ async def encode_message(
     try:
         fp = encode.api(message, data, delim, lsb_n, rev)
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=e.args) from e
-
+        raise HTTPException(status_code=404, detail=e.args) from e
     background_tasks.add_task(fp.unlink)
-    return FileResponse(fp)
+    return FileResponse(fp, media_type="image/png", filename=file.filename)
 
 
 __all__ = [

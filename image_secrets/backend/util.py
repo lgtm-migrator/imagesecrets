@@ -4,7 +4,7 @@ from __future__ import annotations
 import secrets
 from io import BytesIO
 from pathlib import Path
-from typing import TYPE_CHECKING, TypeVar, Union
+from typing import TYPE_CHECKING, TypeVar
 
 import numpy as np
 from PIL import Image
@@ -16,15 +16,15 @@ if TYPE_CHECKING:
 _T = TypeVar("_T")
 
 
-def message_bit_array(message: str, delimeter: str, bits: int) -> tuple[ArrayLike, int]:
+def message_bit_array(message: str, delimiter: str, bits: int) -> tuple[ArrayLike, int]:
     """Return a message turned into bits in an array.
 
     :param message: Main message to encode
-    :param delimeter: Message end identifier
+    :param delimiter: Message end identifier
     :param bits: Amount of bits per pixel
 
     """
-    message = (message + delimeter).encode("utf-8")
+    message = (message + delimiter).encode("utf-8")
 
     msg_arr = np.frombuffer(message, dtype=np.uint8)
     lsbits_arr = np.unpackbits(msg_arr)
@@ -86,7 +86,6 @@ __all__ = [
     "encoded_image_name",
     "image_data",
     "message_bit_array",
-    "read_coroutine",
     "save_image",
     "token_hex",
 ]
