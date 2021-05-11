@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Union
 import numpy as np
 
 from image_secrets.backend import util
-from image_secrets.settings import API_IMAGES, MESSAGE_DELIMETER
+from image_secrets.settings import API_IMAGES, MESSAGE_DELIMITER
 
 if TYPE_CHECKING:
     from _io import BytesIO
@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 def main(
     message: str,
     data: Union[BytesIO, Path],
-    delimeter: str = MESSAGE_DELIMETER,
+    delimeter: str = MESSAGE_DELIMITER,
     lsb_n: int = 1,
     reverse: bool = False,
 ) -> ArrayLike:
@@ -58,7 +58,7 @@ def api(
     :param reverse: Reverse encoding bool
 
     """
-    data = util.read_coroutine(file)
+    data = util.read_image_bytes(file)
     arr = main(message, data, delimeter, lsb_n, reverse)
 
     fp = API_IMAGES / f"{util.token_hex()}.png"
@@ -106,18 +106,18 @@ def encode_into_bit_array(base: ArrayLike, new: ArrayLike) -> ArrayLike:
 
 def merge_into_image_array(
     packed: ArrayLike,
-    main: ArrayLike,
+    base: ArrayLike,
     final_shape: tuple,
 ) -> ArrayLike:
     """Concatenate two arrays into the final one.
 
     :param packed: The packed array with the encoded data
-    :param main: Main array with the pixel data
+    :param base: Main array with the pixel data
     :param final_shape: Shape of the original image array
 
     """
     packed_arr = np.packbits(packed)
-    final = np.concatenate((packed_arr, main))
+    final = np.concatenate((packed_arr, base))
     return final.reshape(final_shape)
 
 

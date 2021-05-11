@@ -12,14 +12,14 @@ import pytest
 
 from image_secrets.backend import decode
 from image_secrets.backend.regex import CHARS_8
-from image_secrets.settings import MESSAGE_DELIMETER
+from image_secrets.settings import MESSAGE_DELIMITER
 
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
 
 def random_word(word=None) -> str:
-    """Return a random word of length 3 + MESSAGE_DELIMETER in binary format.
+    """Return a random word of length 3 + MESSAGE_DELIMITER in binary format.
 
     :param word: Optional argument to specify from which Sequence to pick chars, defaults to None
 
@@ -28,7 +28,7 @@ def random_word(word=None) -> str:
         format(ord(char), "b").zfill(8)
         for char in it.chain(
             (random.choice(word if word else string.printable[:-6]) for _ in range(3)),
-            MESSAGE_DELIMETER,
+            MESSAGE_DELIMITER,
         )
     )
 
@@ -80,7 +80,7 @@ def test_decode(enc_array: ArrayLike, expected: str) -> None:
     :param expected: The expected result to be decoded from the array
 
     """
-    assert decode.decode_text(enc_array) == expected[: -len(MESSAGE_DELIMETER)]
+    assert decode.decode_text(enc_array) == expected[: -len(MESSAGE_DELIMITER)]
 
 
 @pytest.mark.parametrize("array", [random_image_array(), random_image_array()])

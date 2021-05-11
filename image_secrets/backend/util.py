@@ -37,7 +37,12 @@ def message_bit_array(message: str, delimeter: str, bits: int) -> tuple[ArrayLik
     return lsbits_arr, msg_len
 
 
-def read_coroutine(data) -> BytesIO:
+def read_image_bytes(data: bytes) -> BytesIO:
+    """Read and return the bytes created by ``FileUpload``.
+
+    :param data: The data to read
+
+    """
     return BytesIO(data)
 
 

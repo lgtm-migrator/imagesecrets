@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Optional, Union
 import numpy as np
 
 from image_secrets.backend import util
-from image_secrets.settings import MESSAGE_DELIMETER
+from image_secrets.settings import MESSAGE_DELIMITER
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 def main(
     data: Union[BytesIO, Path],
-    delimeter: str = MESSAGE_DELIMETER,
+    delimeter: str = MESSAGE_DELIMITER,
     lsb_n: int = 1,
     reverse: bool = False,
 ) -> str:
@@ -50,7 +50,7 @@ def api(
     :param reverse: Reverse decoding bool
 
     """
-    data = util.read_coroutine(data)
+    data = util.read_image_bytes(data)
     text = main(data, delimeter, lsb_n, reverse)
     return text
 
@@ -86,9 +86,8 @@ def decode_text(array: ArrayLike, delimeter) -> Optional[str]:
     # iterating is faster than vectorizing 'chr' on the whole array,
     # many slow string operation are avoided
     for num in array:
-        char = chr(num)
-        text += char
-        if text[-delim_len:] == delimeter:
+        text += chr(num)
+        if text.endswith(delimeter):
             return text[:-delim_len]
     else:
         raise StopIteration("No message found after scanning the whole image.")

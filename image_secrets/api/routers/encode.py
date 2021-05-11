@@ -13,7 +13,7 @@ from fastapi.responses import FileResponse
 from image_secrets.api import config
 from image_secrets.api.dependencies import get_settings
 from image_secrets.backend import encode
-from image_secrets.settings import MESSAGE_DELIMETER
+from image_secrets.settings import MESSAGE_DELIMITER
 
 router = APIRouter(
     tags=["encode"],
@@ -46,7 +46,7 @@ async def encode_message(
         description="The image in which to encode the message.",
     ),
     delim: str = Query(
-        MESSAGE_DELIMETER,
+        MESSAGE_DELIMITER,
         description="""String which is going to be appended to the end of your message
         so that the message can be decoded later.""",
         alias="custom-delimeter",
@@ -55,7 +55,7 @@ async def encode_message(
         1,
         title="Number of least significant bits to alter.",
         ge=1,
-        le=2,
+        le=8,
         alias="least-significant-bit-amount",
     ),
     rev: bool = Query(
@@ -68,7 +68,7 @@ async def encode_message(
 
     - **message**: The message to encode into the image
     - **file**: The image
-    - **custom-delimeter**: String which is going to be appended to the end of your message
+    - **custom-delimiter**: String which is going to be appended to the end of your message
         so that the message can be decoded later.
     - **least-significant-bit-amount**: Number of least significant bits to alter.
     - **reversed-encoding**: Message will be encoded starting from the last pixel instead of the first one.
@@ -76,7 +76,7 @@ async def encode_message(
     \f
     :param message: Message to encode
     :param file: Source image
-    :param delim: Message delimeter, defaults to 'MESSAGE_DELIMETER'
+    :param delim: Message delimiter, defaults to 'MESSAGE_DELIMITER'
     :param lsb_n: Number of lsb to use, defaults to 1
     :param rev: Reverse encoding bool, defaults to False
 
