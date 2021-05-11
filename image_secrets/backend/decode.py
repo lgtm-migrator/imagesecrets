@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Optional, Union
 
 import numpy as np
 
-from image_secrets.backend import util
+from image_secrets.backend.util import image
 from image_secrets.settings import MESSAGE_DELIMITER
 
 if TYPE_CHECKING:
@@ -29,7 +29,7 @@ def main(
     :param reverse: Reverse decoding bool, defaults to False
 
     """
-    _, arr = util.image_data(data)
+    _, arr = image.data(data)
     arr = prepare_array(arr, lsb_n, reverse)
 
     text = decode_text(arr, delimiter)
@@ -50,7 +50,7 @@ def api(
     :param reverse: Reverse decoding bool
 
     """
-    data = util.read_image_bytes(data)
+    data = image.read_bytes(data)
     text = main(data, delimiter, lsb_n, reverse)
     return text
 

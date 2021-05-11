@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Union
 
 import numpy as np
 
-from image_secrets.backend import util
+from image_secrets.backend.util import array, image, main
 from image_secrets.settings import API_IMAGES, MESSAGE_DELIMITER
 
 if TYPE_CHECKING:
@@ -32,7 +32,7 @@ def main(
     :raises ValueError: if the message is too long for the image
 
     """
-    msg_arr, msg_len = util.message_bit_array(message, delimiter, lsb_n)
+    msg_arr, msg_len = array.message_bit(message, delimiter, lsb_n)
     shape, img_arr, unpacked_arr = prepare_image(data, msg_len)
 
     if (size := img_arr.size * lsb_n) < (msg_len := len(message)):
@@ -43,8 +43,13 @@ def main(
     if reverse:
         msg_arr, img_arr = np.flip(msg_arr), np.flip(img_arr)  # all axes get flipped
 
-    enc_arr = encode_into_bit_array(unpacked_arr, msg_arr)
-    final_arr = merge_into_image_array(enc_arr, img_arr, shape)
+    enc_arr = array.edit_column(
+        unpacked_arr,
+        msg_arr,
+        column_num=lsb_n,
+        start_from_end=True,
+    )
+    final_arr = array.pack_and_concatenate(enc_arr, img_arr, shape)
 
     return final_arr if not reverse else np.flip(final_arr)
 
@@ -65,21 +70,17 @@ def api(
     :param reverse: Reverse encoding bool
 
     """
-    data = util.read_image_bytes(file)
+    data = image.read_bytes(file)
     arr = main(message, data, delimiter, lsb_n, reverse)
 
-    fp = API_IMAGES / f"{util.token_hex()}.png"
-    util.save_image(arr, fp)
+    fp = API_IMAGES / f"{main.token_hex(16)}.png"
+    image.save_array(arr, fp)
 
     return fp
 
 
-def cli():
-    ...
-
-
 def prepare_image(
-    data: Union[BytesIO, Path],
+    data: BytesIO,
     message_len: int,
 ) -> tuple[tuple[int, int, int], ArrayLike, ArrayLike]:
     """Prepare an image for encoding.
@@ -88,7 +89,7 @@ def prepare_image(
     :param message_len: Length of the message which will be encoded
 
     """
-    shape, arr = util.image_data(data)
+    shape, arr = image.data(data)
 
     arr = arr.ravel()
     unpacked_arr = np.unpackbits(
@@ -97,47 +98,3 @@ def prepare_image(
     )
 
     return shape, arr[message_len:], unpacked_arr.reshape(-1, 8)
-
-
-def encode_into_bit_array(base: ArrayLike, new: ArrayLike) -> ArrayLike:
-    """Encode an array into the parent array.
-
-    :param base: The main array, data will be encoded into here
-    :param new: The new data to encode, will be put into the base array
-
-    """
-    lsb_n = new.shape[1]
-    base[:, -lsb_n:] = new
-    return base
-
-
-def merge_into_image_array(
-    packed: ArrayLike,
-    base: ArrayLike,
-    final_shape: tuple,
-) -> ArrayLike:
-    """Concatenate two arrays into the final one.
-
-    :param packed: The packed array with the encoded data
-    :param base: Main array with the pixel data
-    :param final_shape: Shape of the original image array
-
-    """
-    packed_arr = np.packbits(packed)
-    final = np.concatenate((packed_arr, base))
-    return final.reshape(final_shape)
-
-
-__all__ = [
-    "api",
-    "cli",
-    "encode_into_bit_array",
-    "main",
-    "merge_into_image_array",
-    "prepare_image",
-]
-
-if __name__ == "__main__":
-    pat = Path("f:/Download/from_api.png")
-    dec = main("helo", pat)
-    print(dec)

@@ -24,8 +24,8 @@ def random_image_arr():
 
 
 @pytest.fixture(scope="session")
-def delimeter_array() -> ArrayLike:
-    """Return a delimeter array, string form = 'dlm'."""
+def delimiter_array() -> ArrayLike:
+    """Return a delimiter array, string form = 'dlm'."""
     return np.array(
         (
             [0],
