@@ -12,4 +12,6 @@ EXPOSE 80
 
 COPY . /app/
 
+RUN pytest
+
 CMD ["python", "bin/run_api.py"]

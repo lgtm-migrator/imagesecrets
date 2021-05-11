@@ -11,19 +11,19 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def test_image_path() -> Path:
     """Return the path to the test.png image."""
-    return Path("tests/test.png").absolute()
+    return Path(__file__).parent / "test.png"
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def random_image_arr():
     """Return array containing data about a random image."""
-    return np.random.randint(0, 255, size=(256, 3), dtype=np.uint8)
+    return np.random.randint(0, 255, size=(8, 8, 3), dtype=np.uint8)
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def delimiter_array() -> ArrayLike:
     """Return a delimiter array, string form = 'dlm'."""
     return np.array(

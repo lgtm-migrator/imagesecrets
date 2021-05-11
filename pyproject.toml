@@ -4,6 +4,16 @@ version = "0.1.0"
 description = "A tool for encoding and decoding messages into/from images."
 authors = ["Lukas Kucera <lukas.kucera.g@protonmail.com>"]
 license = "MIT"
+readme = "README.md"
+repository = "https://gitlab.com/Lkms19/imagesecrets-api"
+
+[tool.black]
+line-length = 88
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+src_paths = ["image_secrets", "tests"]
 
 [tool.poetry.dependencies]
 python = "^3.9"

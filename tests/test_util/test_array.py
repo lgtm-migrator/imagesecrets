@@ -57,3 +57,63 @@ def test_message_bit_array(
     # numpy testing for better visual array differences, raises AssertionError same way like assert
     np.testing.assert_array_equal(arr, expected_arr)
     assert length == expected_arr.size // bits
+
+
+r = fn.partial(np.random.randint, low=0, high=255, size=192, dtype=np.uint8)
+
+
+@pytest.mark.parametrize(
+    "new, col_num, start_from_end",
+    [
+        (r(), 1, True),
+        (r(), 2, True),
+        (r(), 3, True),
+        (r(), 1, False),
+        (r(), 2, False),
+        (r(), 3, False),
+    ],
+)
+def test_edit_column(
+    random_image_arr: ArrayLike,
+    new: ArrayLike,
+    col_num: int,
+    start_from_end: bool,
+) -> None:
+    """Test the edit column function."""
+    bitlike_shape = (-1, 8)
+
+    random_image_arr = random_image_arr.reshape(bitlike_shape)
+    new = new.reshape(-1, col_num)[: random_image_arr.shape[0], :]
+
+    if start_from_end:
+        random_image_arr[:, -col_num:] = new
+    else:
+        random_image_arr[:, :col_num] = new
+
+    result = array.edit_column(
+        random_image_arr.reshape(bitlike_shape),
+        new,
+        col_num,
+        start_from_end,
+    )
+
+    np.testing.assert_array_equal(result, random_image_arr)
+
+
+r = np.random.randint(0, 2, size=(20, 8), dtype=np.uint8)
+
+
+@pytest.mark.parametrize("unpacked", [r, r, r, r, r, r])
+def test_pack_and_concatenate(random_image_arr, unpacked) -> None:
+    """Test the pack and concatenate function."""
+
+    result = array.pack_and_concatenate(
+        unpacked.ravel(),
+        random_image_arr.ravel(),
+        (-1,),
+    )
+
+    np.testing.assert_array_equal(
+        result.ravel()[: -random_image_arr.size],
+        np.packbits(unpacked),
+    )
