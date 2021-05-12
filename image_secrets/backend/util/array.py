@@ -21,7 +21,7 @@ def message_bit(message: str, delimiter: str, bits: int) -> tuple[ArrayLike, int
 
     msg_arr = np.frombuffer(message, dtype=np.uint8)
     lsbits_arr = np.unpackbits(msg_arr)
-    lsbits_arr.resize(
+    lsbits_arr.resize(  # resize fills with zeros if shape doesn't match fully
         (np.ceil(lsbits_arr.size / bits).astype(int), bits),
         refcheck=False,
     )

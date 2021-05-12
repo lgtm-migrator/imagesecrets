@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
+from PIL import Image
 
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
@@ -18,7 +19,14 @@ def test_image_path() -> Path:
 
 
 @pytest.fixture()
-def random_image_arr():
+def test_image_array(test_image_path: Path) -> ArrayLike:
+    """Return numpy array of the test image."""
+    with Image.open(test_image_path).convert("RGB") as img:
+        return np.asarray(img, dtype=np.uint8)
+
+
+@pytest.fixture()
+def random_image_arr() -> ArrayLike:
     """Return array containing data about a random image."""
     return np.random.randint(0, 255, size=(8, 8, 3), dtype=np.uint8)
 

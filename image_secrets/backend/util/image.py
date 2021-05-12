@@ -41,4 +41,4 @@ def save_array(arr: ArrayLike, filepath: Path, /) -> None:
     :param filepath: The path where the image should be saved
 
     """
-    Image.fromarray(np.uint8(arr)).convert("RGB").save(filepath)
+    Image.fromarray(np.uint8(arr)).convert("RGB").save(str(filepath))

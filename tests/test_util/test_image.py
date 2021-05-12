@@ -1,16 +1,12 @@
 """Test the image_util module."""
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from pathlib import Path
 
 import numpy as np
 import pytest
 
 from image_secrets.backend.util import image
-
-if TYPE_CHECKING:
-    ...
-from pathlib import Path
 
 
 @pytest.mark.parametrize(
@@ -33,8 +29,7 @@ def test_data(test_image_path: Path) -> None:
 
     assert arr.ndim == 3
     assert arr.dtype == np.uint8
-    assert arr.max() <= 255
-    assert arr.min() >= 0
+    assert np.logical_and(arr >= 0, arr <= 255).all()
 
     assert shape[-1] == 3
 
