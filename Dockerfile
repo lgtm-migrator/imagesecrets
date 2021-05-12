@@ -1,4 +1,6 @@
-FROM python:3.9
+FROM python:3.9-slim
+
+MAINTAINER lukas.kucera.g@protonmail.com
 
 RUN pip install poetry
 
@@ -8,10 +10,8 @@ COPY poetry.lock pyproject.toml /app/
 RUN poetry config virtualenvs.create false
 RUN poetry install --no-interaction --no-ansi
 
-EXPOSE 80
-
 COPY . /app/
 
 RUN pytest
 
-CMD ["python", "bin/run_api.py"]
+ENTRYPOINT ["python", "bin/run_api.py"]

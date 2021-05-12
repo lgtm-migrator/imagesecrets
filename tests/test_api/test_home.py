@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from fastapi.testclient import TestClient
 
 
-def test_home(api_client: TestClient, api_name) -> None:
+def test_get(api_client: TestClient, api_name) -> None:
     """Test the get request on the home route."""
     response = api_client.get("/")
     assert response.status_code == 200
@@ -15,5 +15,5 @@ def test_home(api_client: TestClient, api_name) -> None:
 
 
 __all__ = [
-    "test_home",
+    "test_get",
 ]

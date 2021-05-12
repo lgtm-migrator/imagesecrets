@@ -16,7 +16,7 @@ router = APIRouter(
 
 
 @router.get(
-    "/decode/",
+    "/decode",
     response_model=dict[str, str],
     summary="Information about decode route",
 )
@@ -27,7 +27,7 @@ async def decode_home(
 
 
 @router.post(
-    "/decode/",
+    "/decode",
     response_model=dict[str, Union[str, DecodeSchema]],
     summary="Decode a message from an image",
     responses={

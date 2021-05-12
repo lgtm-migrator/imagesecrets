@@ -23,7 +23,7 @@ router = APIRouter(
 
 
 @router.get(
-    "/encode/",
+    "/encode",
     response_model=dict[str, str],
     summary="Information about encode route",
 )
@@ -34,7 +34,7 @@ async def encode_home(
 
 
 @router.post(
-    "/encode/",
+    "/encode",
     response_class=FileResponse,
     summary="Encode a message into an image",
     responses={
