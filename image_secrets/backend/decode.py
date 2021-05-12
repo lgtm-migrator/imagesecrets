@@ -63,6 +63,11 @@ def prepare_array(array: ArrayLike, lsb_n: int, reverse: bool) -> ArrayLike:
     :param reverse: Whether the array should be flipped or not
 
     """
+    if not 1 <= lsb_n <= 8:
+        raise ValueError(
+            f"{lsb_n!r} is not a valid amount of least significant bits, must be within {range(1,9)!r}.",
+        )
+
     shape = (-1, 8)
     if reverse:
         array = np.flip(array)
