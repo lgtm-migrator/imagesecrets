@@ -2,7 +2,6 @@
 from typing import Union
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
-from starlette.responses import JSONResponse
 
 from image_secrets.api import config
 from image_secrets.api.dependencies import get_settings
@@ -16,15 +15,19 @@ router = APIRouter(
 )
 
 
-@router.get("/decode/", response_model=dict, summary="Information about decode route")
+@router.get(
+    "/decode/",
+    response_model=dict[str, str],
+    summary="Information about decode route",
+)
 async def decode_home(
     settings: config.Settings = Depends(get_settings),
-) -> JSONResponse:
-    return JSONResponse({"app-name": settings.app_name})
+) -> dict[str, str]:
+    return {"app-name": settings.app_name}
 
 
 @router.post(
-    "/decode",
+    "/decode/",
     response_model=dict[str, Union[str, DecodeSchema]],
     summary="Decode a message from an image",
     responses={

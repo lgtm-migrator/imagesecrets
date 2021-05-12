@@ -6,10 +6,26 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
+from fastapi.testclient import TestClient
 from PIL import Image
+
+from image_secrets.api.config import Settings
+from image_secrets.api.interface import app
 
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
+
+
+@pytest.fixture()
+def api_client() -> TestClient:
+    """Return the starlette testing client."""
+    return TestClient(app)
+
+
+@pytest.fixture()
+def api_name() -> str:
+    """Return the default app name, specified in the Settings BaseModel."""
+    return Settings.__dict__["__fields__"]["app_name"].default
 
 
 @pytest.fixture()

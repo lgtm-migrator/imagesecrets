@@ -12,10 +12,7 @@ class DecodeSchema(BaseModel):
 
     def header_dict(self) -> dict:
         """Return a dictionary to be shown in api headers."""
-        return {
-            key.replace("_", "-"): repr(value)  # bool and int are not hashable
-            for key, value in self
-        }
+        return {key.replace("_", "-"): repr(value) for key, value in self}
 
 
 class EncodeSchema(DecodeSchema):
