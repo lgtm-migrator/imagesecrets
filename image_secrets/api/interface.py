@@ -13,7 +13,6 @@ app = FastAPI(
     title="ImageSecrets",
     description="Encode and decode messages from images!",
     version="0.1.0",
-    redoc_url=None,
 )
 app.include_router(decode.router)
 app.include_router(encode.router)

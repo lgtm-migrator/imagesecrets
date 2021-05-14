@@ -2,13 +2,15 @@ image: python:latest
 
 before_script:
     - python --version
+    - docker info
 
 stages:
-    - build
+    - install
     - test
+    - build
 
-build:
-    stage: build
+install:
+    stage: install
     script:
         - python -m pip install --upgrade pip
         - python -m pip install poetry
@@ -23,3 +25,9 @@ pytest:
         - python -m poetry run pytest
     tags:
         - ci
+
+docker:
+    stage: build
+    when: on_success
+    script:
+        - docker build . -t imagesecrets --rm
