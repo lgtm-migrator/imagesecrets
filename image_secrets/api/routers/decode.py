@@ -71,11 +71,10 @@ async def decode(
         description="The previously defined message delimiter.",
         alias="custom-delimiter",
         min_length=1,
-        example="<>this-was-my-delimiter<>",
     ),
     lsb_n: int = Query(
         1,
-        title="Number of least significant bits which have been used to encode the message.",
+        description="Number of least significant bits which have been used to encode the message.",
         ge=1,
         le=8,
         alias="least-significant-bit-amount",

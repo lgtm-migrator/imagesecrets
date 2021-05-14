@@ -59,7 +59,7 @@ async def encode_message(
     *,
     message: str = Query(
         ...,
-        title="message to encode",
+        title="Message to encode",
         description="The message to encode into the image.",
         min_length=1,
         example="My secret message!",
@@ -74,11 +74,10 @@ async def encode_message(
         so that the message can be decoded later.""",
         alias="custom-delimiter",
         min_length=1,
-        example="<>my-custom-delimiter<>",
     ),
     lsb_n: int = Query(
         1,
-        title="Number of least significant bits to alter.",
+        description="Number of least significant bits to alter.",
         ge=1,
         le=8,
         alias="least-significant-bit-amount",
