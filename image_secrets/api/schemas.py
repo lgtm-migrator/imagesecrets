@@ -6,9 +6,9 @@ class DecodeSchema(BaseModel):
     """Response model for information about decoding."""
 
     filename: str
-    delimiter: str
-    least_significant_bits: int
-    reverse_decoding: bool
+    custom_delimiter: str
+    least_significant_bit_amount: int
+    reversed_encoding: bool
 
     def header_dict(self) -> dict:
         """Return a dictionary to be shown in api headers."""

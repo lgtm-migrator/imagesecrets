@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, BinaryIO
 
 import numpy as np
 import pytest
@@ -32,6 +32,12 @@ def api_name() -> str:
 def test_image_path() -> Path:
     """Return the path to the test.png image."""
     return Path(__file__).parent / "test.png"
+
+
+@pytest.fixture()
+def api_image_file(test_image_path) -> dict[str, tuple[str, BinaryIO, str]]:
+    """Return the dict with file needed to use post requests."""
+    return {"file": (test_image_path.name, test_image_path.open("rb"), "image/png")}
 
 
 @pytest.fixture()

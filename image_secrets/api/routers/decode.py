@@ -53,7 +53,7 @@ async def decode_home(
             "content": {
                 "application/json": {
                     "example": {
-                        "detail": ["Something went wrong while decoding."],
+                        "detail": "Something went wrong with decoding.",
                     },
                 },
             },
@@ -68,12 +68,14 @@ async def decode(
     ),
     delim: str = Query(
         MESSAGE_DELIMITER,
-        description="""The previously defined message delimiter.""",
+        description="The previously defined message delimiter.",
         alias="custom-delimiter",
+        min_length=1,
+        example="<>this-was-my-delimiter<>",
     ),
     lsb_n: int = Query(
         1,
-        title="Number of least significant bits which have beed used to encode the message.",
+        title="Number of least significant bits which have been used to encode the message.",
         ge=1,
         le=8,
         alias="least-significant-bit-amount",
@@ -89,7 +91,7 @@ async def decode(
     - **file**: The image
     - **custom-delimiter**: String which identifies the end of the encoded message.
     - **least-significant-bit-amount**: Number of least significant bits which was used to encode the message.
-    - **reversed-decoding**: Whether the message was encoded in reverse.
+    - **reversed-encoding**: Whether the message was encoded in reverse.
 
     \f
     :param file: Source image
@@ -100,9 +102,9 @@ async def decode(
     """
     schema = DecodeSchema(
         filename=file.filename,
-        delimiter=delim,
-        least_significant_bits=lsb_n,
-        reverse_decoding=rev,
+        custom_delimiter=delim,
+        least_significant_bit_amount=lsb_n,
+        reversed_encoding=rev,
     )
 
     data = await file.read()

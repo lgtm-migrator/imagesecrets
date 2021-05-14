@@ -47,7 +47,7 @@ async def encode_home(
             "content": {
                 "application/json": {
                     "example": {
-                        "detail": ["Something went wrong while encoding."],
+                        "detail": "Something went wrong with encoding.",
                     },
                 },
             },
@@ -61,6 +61,8 @@ async def encode_message(
         ...,
         title="message to encode",
         description="The message to encode into the image.",
+        min_length=1,
+        example="My secret message!",
     ),
     file: UploadFile = File(
         ...,
@@ -71,6 +73,8 @@ async def encode_message(
         description="""String which is going to be appended to the end of your message
         so that the message can be decoded later.""",
         alias="custom-delimiter",
+        min_length=1,
+        example="<>my-custom-delimiter<>",
     ),
     lsb_n: int = Query(
         1,
@@ -106,9 +110,9 @@ async def encode_message(
     schema = EncodeSchema(
         message=message,
         filename=file.filename,
-        delimiter=delim,
-        least_significant_bits=lsb_n,
-        reverse_decoding=rev,
+        custom_delimiter=delim,
+        least_significant_bit_amount=lsb_n,
+        reversed_encoding=rev,
     )
     header_dict = schema.header_dict()
 
