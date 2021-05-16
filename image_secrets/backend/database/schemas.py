@@ -1,34 +1,19 @@
 """Module with pydantic models (schemas)."""
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 
 class ImageBase(BaseModel):
     """Base image model."""
 
-    delimiter: str
-    lsb_amount: int
-    reversed: bool
-
-
-class DecodeImageCreate(ImageBase):
-    """Model for new image creation via decoding data from it."""
-
-
-class EncodeImageCreate(ImageBase):
-    """Model for new image creation via encoding data from it."""
-
-    message: str
-
 
 class Image(ImageBase):
     """Model for reading image information."""
 
-    id: int
-    filename: str
     image_name: str
     message: str
-
-    owner_id: int
+    delimiter: str
+    lsb_amount: int
+    reversed: bool
 
     class Config:
         """Config class to setup orm mode."""
@@ -40,7 +25,7 @@ class UserBase(BaseModel):
     """Base user model."""
 
     username: str
-    email: str
+    email: EmailStr
 
 
 class UserCreate(UserBase):
@@ -52,8 +37,8 @@ class UserCreate(UserBase):
 class User(UserBase):
     """Model for reading user information."""
 
-    id: int
-    items: list[Image] = []
+    decoded_images: list[Image] = []
+    encoded_images: list[Image] = []
 
     class Config:
         """Config class to setup orm mode."""

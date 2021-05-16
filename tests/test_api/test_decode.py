@@ -70,9 +70,6 @@ def test_post_invalid_lsb(
 
     json_ = response.json()
     assert response.status_code == 422
-    assert json_["detail"][0]["loc"][-1] == "least-significant-bit-amount"
-    assert (
-        f"value_error.number.not_{'ge' if lsb_n < 1 else 'le'}"
-        in response.content.decode()
-    )
+    assert json_["field"] == "least-significant-bit-amount"
+    assert f"ensure this value is {'greater' if lsb_n < 1 else 'less'}" in json_["info"]
     assert response.headers["content-type"] == "application/json"

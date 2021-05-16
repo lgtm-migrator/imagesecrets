@@ -1,4 +1,4 @@
-"""Decode router."""
+"""Router for decoding operations."""
 from typing import Union
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
@@ -7,6 +7,7 @@ from image_secrets.api import config
 from image_secrets.api.dependencies import get_settings
 from image_secrets.api.schemas import DecodeSchema
 from image_secrets.backend import decode as b_decode
+from image_secrets.backend.database.schemas import User, UserCreate
 from image_secrets.settings import MESSAGE_DELIMITER
 
 router = APIRouter(

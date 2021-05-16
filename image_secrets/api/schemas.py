@@ -19,3 +19,10 @@ class EncodeSchema(DecodeSchema):
     """Response model for information about encoding."""
 
     message: str
+
+
+class Token(BaseModel):
+    """Response model for access token."""
+
+    access_token: str
+    token_type: str

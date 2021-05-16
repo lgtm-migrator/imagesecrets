@@ -1,4 +1,4 @@
-"""Router for the encoding endpoint."""
+"""Router for the encoding operations."""
 from fastapi import (
     APIRouter,
     BackgroundTasks,
