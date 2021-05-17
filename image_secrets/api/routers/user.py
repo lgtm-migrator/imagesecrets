@@ -28,7 +28,7 @@ router = APIRouter(
 def create_access_token(data: dict, minutes: int = TOKEN_EXPIRATION_MINUTES):
     to_encode = data.copy()
     expire = dt.datetime.utcnow() + dt.timedelta(minutes=minutes)
-    to_encode.update({"exp": expire})
+    to_encode |= {"exp": expire}
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 

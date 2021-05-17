@@ -1,13 +1,11 @@
 """Application Programming Interface"""
 import shutil
 
-from fastapi import Depends, FastAPI, Request, status
-from fastapi.encoders import jsonable_encoder
-from fastapi.exceptions import HTTPException, RequestValidationError
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi import Depends, FastAPI
 
-from image_secrets.api import config, exceptions
+
+from image_secrets.api.handlers import init_handlers
+from image_secrets.api import config
 from image_secrets.api.dependencies import get_settings
 from image_secrets.api.routers import decode, encode, user
 from image_secrets.settings import API_IMAGES
@@ -22,28 +20,7 @@ app.include_router(user.router)
 app.include_router(decode.router)
 app.include_router(encode.router)
 
-
-@app.exception_handler(RequestValidationError)
-async def validation_exception_handler(
-    request: Request,
-    exc: RequestValidationError,
-) -> JSONResponse:
-    errors = exc.errors()[0]
-    msg = errors["msg"]
-    field = errors["loc"][-1]
-    return await exceptions.handler(status_code=422, message=msg, field=field)
-
-
-@app.exception_handler(exceptions.DetailExists)
-async def http_exception_handler(
-    request: Request,
-    exc: exceptions.DetailExists,
-) -> JSONResponse:
-    return await exceptions.handler(
-        status_code=exc.status_code,
-        message=exc.message,
-        field=exc.field,
-    )
+init_handlers(app)
 
 
 @app.on_event("startup")

@@ -10,15 +10,13 @@ from fastapi import (
 )
 from fastapi.responses import FileResponse
 
-from image_secrets.api import config
-from image_secrets.api.dependencies import get_settings
-from image_secrets.api.schemas import EncodeSchema
+from image_secrets.api import config, schemas, dependencies
 from image_secrets.backend import encode
 from image_secrets.settings import MESSAGE_DELIMITER
 
 router = APIRouter(
     tags=["encode"],
-    dependencies=[Depends(get_settings)],
+    dependencies=[Depends(dependencies.get_settings)],
 )
 
 
@@ -28,7 +26,7 @@ router = APIRouter(
     summary="Information about encode route",
 )
 async def encode_home(
-    settings: config.Settings = Depends(get_settings),
+    settings: config.Settings = Depends(dependencies.get_settings),
 ) -> dict[str, str]:
     return {"app-name": settings.app_name}
 
@@ -106,7 +104,7 @@ async def encode_message(
     :param rev: Reverse encoding bool, defaults to False
 
     """
-    schema = EncodeSchema(
+    schema = schemas.Encode(
         message=message,
         filename=file.filename,
         custom_delimiter=delim,

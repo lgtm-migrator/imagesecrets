@@ -3,16 +3,13 @@ from typing import Union
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 
-from image_secrets.api import config
-from image_secrets.api.dependencies import get_settings
-from image_secrets.api.schemas import DecodeSchema
+from image_secrets.api import config, schemas, dependencies
 from image_secrets.backend import decode as b_decode
-from image_secrets.backend.database.schemas import User, UserCreate
 from image_secrets.settings import MESSAGE_DELIMITER
 
 router = APIRouter(
     tags=["decode"],
-    dependencies=[Depends(get_settings)],
+    dependencies=[Depends(dependencies.get_settings)],
 )
 
 
@@ -22,18 +19,18 @@ router = APIRouter(
     summary="Information about decode route",
 )
 async def decode_home(
-    settings: config.Settings = Depends(get_settings),
+    settings: config.Settings = Depends(dependencies.get_settings),
 ) -> dict[str, str]:
     return {"app-name": settings.app_name}
 
 
 @router.post(
     "/decode",
-    response_model=dict[str, Union[str, DecodeSchema]],
+    response_model=dict[str, Union[str, schemas.Decode]],
     summary="Decode a message from an image",
     responses={
         200: {
-            "model": dict[str, Union[str, DecodeSchema]],
+            "model": dict[str, Union[str, schemas.Decode]],
             "description": "Successful Response",
             "content": {
                 "application/json": {
@@ -85,7 +82,7 @@ async def decode(
         alias="reversed-encoding",
         description="Whether the message was encoded in reverse.",
     ),
-) -> dict[str, Union[str, DecodeSchema]]:
+) -> dict[str, Union[str, schemas.Decode]]:
     """Decode a message from an image.
 
     - **file**: The image
@@ -100,7 +97,7 @@ async def decode(
     :param rev: Reverse encoding bool, defaults to False
 
     """
-    schema = DecodeSchema(
+    schema = schemas.Decode(
         filename=file.filename,
         custom_delimiter=delim,
         least_significant_bit_amount=lsb_n,

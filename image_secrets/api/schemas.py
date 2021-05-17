@@ -2,7 +2,7 @@
 from pydantic import BaseModel
 
 
-class DecodeSchema(BaseModel):
+class Decode(BaseModel):
     """Response model for information about decoding."""
 
     filename: str
@@ -15,7 +15,7 @@ class DecodeSchema(BaseModel):
         return {key.replace("_", "-"): repr(value) for key, value in self}
 
 
-class EncodeSchema(DecodeSchema):
+class Encode(Decode):
     """Response model for information about encoding."""
 
     message: str
