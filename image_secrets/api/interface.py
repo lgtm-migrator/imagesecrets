@@ -7,7 +7,7 @@ from fastapi import Depends, FastAPI
 
 from image_secrets.api import config, handlers, dependencies
 from image_secrets.api.routers import decode, encode
-from image_secrets.api.routers.users import main
+from image_secrets.api.routers.users import main, me
 from image_secrets.settings import API_IMAGES
 
 app = FastAPI(
@@ -19,6 +19,7 @@ app = FastAPI(
 app.include_router(decode.router)
 app.include_router(encode.router)
 app.include_router(main.router)
+app.include_router(me.router)
 
 handlers.init(app)
 

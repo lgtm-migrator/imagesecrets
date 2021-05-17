@@ -17,8 +17,8 @@ def token_hex(length: int, /) -> str:
     return secrets.token_hex(math.ceil(abs(length) / 2))
 
 
-def extract_field_from_integrity(error_message: str) -> str:
-    return re.search(INTEGRITY_FIELD, error_message).group(1)
+def parse_integrity(*, error_message: str) -> tuple[str, str]:
+    return re.findall(INTEGRITY_FIELD, error_message)[0]
 
 
 __all__ = [

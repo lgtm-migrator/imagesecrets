@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Optional, Any, TYPE_CHECKING
 
-from fastapi import Request
+from fastapi import Request, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
@@ -29,11 +29,15 @@ async def handler(
     status_code: int,
     message: str,
     field: str,
+    value: Optional[str] = None,
     headers: Optional[Any] = None,
 ) -> JSONResponse:
+    content = {"info": message, "field": field}
+    if value:
+        content |= {"value": value}
     return JSONResponse(
         status_code=status_code,
-        content=jsonable_encoder({"info": message, "field": field}),
+        content=jsonable_encoder(content),
         headers=headers,
     )
 
@@ -45,7 +49,11 @@ async def validation_exception_handler(
     errors = exc.errors()[0]
     msg = errors["msg"]
     field = errors["loc"][-1]
-    return await handler(status_code=422, message=msg, field=field)
+    return await handler(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        message=msg,
+        field=field,
+    )
 
 
 async def http_exception_handler(
@@ -56,4 +64,5 @@ async def http_exception_handler(
         status_code=exc.status_code,
         message=exc.message,
         field=exc.field,
+        value=exc.value,
     )

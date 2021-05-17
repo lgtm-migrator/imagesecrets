@@ -1,14 +1,16 @@
 """CRUD operations with user."""
 from __future__ import annotations
 
-from sqlalchemy import select, orm
+from typing import Optional
+
+from sqlalchemy import select, orm, delete as delete_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from image_secrets.backend.database import models, schemas
 from image_secrets.backend.util import password
 
 
-async def get(session: AsyncSession, username: str) -> models.User:
+async def get(session: AsyncSession, username: str) -> Optional[models.User]:
     """Return a user registered in a database.
 
     :param session: Database session
@@ -27,7 +29,7 @@ async def get(session: AsyncSession, username: str) -> models.User:
     return r
 
 
-async def create(session: AsyncSession, user: schemas.UserCreate):
+async def create(session: AsyncSession, user: schemas.UserCreate) -> models.User:
     """Create a new user.
 
     :param session: Database session
@@ -43,5 +45,15 @@ async def create(session: AsyncSession, user: schemas.UserCreate):
     async with session.begin():
         session.add(db_user)
         await session.commit()
-    await session.refresh(db_user)
     return db_user
+
+
+async def delete(session: AsyncSession, username: str):
+    """Delete a user.
+
+    :param session: Database session.
+    :param username: Username of the user to delete
+
+    """
+    await session.execute(delete_(models.User).where(models.User.username == username))
+    await session.commit()

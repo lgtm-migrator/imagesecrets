@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import datetime as dt
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from jose import jwt
 
@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
 
 
-def create_access_token(data: dict, minutes: int = TOKEN_EXPIRATION_MINUTES):
+def create_access_token(data: dict, minutes: int = TOKEN_EXPIRATION_MINUTES) -> str:
     to_encode = data.copy()
     expire = dt.datetime.utcnow() + dt.timedelta(minutes=minutes)
     to_encode |= {"exp": expire}
@@ -30,7 +30,7 @@ async def authenticate(
     session: AsyncSession,
     username: str,
     plain_password: str,
-) -> models.User:
+) -> Optional[models.User]:
     user_model = await user_crud.get(session, username)
-    if password.auth(plain_password, user_model.password):
+    if user_model and password.auth(plain_password, user_model.password):
         return user_model
