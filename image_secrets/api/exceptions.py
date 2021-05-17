@@ -1,9 +1,5 @@
 """Custom exceptions."""
-from typing import Any, Optional
-
 from fastapi import HTTPException
-from fastapi.encoders import jsonable_encoder
-from fastapi.responses import JSONResponse
 
 
 class DetailExists(HTTPException):

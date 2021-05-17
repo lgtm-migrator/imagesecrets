@@ -1,26 +1,26 @@
 """Application Programming Interface"""
+from __future__ import annotations
+
 import shutil
 
 from fastapi import Depends, FastAPI
 
-
-from image_secrets.api.handlers import init_handlers
-from image_secrets.api import config
-from image_secrets.api.dependencies import get_settings
-from image_secrets.api.routers import decode, encode, user
+from image_secrets.api import config, handlers, dependencies
+from image_secrets.api.routers import decode, encode
+from image_secrets.api.routers.users import main
 from image_secrets.settings import API_IMAGES
 
 app = FastAPI(
-    dependencies=[Depends(get_settings)],
+    dependencies=[Depends(dependencies.get_settings)],
     title="ImageSecrets",
     description="Encode and decode messages from images!",
     version="0.1.0",
 )
-app.include_router(user.router)
 app.include_router(decode.router)
 app.include_router(encode.router)
+app.include_router(main.router)
 
-init_handlers(app)
+handlers.init(app)
 
 
 @app.on_event("startup")
@@ -42,7 +42,9 @@ async def shutdown() -> None:
     summary="Basic information about the API.",
     tags=["home"],
 )
-async def home(settings: config.Settings = Depends(get_settings)) -> dict[str, str]:
+async def home(
+    settings: config.Settings = Depends(dependencies.get_settings),
+) -> dict[str, str]:
     """Return basic info about the home route."""
     return {"app-name": settings.app_name}
 

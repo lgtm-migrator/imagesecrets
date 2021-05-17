@@ -1,15 +1,11 @@
-"""Module with CRUD operations connected to users."""
+"""CRUD operations with user."""
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
-from sqlalchemy import orm, select
+from sqlalchemy import select, orm
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from image_secrets.backend.database import models, schemas
 from image_secrets.backend.util import password
-
-if TYPE_CHECKING:
-    from sqlalchemy.ext.asyncio import AsyncSession
 
 
 async def get(session: AsyncSession, username: str) -> models.User:
@@ -49,13 +45,3 @@ async def create(session: AsyncSession, user: schemas.UserCreate):
         await session.commit()
     await session.refresh(db_user)
     return db_user
-
-
-async def authenticate(
-    session: AsyncSession,
-    username: str,
-    plain_password: str,
-) -> models.User:
-    user = await get(session, username)
-    if password.auth(plain_password, user.password):
-        return user

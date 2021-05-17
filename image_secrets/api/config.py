@@ -7,10 +7,16 @@ from image_secrets.settings import API_IMAGES
 
 
 class Settings(BaseSettings):
-    """Settings class."""
+    """API Settings."""
 
     app_name: str = "ImageSecrets"
     image_folder: Path = API_IMAGES
+
+    class Config:
+        """Settings configuration."""
+
+        env_file = ".env"
+        env_file_encoding = "utf-8"
 
 
 __all__ = [

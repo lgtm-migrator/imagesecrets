@@ -14,13 +14,13 @@ if TYPE_CHECKING:
     from fastapi import FastAPI
 
 
-def init_handlers(app: FastAPI):
-    """Connect the exception handlers to the app.
+def init(app: FastAPI):
+    """Connect exception handlers to app.
 
     :param app: The current app instance
 
     """
-    # replace the decorators
+    # same as decorator syntax
     app.exception_handler(RequestValidationError)(validation_exception_handler)
     app.exception_handler(DetailExists)(http_exception_handler)
 
