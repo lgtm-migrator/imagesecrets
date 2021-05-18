@@ -36,7 +36,7 @@ class DecodedImage(ImageMixin, Base):
 
     __tablename__ = "decoded_images"
 
-    owner_id = Column(Integer, ForeignKey("users.id"))
+    owner_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
     owner = orm.relationship("User", back_populates="decoded_images")
 
 
@@ -45,5 +45,5 @@ class EncodedImage(ImageMixin, Base):
 
     __tablename__ = "encoded_images"
 
-    owner_id = Column(Integer, ForeignKey("users.id"))
+    owner_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
     owner = orm.relationship("User", back_populates="encoded_images")

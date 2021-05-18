@@ -5,15 +5,13 @@ import functools as fn
 
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError, jwt
 from sqlalchemy.ext.asyncio import AsyncSession
-from jose import jwt, JWTError
 
 from image_secrets.api import config
-from image_secrets.backend.constants import SECRET_KEY, ALGORITHM
+from image_secrets.backend.constants import ALGORITHM, SECRET_KEY
 from image_secrets.backend.database import user_crud
-
 from image_secrets.backend.database.base import async_session
-
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -42,7 +40,7 @@ async def get_current_user(
             detail="could not validate token",
             headers={"WWW-Authenticate": "Bearer"},
         ) from e
-    user = await user_crud.get(session, username=payload["sub"])
+    user = await user_crud.get(session, value=payload["sub"], column="username")
     return user
 
 

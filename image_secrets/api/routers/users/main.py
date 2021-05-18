@@ -22,14 +22,14 @@ async def login_for_access_token(
     session: AsyncSession = Depends(dependencies.get_session),
     form_data: OAuth2PasswordRequestForm = Depends(),
 ) -> dict[str, str]:
-    user = await login.authenticate(session, form_data.username, form_data.password)
-    if not user:
+    auth = await login.authenticate(session, form_data.username, form_data.password)
+    if not auth:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token = login.create_access_token(data={"sub": user.username})
+    access_token = login.create_access_token(data={"sub": form_data.username})
     return {"access_token": access_token, "token_type": "bearer"}
 
 

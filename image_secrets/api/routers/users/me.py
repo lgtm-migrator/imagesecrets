@@ -6,11 +6,11 @@ Note: get_current_user dependency is in every function because access to the cur
 """
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from image_secrets.api.dependencies import get_settings, get_current_user, get_session
-from image_secrets.backend.database import schemas, models, user_crud
+from image_secrets.api.dependencies import get_current_user, get_session, get_settings
+from image_secrets.backend.database import models, schemas, user_crud
 
 router = APIRouter(
     prefix="/users",
@@ -44,9 +44,10 @@ async def patch(
     return current_user
 
 
-@router.delete("/me", status_code=status.HTTP_200_OK)
+@router.delete("/me", status_code=status.HTTP_204_NO_CONTENT)
 async def delete(
     session: AsyncSession = Depends(get_session),
     current_user: models.User = Depends(get_current_user),
 ):
-    await user_crud.delete(session, current_user.username)
+    await user_crud.delete(session, current_user.id)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
