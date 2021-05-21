@@ -1,15 +1,17 @@
 """Router for current user.
 
 Note: manager dependency is in every route because access to the current user information is needed.
-    github issue link: https://github.com/tiangolo/fastapi/issues/424#issuecomment-584169213
+    relevant github discussion: https://github.com/tiangolo/fastapi/issues/424#issuecomment-584169213
 
 """
 from __future__ import annotations
 
+from typing import Optional
+
 from fastapi import APIRouter, Depends, Response, status
 from tortoise.exceptions import IntegrityError
 
-from image_secrets.api import dependencies, exceptions
+from image_secrets.api import dependencies, exceptions, responses
 from image_secrets.api.routers.users.main import manager
 from image_secrets.backend.database.user import crud, models, schemas
 from image_secrets.backend.util.main import parse_integrity
@@ -18,21 +20,46 @@ router = APIRouter(
     prefix="/users",
     tags=["me"],
     dependencies=[Depends(dependencies.get_config), Depends(manager)],
+    responses=responses.AUTHORIZATION | responses.NOT_FOUND,
 )
 
 
-@router.get("/me", response_model=schemas.User)
+@router.get("/me", response_model=schemas.User, summary="Account information")
 async def get(
     current_user: models.User = Depends(manager),
-):
+) -> Optional[schemas.User]:
+    """Show all information connected to a User.
+
+    \f
+    :param current_user: Current user dependency
+
+    """
     return await schemas.User.from_tortoise_orm(current_user)
 
 
-@router.patch("/me", status_code=status.HTTP_202_ACCEPTED, response_model=schemas.User)
+@router.patch(
+    "/me",
+    status_code=status.HTTP_202_ACCEPTED,
+    response_model=schemas.User,
+    summary="Update user credentials",
+    responses=responses.CONFLICT,
+)
 async def patch(
     update_schema: schemas.UserUpdate,
     current_user: models.User = Depends(manager),
-):
+) -> Optional[schemas.User]:
+    """Update account details
+
+    - **username**: New account username
+    - **email**: New account email
+
+    \f
+    :param update_schema: Schema with necessary information to update the user details
+    :param current_user: Current user dependency
+
+    :raises DetailExists: if either of the new values are already claimed in the database
+
+    """
     try:
         user = await crud.update(
             current_user.id,
@@ -49,9 +76,19 @@ async def patch(
     return await schemas.User.from_tortoise_orm(user)
 
 
-@router.delete("/me", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/me",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete an Account",
+)
 async def delete(
     current_user: models.User = Depends(manager),
-):
+) -> Optional[Response]:
+    """Delete a user and all extra information connected to it.
+
+    \f
+    :param current_user: Current user dependency
+
+    """
     await crud.delete(current_user.id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

@@ -71,7 +71,7 @@ async def login(
         )
 
     access_token = manager.create_access_token(data={"sub": form_data.username})
-    return {"access-token": access_token, "token-type": "bearer"}
+    return {"access_token": access_token, "token_type": "bearer"}
 
 
 @router.post(
@@ -89,9 +89,9 @@ async def register(user: schemas.UserCreate) -> schemas.User:
     - **password**: New account password
 
     \f
-    :param user: UserCreate schema with necessary information to create a new user
+    :param user: Schema with necessary information to create a new user
 
-    :raises DetailExists: if either username or email already exist in database
+    :raises DetailExists: if either username or email are already claimed in database
 
     """
     try:
