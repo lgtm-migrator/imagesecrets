@@ -1,22 +1,29 @@
 """FastAPI configuration."""
-from pathlib import Path
+import os
 
-from pydantic import BaseSettings
+from dotenv import load_dotenv
+from pydantic import BaseSettings, DirectoryPath, PostgresDsn
 
-from image_secrets.settings import API_IMAGES
+from image_secrets.settings import API_IMAGES, ENV, MESSAGE_DELIMITER
+
+load_dotenv()
 
 
 class Settings(BaseSettings):
     """API Settings."""
 
     app_name: str = "ImageSecrets"
-    image_folder: Path = API_IMAGES
+
+    message_delimiter: str = MESSAGE_DELIMITER
+    image_folder: DirectoryPath = API_IMAGES
+
+    pg_dsn: PostgresDsn = os.getenv("PG_DSN")
+    secret_key: str = os.getenv("SECRET_KEY")
 
     class Config:
         """Settings configuration."""
 
-        env_file = ".env"
-        env_file_encoding = "utf-8"
+        env_file = ENV
 
 
 __all__ = [

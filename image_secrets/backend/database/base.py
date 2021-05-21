@@ -1,24 +1,27 @@
-"""Base SQLAlchemy setup."""
-import os
+"""Main database module."""
+from __future__ import annotations
 
-from dotenv import load_dotenv
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from typing import TYPE_CHECKING
 
-load_dotenv()
-DATABASE_URL = os.getenv("DB_URL")
-engine = create_async_engine(DATABASE_URL, echo=True)
-async_session = sessionmaker(
-    engine,
-    class_=AsyncSession,
-    expire_on_commit=False,
-    autocommit=False,
-)
-Base = declarative_base()
+from tortoise.contrib.fastapi import register_tortoise
+
+from image_secrets.backend.database.image import models as image_models
+from image_secrets.backend.database.user import models as user_models
+
+if TYPE_CHECKING:
+    from fastapi import FastAPI
 
 
-async def init_models():
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
-        await conn.run_sync(Base.metadata.create_all)
+def init(app: FastAPI, db_url: str) -> None:
+    """Initialize a database connection.
+
+    :param app: FastAPI instance
+    :param db_url: Url to database
+
+    """
+    register_tortoise(
+        app,
+        db_url=db_url,
+        modules={"models": [user_models, image_models]},
+        generate_schemas=True,
+    )

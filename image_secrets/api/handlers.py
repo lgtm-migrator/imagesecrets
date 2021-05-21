@@ -1,28 +1,29 @@
 """Exception handlers for api."""
 from __future__ import annotations
 
-from typing import Optional, Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Optional
 
 from fastapi import Request, status
 from fastapi.encoders import jsonable_encoder
-from fastapi.exceptions import RequestValidationError
+from fastapi.exceptions import HTTPException, RequestValidationError
 from fastapi.responses import JSONResponse
 
-from image_secrets.api.exceptions import DetailExists
+from image_secrets.api.exceptions import DetailExists, NotAuthenticated
 
 if TYPE_CHECKING:
     from fastapi import FastAPI
 
 
-def init(app: FastAPI):
+def init(app: FastAPI) -> None:
     """Connect exception handlers to app.
 
     :param app: The current app instance
 
     """
     # same as decorator syntax
-    app.exception_handler(RequestValidationError)(validation_exception_handler)
-    app.exception_handler(DetailExists)(http_exception_handler)
+    app.exception_handler(RequestValidationError)(validation_error)
+    app.exception_handler(DetailExists)(detail_exists)
+    app.exception_handler(NotAuthenticated)(not_authenticated)
 
 
 async def handler(
@@ -42,10 +43,7 @@ async def handler(
     )
 
 
-async def validation_exception_handler(
-    request: Request,
-    exc: RequestValidationError,
-) -> JSONResponse:
+async def validation_error(req: Request, exc: RequestValidationError) -> JSONResponse:
     errors = exc.errors()[0]
     msg = errors["msg"]
     field = errors["loc"][-1]
@@ -56,13 +54,17 @@ async def validation_exception_handler(
     )
 
 
-async def http_exception_handler(
-    request: Request,
-    exc: DetailExists,
-) -> JSONResponse:
+async def detail_exists(req: Request, exc: DetailExists) -> JSONResponse:
     return await handler(
         status_code=exc.status_code,
         message=exc.message,
         field=exc.field,
         value=exc.value,
+    )
+
+
+async def not_authenticated(req: Request, exc: NotAuthenticated) -> JSONResponse:
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": "user authorization required"},
     )

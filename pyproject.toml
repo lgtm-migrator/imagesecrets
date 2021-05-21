@@ -17,25 +17,25 @@ src_paths = ["image_secrets", "tests"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-Pillow = "^8.2.0"
-fastapi = "^0.65.0"
-numpy = "^1.20.2"
-uvicorn = "^0.13.4"
+fastapi = "^0.65.1"
+fastapi-login = "^1.6.0"
+fastapi-mail = "^0.3.7"
+pydantic = {extras = ["email", "ujson"], version = "^1.8.2"}
 python-multipart = "^0.0.5"
+aiofiles = "^0.7.0"
 requests = "^2.25.1"
-aiofiles = "^0.6.0"
-pydantic = {extras = ["email"], version = "^1.8.2"}
-SQLAlchemy = "^1.4.15"
-asyncpg = "^0.22.0"
-python-jose = "^3.2.0"
+uvicorn = "^0.13.4"
+tortoise-orm = { extras = ["asyncpg"], version = "^0.17.2" }
+numpy = "^1.20.2"
+Pillow = "^8.2.0"
 bcrypt = "^3.2.0"
+python-dotenv = "^0.17.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.3"
 pytest-mock = "^3.6.1"
-python-dotenv = "^0.17.1"
-httpx = "^0.18.1"
 pytest-asyncio = "^0.15.1"
+devtools = "^0.6.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

@@ -3,13 +3,13 @@ from typing import Union
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 
-from image_secrets.api import config, schemas, dependencies
+from image_secrets.api import config, dependencies, schemas
 from image_secrets.backend import decode as b_decode
 from image_secrets.settings import MESSAGE_DELIMITER
 
 router = APIRouter(
     tags=["decode"],
-    dependencies=[Depends(dependencies.get_settings)],
+    dependencies=[Depends(dependencies.get_config)],
 )
 
 
@@ -19,7 +19,7 @@ router = APIRouter(
     summary="Information about decode route",
 )
 async def decode_home(
-    settings: config.Settings = Depends(dependencies.get_settings),
+    settings: config.Settings = Depends(dependencies.get_config),
 ) -> dict[str, str]:
     return {"app-name": settings.app_name}
 

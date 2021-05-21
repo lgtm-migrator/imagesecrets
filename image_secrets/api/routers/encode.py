@@ -10,13 +10,13 @@ from fastapi import (
 )
 from fastapi.responses import FileResponse
 
-from image_secrets.api import config, schemas, dependencies
+from image_secrets.api import config, dependencies, schemas
 from image_secrets.backend import encode
 from image_secrets.settings import MESSAGE_DELIMITER
 
 router = APIRouter(
     tags=["encode"],
-    dependencies=[Depends(dependencies.get_settings)],
+    dependencies=[Depends(dependencies.get_config)],
 )
 
 
@@ -26,7 +26,7 @@ router = APIRouter(
     summary="Information about encode route",
 )
 async def encode_home(
-    settings: config.Settings = Depends(dependencies.get_settings),
+    settings: config.Settings = Depends(dependencies.get_config),
 ) -> dict[str, str]:
     return {"app-name": settings.app_name}
 

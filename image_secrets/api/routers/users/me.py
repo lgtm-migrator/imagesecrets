@@ -1,53 +1,57 @@
 """Router for current user.
 
-Note: get_current_user dependency is in every function because access to the current user is needed.
+Note: manager dependency is in every route because access to the current user information is needed.
     github issue link: https://github.com/tiangolo/fastapi/issues/424#issuecomment-584169213
 
 """
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Query, Response, status
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, Depends, Response, status
+from tortoise.exceptions import IntegrityError
 
-from image_secrets.api.dependencies import get_current_user, get_session, get_settings
-from image_secrets.backend.database import models, schemas, user_crud
+from image_secrets.api import dependencies, exceptions
+from image_secrets.api.routers.users.main import manager
+from image_secrets.backend.database.user import crud, models, schemas
+from image_secrets.backend.util.main import parse_integrity
 
 router = APIRouter(
     prefix="/users",
     tags=["me"],
-    dependencies=[Depends(get_settings), Depends(get_current_user)],
+    dependencies=[Depends(dependencies.get_config), Depends(manager)],
 )
 
 
 @router.get("/me", response_model=schemas.User)
 async def get(
-    current_user: models.User = Depends(get_current_user),
+    current_user: models.User = Depends(manager),
 ):
-    return current_user
+    return await schemas.User.from_tortoise_orm(current_user)
 
 
 @router.patch("/me", status_code=status.HTTP_202_ACCEPTED, response_model=schemas.User)
 async def patch(
-    attr: str = Query(
-        ...,
-        alias="attribute",
-        description="Account detail to edit",
-    ),
-    new_value: str = Query(
-        ...,
-        alias="new-value",
-        description="New value of specified attribute",
-    ),
-    current_user: models.User = Depends(get_current_user),
+    update_schema: schemas.UserUpdate,
+    current_user: models.User = Depends(manager),
 ):
-    print(attr, new_value)
-    return current_user
+    try:
+        user = await crud.update(
+            current_user.id,
+            **update_schema.dict(exclude_unset=True),
+        )
+    except IntegrityError as e:
+        field, value = parse_integrity(error_message=e)
+        raise exceptions.DetailExists(
+            status_code=status.HTTP_409_CONFLICT,
+            message="account detail already exists",
+            field=field,
+            value=value,
+        ) from e
+    return await schemas.User.from_tortoise_orm(user)
 
 
 @router.delete("/me", status_code=status.HTTP_204_NO_CONTENT)
 async def delete(
-    session: AsyncSession = Depends(get_session),
-    current_user: models.User = Depends(get_current_user),
+    current_user: models.User = Depends(manager),
 ):
-    await user_crud.delete(session, current_user.id)
+    await crud.delete(current_user.id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
