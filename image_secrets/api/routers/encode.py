@@ -1,10 +1,11 @@
 """Router for the encoding operations."""
 from typing import Optional
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 from fastapi.responses import FileResponse
+from filetype import filetype
 
-from image_secrets.api import dependencies, responses
+from image_secrets.api import dependencies, exceptions, responses
 from image_secrets.api.routers.users.main import manager
 from image_secrets.backend import encode
 from image_secrets.backend.database.image import crud
@@ -21,8 +22,9 @@ router = APIRouter(
 @router.get(
     "/encode",
     response_model=list[Optional[image_schemas.Image]],
+    status_code=status.HTTP_200_OK,
     summary="Encoded images",
-    responses=responses.AUTHORIZATION | responses.NOT_FOUND,
+    responses=responses.AUTHORIZATION | responses.FORBIDDEN,
 )
 async def get(
     current_user: models.User = Depends(manager),
@@ -44,9 +46,10 @@ async def get(
 
 @router.post(
     "/encode",
+    status_code=status.HTTP_201_CREATED,
     response_class=FileResponse,
     summary="Encode a message into an image",
-    responses=responses.AUTHORIZATION | responses.NOT_FOUND,
+    responses=responses.AUTHORIZATION | responses.FORBIDDEN | responses.MEDIA,
 )
 async def encode_message(
     current_user: models.User = Depends(manager),
@@ -93,20 +96,24 @@ async def encode_message(
     :param lsb_n: Number of lsb to use, defaults to 1
 
     """
-    data = await file.read()
-    header = {
+    headers = {
         "image-name": file.filename,
         "message": message,
         "delimiter": delim,
         "lsb_amount": repr(lsb_n),
     }
+    data = await file.read()
+
+    if not filetype.match(data).extension == "png":
+        raise exceptions.UnsupportedMediaType(headers=headers)
+
     try:
         fp = encode.api(message, data, delim, lsb_n, False)
     except ValueError as e:
         raise HTTPException(
             status_code=400,
             detail=e.args,
-            headers=header,
+            headers=headers,
         ) from e
     image_schema = image_schemas.ImageCreate(
         delimiter=delim,
@@ -120,7 +127,7 @@ async def encode_message(
         fp,
         media_type="image/png",
         filename=file.filename,
-        headers=header,
+        headers=headers,
     )
 
 

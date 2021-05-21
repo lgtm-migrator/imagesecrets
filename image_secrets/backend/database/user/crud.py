@@ -1,7 +1,7 @@
 """CRUD operations with a user in database."""
 from __future__ import annotations
 
-from typing import NamedTuple, Optional, Union
+from typing import Any, NamedTuple, Optional, Union
 
 from image_secrets.backend.database.user import models, schemas
 from image_secrets.backend.util import password
@@ -52,7 +52,7 @@ async def delete(user_id: int) -> None:
     await models.User.filter(id=user_id).delete()
 
 
-async def update(user_id: int, **attributes: dict) -> models.User:
+async def update(user_id: int, **attributes: Any) -> models.User:
     """Update user's credentials in the database.
 
     :param user_id: User's database id

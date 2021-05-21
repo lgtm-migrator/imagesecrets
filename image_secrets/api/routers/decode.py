@@ -1,9 +1,10 @@
 """Router for decoding operations."""
 from typing import Optional
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
+from filetype import filetype
 
-from image_secrets.api import dependencies, responses
+from image_secrets.api import dependencies, exceptions, responses
 from image_secrets.api.routers.users.main import manager
 from image_secrets.backend import decode
 from image_secrets.backend.database.image import crud, schemas
@@ -19,8 +20,9 @@ router = APIRouter(
 @router.get(
     "/decode",
     response_model=list[Optional[schemas.Image]],
+    status_code=status.HTTP_200_OK,
     summary="Decoded images",
-    responses=responses.AUTHORIZATION | responses.NOT_FOUND,
+    responses=responses.AUTHORIZATION | responses.FORBIDDEN,
 )
 async def get(
     current_user: models.User = Depends(manager),
@@ -42,8 +44,9 @@ async def get(
 @router.post(
     "/decode",
     response_model=schemas.Image,
+    status_code=status.HTTP_201_CREATED,
     summary="Decode a message",
-    responses=responses.AUTHORIZATION | responses.NOT_FOUND,
+    responses=responses.AUTHORIZATION | responses.FORBIDDEN,
 )
 async def post(
     current_user: models.User = Depends(manager),
@@ -78,7 +81,15 @@ async def post(
     :param lsb_n: Number of lsb
 
     """
+    headers = {
+        "custom-delimiter": delim,
+        "least-significant-bit-amount": repr(lsb_n),
+    }
     image_data = await file.read()
+
+    if not filetype.match(image_data).extension == "png":
+        raise exceptions.UnsupportedMediaType(headers=headers)
+
     try:
         decoded, fp = decode.api(
             image_data=image_data,
@@ -90,10 +101,7 @@ async def post(
         raise HTTPException(
             status_code=400,
             detail=e.args,
-            headers={
-                "custom-delimiter": delim,
-                "least-significant-bit-amount": repr(lsb_n),
-            },
+            headers=headers,
         ) from e
     db_schema = schemas.ImageCreate(
         delimiter=delim,

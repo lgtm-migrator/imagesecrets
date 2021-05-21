@@ -1,6 +1,14 @@
 """Custom exceptions."""
 from fastapi import HTTPException, status
 
+from image_secrets.backend.util.main import partial_init
+
+UnsupportedMediaType = partial_init(
+    HTTPException,
+    status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+    detail="only .png images are supported",
+)
+
 
 class DetailExists(HTTPException):
     """Raised when user tries to claim an account detail which already exists."""

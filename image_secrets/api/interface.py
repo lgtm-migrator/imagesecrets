@@ -1,7 +1,7 @@
 """Application Programming Interface."""
 from __future__ import annotations
 
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, status
 
 from image_secrets.api import config, dependencies, handlers, responses
 from image_secrets.api.routers import decode, encode, users
@@ -30,6 +30,7 @@ handlers.init(app)
 @app.get(
     "/",
     response_model=dict[str, str],
+    status_code=status.HTTP_200_OK,
     summary="Basic information about the API.",
     tags=["home"],
 )

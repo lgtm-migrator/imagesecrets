@@ -20,11 +20,16 @@ router = APIRouter(
     prefix="/users",
     tags=["me"],
     dependencies=[Depends(dependencies.get_config), Depends(manager)],
-    responses=responses.AUTHORIZATION | responses.NOT_FOUND,
+    responses=responses.AUTHORIZATION | responses.FORBIDDEN,
 )
 
 
-@router.get("/me", response_model=schemas.User, summary="Account information")
+@router.get(
+    "/me",
+    response_model=schemas.User,
+    status_code=status.HTTP_200_OK,
+    summary="Account information",
+)
 async def get(
     current_user: models.User = Depends(manager),
 ) -> Optional[schemas.User]:
@@ -39,8 +44,8 @@ async def get(
 
 @router.patch(
     "/me",
-    status_code=status.HTTP_202_ACCEPTED,
     response_model=schemas.User,
+    status_code=status.HTTP_200_OK,
     summary="Update user credentials",
     responses=responses.CONFLICT,
 )
