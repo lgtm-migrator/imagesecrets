@@ -1,7 +1,8 @@
 """Router for decoding operations."""
-from typing import Optional
+from typing import Optional, Union
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, File, Form, UploadFile, status
+from fastapi.responses import JSONResponse
 from filetype import filetype
 
 from image_secrets.api import dependencies, exceptions, responses
@@ -46,7 +47,10 @@ async def get(
     response_model=schemas.Image,
     status_code=status.HTTP_201_CREATED,
     summary="Decode a message",
-    responses=responses.AUTHORIZATION | responses.FORBIDDEN,
+    responses=responses.MESSAGE_NOT_FOUND
+    | responses.AUTHORIZATION
+    | responses.FORBIDDEN
+    | responses.MEDIA,
 )
 async def post(
     current_user: models.User = Depends(manager),
@@ -67,7 +71,7 @@ async def post(
         ge=1,
         le=8,
     ),
-) -> schemas.Image:
+) -> Union[schemas.Image, JSONResponse]:
     """Decode a message from an image.
 
     - **custom-delimiter**: String which identifies the end of the encoded message.
@@ -98,11 +102,11 @@ async def post(
             reverse=False,
         )
     except StopIteration as e:
-        raise HTTPException(
-            status_code=400,
-            detail=e.args,
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content={"detail": e.args[0]},
             headers=headers,
-        ) from e
+        )
     db_schema = schemas.ImageCreate(
         delimiter=delim,
         lsb_amount=lsb_n,

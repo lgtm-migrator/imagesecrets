@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 def init(app: FastAPI, db_url: str) -> None:
-    """Initialize a database connection.
+    """Initialize database connection.
 
     :param app: FastAPI instance
     :param db_url: Url to database

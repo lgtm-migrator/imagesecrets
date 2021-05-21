@@ -1,8 +1,8 @@
 """Router for the encoding operations."""
-from typing import Optional
+from typing import Optional, Union
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
-from fastapi.responses import FileResponse
+from fastapi import APIRouter, Depends, File, Form, UploadFile, status
+from fastapi.responses import FileResponse, JSONResponse
 from filetype import filetype
 
 from image_secrets.api import dependencies, exceptions, responses
@@ -24,7 +24,7 @@ router = APIRouter(
     response_model=list[Optional[image_schemas.Image]],
     status_code=status.HTTP_200_OK,
     summary="Encoded images",
-    responses=responses.AUTHORIZATION | responses.FORBIDDEN,
+    responses=responses.AUTHORIZATION | responses.FORBIDDEN | responses.IMAGE_TOO_SMALL,
 )
 async def get(
     current_user: models.User = Depends(manager),
@@ -35,7 +35,7 @@ async def get(
     :param current_user: Current user dependency
 
     """
-    await current_user.fetch_related("decoded_images")
+    await current_user.fetch_related("encoded_images")
     # not using from_tortoise_orm because it would try to prefetch the owner FK relation
     images = [
         image_schemas.Image.from_orm(image)
@@ -79,7 +79,7 @@ async def encode_message(
         ge=1,
         le=8,
     ),
-) -> FileResponse:
+) -> Union[FileResponse, JSONResponse]:
     """Encode a message into an image.
 
     - **message**: The message to encode into the image
@@ -110,11 +110,10 @@ async def encode_message(
     try:
         fp = encode.api(message, data, delim, lsb_n, False)
     except ValueError as e:
-        raise HTTPException(
-            status_code=400,
-            detail=e.args,
-            headers=headers,
-        ) from e
+        return JSONResponse(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            content={"detail": e.args[0], "field": "file"},
+        )
     image_schema = image_schemas.ImageCreate(
         delimiter=delim,
         lsb_amount=lsb_n,
@@ -126,7 +125,7 @@ async def encode_message(
     return FileResponse(
         fp,
         media_type="image/png",
-        filename=file.filename,
+        filename=image_schema.filename,
         headers=headers,
     )
 

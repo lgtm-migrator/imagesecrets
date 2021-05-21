@@ -38,7 +38,7 @@ def main(
 
     if (size := img_arr.size * lsb_n) < (msg_len := len(message)):
         raise ValueError(
-            f"The image size ({size:,.0f}) is not enough for the message ({msg_len:,.0f}).",
+            f"The image size ({size:,.0f}) is not enough for the message ({msg_len:,.0f})",
         )
 
     if reverse:

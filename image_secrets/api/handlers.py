@@ -33,7 +33,16 @@ async def handler(
     value: Optional[str] = None,
     headers: Optional[Any] = None,
 ) -> JSONResponse:
-    content = {"info": message, "field": field}
+    """Create a json response.
+
+    :param status_code: Status code of the response
+    :param message: Response detail
+    :param field: Field which caused this response
+    :param value: The field value
+    :param headers: Optional headers to include in the response
+
+    """
+    content = {"detail": message, "field": field}
     if value:
         content |= {"value": value}
     return JSONResponse(
@@ -44,6 +53,12 @@ async def handler(
 
 
 async def validation_error(req: Request, exc: RequestValidationError) -> JSONResponse:
+    """Parse the validation error and return response with well readable details.
+
+    :param req: The original starlette request
+    :param exc: The exception that was raised
+
+    """
     errors = exc.errors()[0]
     msg = errors["msg"]
     field = errors["loc"][-1]
@@ -55,6 +70,12 @@ async def validation_error(req: Request, exc: RequestValidationError) -> JSONRes
 
 
 async def detail_exists(req: Request, exc: DetailExists) -> JSONResponse:
+    """Return field already exists response via response handler.
+
+    :param req: The original starlette request
+    :param exc: The exception that was raised
+
+    """
     return await handler(
         status_code=exc.status_code,
         message=exc.message,
@@ -64,6 +85,12 @@ async def detail_exists(req: Request, exc: DetailExists) -> JSONResponse:
 
 
 async def not_authenticated(req: Request, exc: NotAuthenticated) -> JSONResponse:
+    """Return invalid access token response.
+
+    :param req: The original starlette request
+    :param exc: The exception that was raised
+
+    """
     return JSONResponse(
         status_code=exc.status_code,
         content={"detail": "invalid access token"},

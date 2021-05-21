@@ -30,7 +30,7 @@ async def get(identifier: DBIdentifier) -> Optional[models.User]:
 
 
 async def create(user: schemas.UserCreate) -> models.User:
-    """Insert a new user into database.
+    """Insert a new user.
 
     :param user: The schema of the new user
 
