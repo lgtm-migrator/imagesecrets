@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from fastapi import Depends, FastAPI
 
-from image_secrets.api import config, dependencies, handlers
+from image_secrets.api import config, dependencies, handlers, responses
 from image_secrets.api.routers import decode, encode, users
 from image_secrets.backend.database import base
 
@@ -13,6 +13,7 @@ app = FastAPI(
     title="ImageSecrets",
     description="Encode and decode messages from images!",
     version="0.1.0",
+    responses=responses.VALIDATION,
 )
 
 # tortoise setup
