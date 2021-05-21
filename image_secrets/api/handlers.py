@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any, Optional
 
 from fastapi import Request, status
 from fastapi.encoders import jsonable_encoder
-from fastapi.exceptions import HTTPException, RequestValidationError
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from image_secrets.api.exceptions import DetailExists, NotAuthenticated
@@ -66,5 +66,6 @@ async def detail_exists(req: Request, exc: DetailExists) -> JSONResponse:
 async def not_authenticated(req: Request, exc: NotAuthenticated) -> JSONResponse:
     return JSONResponse(
         status_code=exc.status_code,
-        content={"detail": "user authorization required"},
+        content={"detail": "invalid access token"},
+        headers={"WWW-Authenticate": "Bearer"},
     )

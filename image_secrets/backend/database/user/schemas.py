@@ -40,5 +40,5 @@ class UserUpdate(UserBase):
 class User(_UserFull):
     """Main User schema."""
 
-    decoded_images: list[schemas.Image] = []
-    encoded_images: list[schemas.Image] = []
+    decoded_images: list[schemas.Image]
+    encoded_images: list[schemas.Image]

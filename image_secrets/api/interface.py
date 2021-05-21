@@ -1,4 +1,4 @@
-"""Application Programming Interface"""
+"""Application Programming Interface."""
 from __future__ import annotations
 
 from fastapi import Depends, FastAPI

@@ -61,7 +61,6 @@ def api(
     delimiter: str,
     lsb_n: int,
     reverse: bool,
-    image_dir: Path = API_IMAGES,
 ) -> Path:
     """Encode interface for the corresponding API endpoint.
 
@@ -70,15 +69,11 @@ def api(
     :param delimiter: Message end identifier
     :param lsb_n: Number of least significant bits to use
     :param reverse: Reverse encoding bool
-    :param image_dir: Path to directory where to save the final image, defaults to API_IMAGES
 
     """
     data = image.read_bytes(file)
     arr = main(message, data, delimiter, lsb_n, reverse)
-
-    fp = image_dir / f"{main_util.token_hex(16)}.png"
-    image.save_array(arr, fp)
-
+    fp = image.save_array(arr)
     return fp
 
 

@@ -7,6 +7,9 @@ from typing import TYPE_CHECKING, Union
 import numpy as np
 from PIL import Image
 
+from image_secrets.backend.util import main
+from image_secrets.settings import API_IMAGES
+
 if TYPE_CHECKING:
     from pathlib import Path
 
@@ -34,11 +37,13 @@ def data(file: Union[TBytesIO, Path], /) -> tuple[tuple[int, int, int], ArrayLik
     return arr.shape, arr
 
 
-def save_array(arr: ArrayLike, filepath: Path, /) -> None:
+def save_array(arr: ArrayLike, /) -> Path:
     """Save a new image.
 
     :param arr: The numpy array with the pixel data
-    :param filepath: The path where the image should be saved
 
     """
-    Image.fromarray(np.uint8(arr)).convert("RGB").save(str(filepath))
+    filename = f"{main.token_hex(16)}.png"
+    fp = API_IMAGES / filename
+    Image.fromarray(np.uint8(arr)).convert("RGB").save(str(fp))
+    return fp

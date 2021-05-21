@@ -1,30 +1,26 @@
 """Image schemas."""
-import functools as fn
 from datetime import datetime
 
-from pydantic import BaseModel, SecretStr
+from devtools import debug
+from pydantic import BaseModel, Field
 from tortoise.contrib.pydantic import pydantic_model_creator
 
 from image_secrets.backend.database.image import models
+from image_secrets.backend.regex import PNG
 
-pydantic_model_creator = fn.partial(
-    pydantic_model_creator,
-    # decoded and encoded are interchangeable as a blueprint for schema
+_ImageBase = pydantic_model_creator(
     cls=models.DecodedImage,
     name="ImageBase",
-    exclude=("id", "filename", "image_name", "message"),
+    exclude=("id", "filename", "owner"),
+    exclude_readonly=True,
 )
-_ImageBase = pydantic_model_creator(exclude_readonly=False)
 
 
-class DecodeImageCreate(_ImageBase):
-    """Create decode image schema."""
+class ImageCreate(_ImageBase):
+    """Create image schema."""
 
-
-class EncodeImageCreate(_ImageBase):
-    """Create encode image schema."""
-
-    message: SecretStr
+    image_name: str = Field(..., max_length=128, regex=PNG.pattern)
+    filename: str
 
 
 class ImageUpdate(BaseModel):
@@ -35,9 +31,6 @@ class ImageUpdate(BaseModel):
 
 class Image(_ImageBase):
     """Main Image schema."""
-
-    message: SecretStr
-    image_name: str
 
     created: datetime
     modified: datetime

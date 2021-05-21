@@ -6,5 +6,5 @@ ICON = Path(__file__).parent / "static/favicon.ico"
 
 MESSAGE_DELIMITER = "<{~stop-here~}>"
 
-API_IMAGES = Path(__file__).parent / "static/images/"
+API_IMAGES = Path(__file__).parent / "static/images"
 API_IMAGES.mkdir(parents=True, exist_ok=True)
