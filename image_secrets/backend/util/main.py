@@ -27,7 +27,7 @@ def partial_init(cls: Type, *args: Optional[Any], **kwargs: Optional[Any]):
 
         __init__ = fn.partialmethod(cls.__init__, *args, **kwargs)
 
-        # repr with Partial would be confusing
+        # repr only with Partial would be confusing
         def __repr__(self) -> str:
             """Provide information about the parent class."""
             return f"Partial class of {cls.__qualname__!r} in {cls.__module__!r}"
@@ -44,9 +44,13 @@ def token_hex(length: int, /) -> str:
     return secrets.token_hex(math.ceil(abs(length) / 2))
 
 
-def parse_unique_integrity(*, error_message: IntegrityError) -> tuple[str, str]:
+def parse_unique_integrity(*, error: IntegrityError) -> Optional[tuple[str, str]]:
     """Parse a database uniqueness IntegrityError and return the conflicting field and value."""
-    return re.findall(INTEGRITY_FIELD, str(error_message))[0]
+    err = str(error)
+    try:
+        return re.findall(INTEGRITY_FIELD, err)[0]
+    except IndexError as e:
+        raise ValueError(f"invalid error message: {err}") from e
 
 
 __all__ = [

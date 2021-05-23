@@ -6,7 +6,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from image_secrets.backend.util import image
+from image_secrets.backend.util.image import data, png_filetype, read_bytes, save_array
 
 
 @pytest.mark.parametrize(
@@ -20,12 +20,12 @@ def test_read_bytes(bytes_: bytes) -> None:
 
     """
     num = np.random.randint(0, 10)
-    assert image.read_bytes(bytes_).read(num) == bytes_[:num]
+    assert read_bytes(bytes_).read(num) == bytes_[:num]
 
 
 def test_data(test_image_path: Path) -> None:
     """Test the image_data function."""
-    shape, arr = image.data(test_image_path)
+    shape, arr = data(test_image_path)
 
     assert arr.ndim == 3
     assert arr.dtype == np.uint8
@@ -36,9 +36,14 @@ def test_data(test_image_path: Path) -> None:
 
 def test_save(tmpdir, random_image_arr) -> None:
     """Test the save function."""
-    tmp_dir = tmpdir.mkdir("tmp/")
-    image_fp = Path(tmp_dir / "tmp.png")
+    tmp_dir = Path(tmpdir.mkdir("tmp/"))
 
-    assert not image_fp.is_file()
-    image.save_array(random_image_arr, image_fp)
-    assert Path(image_fp).is_file()
+    fp = save_array(random_image_arr, image_dir=tmp_dir)
+    assert fp.is_file()
+
+
+def test_png_filetype(test_image_path) -> None:
+    """Test the png_filetype function."""
+    with open(test_image_path, mode="rb") as image_data:
+        result = png_filetype(image_data)
+    assert result

@@ -72,7 +72,7 @@ async def patch(
         )
     except IntegrityError as e:
         print(e)
-        field, value = parse_unique_integrity(error_message=e)
+        field, value = parse_unique_integrity(error=e)
         raise exceptions.DetailExists(
             status_code=status.HTTP_409_CONFLICT,
             message="account detail already exists",
