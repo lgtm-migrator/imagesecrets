@@ -47,13 +47,14 @@ def data(file: Union[TBytesIO, Path], /) -> tuple[tuple[int, int, int], ArrayLik
     return arr.shape, arr
 
 
-def save_array(arr: ArrayLike, /) -> Path:
+def save_array(arr: ArrayLike, /, *, image_dir: Path = API_IMAGES) -> Path:
     """Save a new image.
 
     :param arr: The numpy array with the pixel data
+    :param image_dir: Directory where to save the image
 
     """
     filename = f"{main.token_hex(16)}.png"
-    fp = API_IMAGES / filename
+    fp = image_dir / filename
     Image.fromarray(np.uint8(arr)).convert("RGB").save(str(fp))
     return fp

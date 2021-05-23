@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Optional
 import numpy as np
 
 from image_secrets.backend.util import image
-from image_secrets.settings import MESSAGE_DELIMITER
+from image_secrets.settings import API_IMAGES, MESSAGE_DELIMITER
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -19,7 +19,7 @@ def main(
     delimiter: str = MESSAGE_DELIMITER,
     lsb_n: int = 1,
     reverse: bool = False,
-) -> str:
+) -> Optional[str]:
     """Decode text from an image.
 
     :param array: Numpy array with pixel image data
@@ -38,24 +38,26 @@ def api(
     delimiter: str,
     lsb_n: int,
     reverse: bool,
-) -> tuple[str, Path]:
+    *,
+    image_dir: Path = API_IMAGES,
+) -> tuple[Optional[str], Optional[Path]]:
     """Function to be used by the corresponding decode API endpoint.
 
     :param image_data: Data of the image uploaded by user
     :param delimiter: Message end identifier
     :param lsb_n: Number of least significant bits to decode
     :param reverse: Reverse decoding bool
+    :param image_dir: Directory where to save the image
 
     """
     data = image.read_bytes(image_data)
     _, arr = image.data(data)
     text = main(arr, delimiter, lsb_n, reverse)
-    # message was found -> save the image
-    fp = image.save_array(arr)
+    fp = image.save_array(arr, image_dir=image_dir) if text else None
     return text, fp
 
 
-def prepare_array(array: ArrayLike, lsb_n: int, reverse: bool) -> ArrayLike:
+def prepare_array(array: ArrayLike, lsb_n: int, reverse: bool) -> Optional[ArrayLike]:
     """Prepare an array into a form from which it is easy to decode text.
 
     :param array: The array to work with

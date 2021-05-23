@@ -46,15 +46,16 @@ def test_api(
     test_image_array: ArrayLike,
 ) -> None:
     """Test the api encoding function."""
-    tmpdir = tmpdir.mkdir("tmp/")
+    tmpdir = Path(tmpdir.mkdir("tmp/"))
 
     mocker.patch("image_secrets.backend.util.image.read_bytes", return_value=...)
     mocker.patch("image_secrets.backend.encode.main", return_value=random_image_arr)
 
-    result = encode.api(..., ..., ..., ..., ..., image_dir=Path(tmpdir))
+    result = encode.api(..., ..., ..., ..., ..., image_dir=tmpdir)
 
     assert isinstance(result, Path)
     assert result.is_file()
+    assert result.parent.name == "tmp"
     assert len(result.stem) == 16
     assert result.suffix == ".png"
 
@@ -78,3 +79,9 @@ def test_main(
     result = encode.main(message.decode(), test_image_path, "", lsb_n)
     with pytest.raises(AssertionError):
         np.testing.assert_array_equal(result, test_image_array)
+
+
+def test_main_raises_value_error(test_image_path) -> None:
+    """Test the the main encode function raises ValueError correctly."""
+    with pytest.raises(ValueError):
+        encode.main("Hello" * 1000, test_image_path)
