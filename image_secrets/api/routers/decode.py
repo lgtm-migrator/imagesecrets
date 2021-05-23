@@ -1,15 +1,15 @@
-"""Router for decoding operations."""
+"""Message decoding router."""
 from typing import Optional, Union
 
 from fastapi import APIRouter, Depends, File, Form, UploadFile, status
 from fastapi.responses import JSONResponse
-from filetype import filetype
 
 from image_secrets.api import dependencies, exceptions, responses
 from image_secrets.api.routers.users.main import manager
 from image_secrets.backend import decode
 from image_secrets.backend.database.image import crud, schemas
 from image_secrets.backend.database.user import models
+from image_secrets.backend.util import image
 from image_secrets.settings import MESSAGE_DELIMITER
 
 router = APIRouter(
@@ -36,9 +36,7 @@ async def get(
     """
     await current_user.fetch_related("decoded_images")
     # not using from_tortoise_orm because it would try to prefetch the owner FK relation
-    images = [
-        schemas.Image.from_orm(image) async for image in current_user.decoded_images
-    ]
+    images = [schemas.Image.from_orm(img) async for img in current_user.decoded_images]
     return images
 
 
@@ -91,7 +89,7 @@ async def post(
     }
     image_data = await file.read()
 
-    if not filetype.match(image_data).extension == "png":
+    if not image.png_filetype(image_data):
         raise exceptions.UnsupportedMediaType(headers=headers)
 
     try:

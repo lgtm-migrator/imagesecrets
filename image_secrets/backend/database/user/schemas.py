@@ -2,11 +2,12 @@
 import functools as fn
 from typing import Optional
 
-from pydantic import EmailStr, SecretStr
+from pydantic import EmailStr, Field, SecretStr
 from tortoise.contrib.pydantic import pydantic_model_creator
 
 from image_secrets.backend.database.image import schemas
 from image_secrets.backend.database.user import models
+from image_secrets.backend.regex import USERNAME
 
 pydantic_model_creator = fn.partial(
     pydantic_model_creator,
@@ -20,7 +21,7 @@ _UserFull = pydantic_model_creator(exclude_readonly=False)
 class UserBase(_UserBase):
     """Base User schema."""
 
-    # override email type to get pydantic email validation
+    username: str = Field(..., regex=USERNAME.pattern)
     email: EmailStr
 
 
@@ -33,7 +34,7 @@ class UserCreate(UserBase):
 class UserUpdate(UserBase):
     """Update existing User schema."""
 
-    username: Optional[str]
+    username: Optional[str] = Field(None, regex=USERNAME.pattern)
     email: Optional[EmailStr]
 
 

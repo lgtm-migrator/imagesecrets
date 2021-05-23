@@ -23,7 +23,7 @@ def partial_init(cls: Type, *args: Optional[Any], **kwargs: Optional[Any]):
     """
 
     class Partial(cls):
-        """Partial class with partially initialized __init__."""
+        """Partial class with partially initialized initializer."""
 
         __init__ = fn.partialmethod(cls.__init__, *args, **kwargs)
 
@@ -44,8 +44,8 @@ def token_hex(length: int, /) -> str:
     return secrets.token_hex(math.ceil(abs(length) / 2))
 
 
-def parse_integrity(*, error_message: IntegrityError) -> tuple[str, str]:
-    """Parse a database IntegrityError and return the conflicting field and value."""
+def parse_unique_integrity(*, error_message: IntegrityError) -> tuple[str, str]:
+    """Parse a database uniqueness IntegrityError and return the conflicting field and value."""
     return re.findall(INTEGRITY_FIELD, str(error_message))[0]
 
 

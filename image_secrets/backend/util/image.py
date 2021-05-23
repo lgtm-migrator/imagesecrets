@@ -5,6 +5,7 @@ from io import BytesIO
 from typing import TYPE_CHECKING, Union
 
 import numpy as np
+from filetype import filetype
 from PIL import Image
 
 from image_secrets.backend.util import main
@@ -17,7 +18,16 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
 
-def read_bytes(data_: bytes) -> TBytesIO:
+def png_filetype(data_: bytes, /) -> bool:
+    """Check that the given file data are part of a png image.
+
+    :param data_: Image data to check
+
+    """
+    return filetype.match(data_).extension == "png"
+
+
+def read_bytes(data_: bytes, /) -> TBytesIO:
     """Read and return the bytes created by ``FileUpload``.
 
     :param data_: The data to read

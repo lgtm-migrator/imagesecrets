@@ -14,7 +14,7 @@ from tortoise.exceptions import IntegrityError
 from image_secrets.api import dependencies, exceptions, responses
 from image_secrets.api.routers.users.main import manager
 from image_secrets.backend.database.user import crud, models, schemas
-from image_secrets.backend.util.main import parse_integrity
+from image_secrets.backend.util.main import parse_unique_integrity
 
 router = APIRouter(
     prefix="/users",
@@ -71,7 +71,8 @@ async def patch(
             **update_schema.dict(exclude_unset=True),
         )
     except IntegrityError as e:
-        field, value = parse_integrity(error_message=e)
+        print(e)
+        field, value = parse_unique_integrity(error_message=e)
         raise exceptions.DetailExists(
             status_code=status.HTTP_409_CONFLICT,
             message="account detail already exists",

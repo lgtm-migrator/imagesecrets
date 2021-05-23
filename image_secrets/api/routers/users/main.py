@@ -12,7 +12,7 @@ from image_secrets.api import dependencies, responses
 from image_secrets.api.exceptions import DetailExists, NotAuthenticated
 from image_secrets.api.schemas import Token
 from image_secrets.backend.database.user import crud, schemas
-from image_secrets.backend.util.main import parse_integrity
+from image_secrets.backend.util.main import parse_unique_integrity
 
 if TYPE_CHECKING:
     from image_secrets.backend.database.user import models
@@ -97,7 +97,7 @@ async def register(user: schemas.UserCreate) -> schemas.User:
     try:
         db_user = await crud.create(user)
     except IntegrityError as e:
-        field, value = parse_integrity(error_message=e)
+        field, value = parse_unique_integrity(error_message=e)
         raise DetailExists(
             status_code=status.HTTP_409_CONFLICT,
             message="account detail already exists",

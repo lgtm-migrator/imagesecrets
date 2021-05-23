@@ -1,16 +1,15 @@
-"""Router for the encoding operations."""
+"""Message encoding router."""
 from typing import Optional, Union
 
 from fastapi import APIRouter, Depends, File, Form, UploadFile, status
 from fastapi.responses import FileResponse, JSONResponse
-from filetype import filetype
 
 from image_secrets.api import dependencies, exceptions, responses
 from image_secrets.api.routers.users.main import manager
 from image_secrets.backend import encode
-from image_secrets.backend.database.image import crud
-from image_secrets.backend.database.image import schemas as image_schemas
+from image_secrets.backend.database.image import crud, schemas
 from image_secrets.backend.database.user import models
+from image_secrets.backend.util import image
 from image_secrets.settings import MESSAGE_DELIMITER
 
 router = APIRouter(
@@ -21,14 +20,14 @@ router = APIRouter(
 
 @router.get(
     "/encode",
-    response_model=list[Optional[image_schemas.Image]],
+    response_model=list[Optional[schemas.Image]],
     status_code=status.HTTP_200_OK,
     summary="Encoded images",
     responses=responses.AUTHORIZATION | responses.FORBIDDEN | responses.IMAGE_TOO_SMALL,
 )
 async def get(
     current_user: models.User = Depends(manager),
-) -> list[Optional[image_schemas.Image]]:
+) -> list[Optional[schemas.Image]]:
     """Return all encoded images.
 
     \f
@@ -37,10 +36,7 @@ async def get(
     """
     await current_user.fetch_related("encoded_images")
     # not using from_tortoise_orm because it would try to prefetch the owner FK relation
-    images = [
-        image_schemas.Image.from_orm(image)
-        async for image in current_user.encoded_images
-    ]
+    images = [schemas.Image.from_orm(img) async for img in current_user.encoded_images]
     return images
 
 
@@ -102,19 +98,19 @@ async def encode_message(
         "delimiter": delim,
         "lsb_amount": repr(lsb_n),
     }
-    data = await file.read()
+    image_data = await file.read()
 
-    if not filetype.match(data).extension == "png":
+    if not image.png_filetype(image_data):
         raise exceptions.UnsupportedMediaType(headers=headers)
 
     try:
-        fp = encode.api(message, data, delim, lsb_n, False)
+        fp = encode.api(message, image_data, delim, lsb_n, False)
     except ValueError as e:
         return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             content={"detail": e.args[0], "field": "file"},
         )
-    image_schema = image_schemas.ImageCreate(
+    image_schema = schemas.ImageCreate(
         delimiter=delim,
         lsb_amount=lsb_n,
         message=message,
