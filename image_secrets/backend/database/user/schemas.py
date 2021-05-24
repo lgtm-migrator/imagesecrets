@@ -14,8 +14,8 @@ pydantic_model_creator = fn.partial(
     cls=models.User,
     exclude=("id", "password_hash"),
 )
-_UserBase = pydantic_model_creator(exclude_readonly=True)
-_UserFull = pydantic_model_creator(exclude_readonly=False)
+_UserBase = pydantic_model_creator(name="UserBase", exclude_readonly=True)
+_UserFull = pydantic_model_creator(name="User", exclude_readonly=False)
 
 
 class UserBase(_UserBase):

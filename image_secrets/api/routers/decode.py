@@ -82,6 +82,8 @@ async def post(
     :param delim: Message delimiter
     :param lsb_n: Number of lsb
 
+    :raises UnsupportedMediaType: if file is not a png image
+
     """
     headers = {
         "custom-delimiter": delim,

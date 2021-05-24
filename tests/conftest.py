@@ -8,22 +8,28 @@ import numpy as np
 import pytest
 from fastapi.testclient import TestClient
 from PIL import Image
+from tortoise.contrib.test import finalizer, initializer
 
 from image_secrets.api.config import Settings
 from image_secrets.api.interface import app
+from image_secrets.backend.database import image_models, user_models
 
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
 
-@pytest.fixture()
-def api_client() -> TestClient:
-    """Return the starlette testing client."""
-    return TestClient(app)
+@pytest.fixture(scope="session", autouse=True)
+def api_client(request):
+    """Return api test client with fake database."""
+    db_url = "sqlite://:memory:"
+    initializer([user_models, image_models], db_url=db_url, app_label="models")
+    with TestClient(app) as client:
+        yield client
+    request.addfinalizer(finalizer)
 
 
 @pytest.fixture()
-def api_name() -> str:
+def app_name() -> str:
     """Return the default app name, specified in the Settings BaseModel."""
     return Settings.__dict__["__fields__"]["app_name"].default
 

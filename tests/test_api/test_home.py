@@ -7,11 +7,12 @@ if TYPE_CHECKING:
     from fastapi.testclient import TestClient
 
 
-def test_get(api_client: TestClient, api_name) -> None:
+def test_get(api_client: TestClient, app_name) -> None:
     """Test the get request on the home route."""
     response = api_client.get("/")
+    response.raise_for_status()
     assert response.status_code == 200
-    assert response.json() == {"app-name": api_name}
+    assert response.json() == {"app-name": app_name}
 
 
 __all__ = [

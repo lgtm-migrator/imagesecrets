@@ -91,6 +91,8 @@ async def encode_message(
     :param delim: Message delimiter, defaults to 'MESSAGE_DELIMITER'
     :param lsb_n: Number of lsb to use, defaults to 1
 
+    :raises UnsupportedMediaType: if file is not a png image
+
     """
     headers = {
         "image-name": file.filename,
