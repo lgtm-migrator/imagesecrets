@@ -27,10 +27,8 @@ def partial_init(cls: Type, *args: Optional[Any], **kwargs: Optional[Any]):
 
         __init__ = fn.partialmethod(cls.__init__, *args, **kwargs)
 
-        # repr only with Partial would be confusing
-        def __repr__(self) -> str:
-            """Provide information about the parent class."""
-            return f"Partial class of {cls.__qualname__!r} in {cls.__module__!r}"
+        # repr with ``Partial`` would be confusing
+        __repr__ = cls.__repr__
 
     return Partial
 
@@ -50,7 +48,7 @@ def parse_unique_integrity(*, error: IntegrityError) -> Optional[tuple[str, str]
     try:
         return re.findall(INTEGRITY_FIELD, err)[0]
     except IndexError as e:
-        raise ValueError(f"invalid error message: {err}") from e
+        raise ValueError(f"invalid error message: {err!r}") from e
 
 
 __all__ = [

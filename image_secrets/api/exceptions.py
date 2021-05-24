@@ -24,6 +24,6 @@ class DetailExists(HTTPException):
 class NotAuthenticated(Exception):
     """Raised a when an user tries to access a protected resource without being authenticated."""
 
-    def __init__(self, status_code=status.HTTP_401_UNAUTHORIZED) -> None:
+    def __init__(self, status_code: int = status.HTTP_401_UNAUTHORIZED) -> None:
         """Construct the class."""
         self.status_code = status_code

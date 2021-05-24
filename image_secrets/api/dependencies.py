@@ -9,7 +9,7 @@ from image_secrets.api import config
 @fn.cache
 def get_config():
     """Return api settings."""
-    return config.Settings()
+    return config.settings
 
 
 __all__ = [

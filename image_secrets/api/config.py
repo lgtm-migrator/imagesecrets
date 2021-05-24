@@ -26,6 +26,9 @@ class Settings(BaseSettings):
         env_file = ENV
 
 
+settings = Settings()
+
+
 __all__ = [
     "Settings",
 ]
