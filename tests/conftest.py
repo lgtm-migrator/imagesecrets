@@ -28,6 +28,7 @@ def api_settings(tmpdir) -> config_.Settings:
     test_settings = config_.Settings.construct(
         image_folder=str(Path(tmpdir.mkdir("images/")).absolute()),
         pg_dsn=db_url,
+        secret_key="test_key",
     )
     config_.settings = test_settings
 
