@@ -24,7 +24,10 @@ def png_filetype(data_: bytes, /) -> bool:
     :param data_: Image data to check
 
     """
-    return filetype.match(data_).extension == "png"
+    try:
+        return filetype.match(data_).extension == "png"
+    except AttributeError:
+        return False
 
 
 def read_bytes(data_: bytes, /) -> TBytesIO:

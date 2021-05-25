@@ -1,12 +1,5 @@
 """Test the settings module."""
-from image_secrets.settings import API_IMAGES, ENV, ICON, MESSAGE_DELIMITER
-
-
-def test_env() -> None:
-    """Test the file with environment variables."""
-    assert ENV.is_file()
-    assert ENV.stem == ".env"
-    assert not ENV.suffix
+from image_secrets.settings import API_IMAGES, ICON, MESSAGE_DELIMITER
 
 
 def test_icon() -> None:

@@ -21,6 +21,9 @@ def test_partial_init() -> None:
             self.args = args
             self.kwargs = kwargs
 
+        def __repr__(self) -> str:
+            return f"{self.args!r}, {self.kwargs!r}"
+
     partial = partial_init(Test, test="test")
     assert partial.__name__ == "Partial"
     assert partial.mro()[1] is Test
@@ -28,6 +31,7 @@ def test_partial_init() -> None:
     assert partial.__module__ == "image_secrets.backend.util.main"
 
     initialized = partial("test")
+    assert initialized.__repr__() == Test("test", test="test").__repr__()
     assert "test" in initialized.args
     assert initialized.kwargs["test"] == "test"
 

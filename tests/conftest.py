@@ -1,6 +1,7 @@
 """Session wide fixtures."""
 from __future__ import annotations
 
+import asyncio
 from pathlib import Path
 from typing import TYPE_CHECKING, BinaryIO, Generator
 
@@ -17,6 +18,8 @@ from image_secrets.backend.util import main
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
+    from image_secrets.backend.database.user.models import User
+
 
 @pytest.fixture(scope="function", autouse=True)
 def api_settings(tmpdir) -> config_.Settings:
@@ -28,19 +31,19 @@ def api_settings(tmpdir) -> config_.Settings:
     )
     config_.settings = test_settings
 
+    def sqlite_parsing(error: str) -> list[str]:
+        """Return parsed sqlite error message."""
+        return str(error).split(":")
+
+    # need to monkey patch error parsing for sqlite
+    main.parse_unique_integrity = sqlite_parsing
+
     return config_.settings
-
-
-def sqlite_parsing(error: str) -> list[str]:
-    """Return parsed sqlite error message."""
-    return str(error).split(":")
 
 
 @pytest.fixture(scope="function")
 def api_client(request, api_settings) -> Generator[TestClient, None, None]:
     """Return api test client connected to fake database."""
-    main.parse_unique_integrity = sqlite_parsing
-
     # settings already patched by fixture
     from image_secrets.api.interface import app
 
@@ -55,6 +58,24 @@ def api_client(request, api_settings) -> Generator[TestClient, None, None]:
         yield client
 
     request.addfinalizer(finalizer)
+
+
+@pytest.fixture(scope="function")
+@pytest.mark.usefixtures("api_client")
+def insert_user() -> User:
+    """Return user inserted into a clean database."""
+    from image_secrets.backend.database.user.models import User
+
+    user = User(
+        username="username",
+        email="user@example.com",
+        password_hash="password",
+    )
+
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(user.save())
+
+    return user
 
 
 @pytest.fixture(scope="session")

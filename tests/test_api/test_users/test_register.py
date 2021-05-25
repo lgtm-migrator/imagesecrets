@@ -10,6 +10,9 @@ if TYPE_CHECKING:
     from fastapi.testclient import TestClient
 
 
+URL = "/users/register"
+
+
 @pytest.mark.parametrize(
     "username, email, password",
     [("string", "user@example.com", "pass"), ("123456", "user@string.com", "secret!!")],
@@ -17,7 +20,7 @@ if TYPE_CHECKING:
 def test_ok(api_client: TestClient, username: str, email: str, password: str) -> None:
     """Test successful post request on the register route."""
     response = api_client.post(
-        "/users/register",
+        URL,
         json={"username": username, "email": email, "password": password},
     )
     response.raise_for_status()
@@ -43,7 +46,7 @@ def test_409(api_client: TestClient, username: str) -> None:
     )
 
     response = api_client.post(
-        "/users/register",
+        URL,
         json={
             "username": username,
             "email": "user@example.com",
@@ -57,3 +60,46 @@ def test_409(api_client: TestClient, username: str) -> None:
     assert json_["detail"] == "account detail already exists"
     assert "UNIQUE constraint" in json_["field"]
     assert "username" in json_["value"]
+
+
+@pytest.mark.parametrize("username", ["", "u" * 5, "u" * 129])
+def test_422_username(api_client: TestClient, username: str) -> None:
+    """Test unprocessable username entity."""
+    response = api_client.post(
+        URL,
+        json={
+            "username": username,
+            "email": "email@example.com",
+            "password": "string",
+        },
+    )
+
+    assert response.status_code == 422
+    assert response.reason == "Unprocessable Entity"
+    assert response.json() == {
+        "detail": f"ensure this value has at {'least 6 characters' if len(username) < 6 else 'most 128 characters'}",
+        "field": "username",
+    }
+
+
+@pytest.mark.parametrize(
+    "email",
+    ["", "@", "email@email", "email.com", "email@email.", "@email.com"],
+)
+def test_422_email(api_client: TestClient, email: str) -> None:
+    """Test unprocessable email entity."""
+    response = api_client.post(
+        URL,
+        json={
+            "username": "string",
+            "email": email,
+            "password": "string",
+        },
+    )
+
+    assert response.status_code == 422
+    assert response.reason == "Unprocessable Entity"
+    assert response.json() == {
+        "detail": "value is not a valid email address",
+        "field": "email",
+    }

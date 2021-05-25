@@ -39,7 +39,8 @@ def token_hex(length: int, /) -> str:
     :param length: How many chars should the final token have
 
     """
-    return secrets.token_hex(math.ceil(abs(length) / 2))
+    nbytes = math.ceil(abs(length) / 2)
+    return secrets.token_hex(nbytes)
 
 
 def parse_unique_integrity(*, error: IntegrityError) -> Optional[tuple[str, str]]:
