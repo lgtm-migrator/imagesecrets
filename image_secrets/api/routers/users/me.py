@@ -71,7 +71,6 @@ async def patch(
             **update_schema.dict(exclude_unset=True),
         )
     except IntegrityError as e:
-        print(e)
         field, value = parse_unique_integrity(error=e)
         raise exceptions.DetailExists(
             status_code=status.HTTP_409_CONFLICT,

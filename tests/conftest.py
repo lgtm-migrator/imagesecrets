@@ -17,8 +17,15 @@ from image_secrets.backend.util import main
 
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
+    from pytest_mock import MockFixture
 
     from image_secrets.backend.database.user.models import User
+
+
+@pytest.fixture(scope="session")
+def app_name() -> str:
+    """Return the default app name, specified in the Settings BaseModel."""
+    return config_.Settings.__dict__["__fields__"]["app_name"].default
 
 
 @pytest.fixture(scope="function", autouse=True)
@@ -79,10 +86,19 @@ def insert_user() -> User:
     return user
 
 
-@pytest.fixture(scope="session")
-def app_name() -> str:
-    """Return the default app name, specified in the Settings BaseModel."""
-    return config_.Settings.__dict__["__fields__"]["app_name"].default
+@pytest.fixture(scope="function")
+def auth_token(
+    api_client,
+    insert_user,
+    mocker: MockFixture,
+) -> tuple[User, dict[str, str]]:
+    """Return authorized user and a token."""
+    mocker.patch("image_secrets.backend.util.password.auth", return_value=True)
+    response = api_client.post(
+        "/login",
+        data={"username": insert_user.username, "password": insert_user.password_hash},
+    )
+    return insert_user, response.json()
 
 
 @pytest.fixture(scope="session")
