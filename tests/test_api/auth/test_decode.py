@@ -6,10 +6,10 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
-from pytest_mock import MockFixture
 
 if TYPE_CHECKING:
     from fastapi.testclient import TestClient
+    from pytest_mock import MockFixture
 
     from image_secrets.backend.database.user.models import User
 
