@@ -45,12 +45,12 @@ def test_save(tmpdir, random_image_arr) -> None:
 def test_png_filetype(test_image_path) -> None:
     """Test the png_filetype function."""
     with open(test_image_path, mode="rb") as image_data:
-        result = png_filetype(image_data)
+        result = png_filetype(image_data.read())
     assert result
 
 
 def test_png_filetype_fail() -> None:
     """Test that png_filetype returns False if not a png file is passed in."""
-    with open(Path(__file__), "rb") as data:
-        result = png_filetype(data)
+    with open(Path(__file__), "rb") as image_data:
+        result = png_filetype(image_data.read())
     assert not result

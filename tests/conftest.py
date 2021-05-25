@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import asyncio
 from pathlib import Path
-from typing import TYPE_CHECKING, BinaryIO, Generator
+from typing import TYPE_CHECKING, Generator
 
 import numpy as np
 import pytest
@@ -108,9 +108,13 @@ def test_image_path() -> Path:
 
 
 @pytest.fixture(scope="session")
-def api_image_file(test_image_path) -> dict[str, tuple[str, BinaryIO, str]]:
+def api_image_file(
+    test_image_path,
+) -> dict[str, tuple[str, bytes, str]]:
     """Return the dict with file needed to use post requests."""
-    return {"file": (test_image_path.name, test_image_path.open("rb"), "image/png")}
+    return {
+        "file": (test_image_path.name, test_image_path.open("rb").read(), "image/png"),
+    }
 
 
 @pytest.fixture(scope="session")
@@ -120,10 +124,19 @@ def test_image_array(test_image_path: Path) -> Generator[ArrayLike, None, None]:
         yield np.asarray(img, dtype=np.uint8)
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def random_image_arr() -> ArrayLike:
     """Return array containing data about a random image."""
     return np.random.randint(0, 255, size=(8, 8, 3), dtype=np.uint8)
+
+
+@pytest.fixture(scope="function")
+def random_image(random_image_arr: ArrayLike, tmpdir) -> bytes:
+    """Return an image file created in a temporary directory."""
+    tmpdir = Path(tmpdir.mkdir("tmpdir/"))
+    fp = tmpdir / "random_image.png"
+    Image.fromarray(random_image_arr).convert("RGB").save(fp)
+    return open(fp, mode="rb").read()
 
 
 @pytest.fixture(scope="session")

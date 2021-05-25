@@ -4,8 +4,8 @@ from __future__ import annotations
 from io import BytesIO
 from typing import TYPE_CHECKING, Union
 
+import magic
 import numpy as np
-from filetype import filetype
 from PIL import Image
 
 from image_secrets.backend.util import main
@@ -24,10 +24,7 @@ def png_filetype(data_: bytes, /) -> bool:
     :param data_: Image data to check
 
     """
-    try:
-        return filetype.match(data_).extension == "png"
-    except AttributeError:
-        return False
+    return magic.from_buffer(buffer=data_, mime=True) == "image/png"
 
 
 def read_bytes(data_: bytes, /) -> TBytesIO:
