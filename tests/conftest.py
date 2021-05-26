@@ -69,8 +69,7 @@ def api_client(request, api_settings) -> Generator[TestClient, None, None]:
 
 
 @pytest.fixture(scope="function")
-@pytest.mark.usefixtures("api_client")
-def insert_user() -> User:
+def insert_user(api_client) -> User:
     """Return user inserted into a clean database."""
     from image_secrets.backend.database.user.models import User
 

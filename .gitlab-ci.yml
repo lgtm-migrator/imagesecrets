@@ -20,6 +20,6 @@ install:
 pytest:
     stage: test
     script:
-        - python -m poetry run pytest
+        - python -m poetry run pytest --cov=image_secrets
     tags:
         - ci
