@@ -2,15 +2,18 @@
 from __future__ import annotations
 
 import random as rn
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
 
 from image_secrets.backend import decode
+from image_secrets.settings import API_IMAGES
 
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
+    from pytest_mock import MockFixture
 
 
 @pytest.mark.parametrize("lsb_n", [1, 2, 3, 4, 5, 6, 7, 8])
@@ -54,3 +57,57 @@ def test_decode_text_raises(
     with pytest.raises(StopIteration):
         decode.decode_text(random_image_arr.ravel(), "fake delimiter")
         decode.decode_text(test_image_array.ravel(), "fake delimiter")
+
+
+@pytest.mark.parametrize(
+    "delimiter, lsb_n",
+    [
+        ("delimiter1", 1),
+        ("delimiter2", 2),
+        ("delimiter3", 3),
+        ("delimiter4", 4),
+        ("delimiter5", 5),
+        ("delimiter6", 6),
+        ("delimiter7", 7),
+        ("delimiter8", 8),
+    ],
+)
+def test_main(mocker: MockFixture, delimiter: str, lsb_n: int) -> None:
+    """Test the main function."""
+    arr = np.fromiter(map(ord, f"Hello{lsb_n}{delimiter}"), dtype=np.uint8)
+    mocker.patch("image_secrets.backend.decode.prepare_array", return_value=arr)
+    result = decode.main(
+        ...,
+        delimiter,
+        lsb_n,
+    )
+    assert result == f"Hello{lsb_n}"
+
+
+@pytest.mark.parametrize(
+    "image_data, delimiter, lsb_n",
+    [(b"image_data", "delimiter", 1)],
+)
+def test_api(mocker: MockFixture, tmpdir, image_data, delimiter, lsb_n) -> None:
+    """Test the api decode function."""
+    tmpdir = Path(tmpdir.mkdir("tmp/"))
+
+    read_bytes = mocker.patch(
+        "image_secrets.backend.util.image.read_bytes",
+        return_value="bytes read",
+    )
+    data = mocker.patch(
+        "image_secrets.backend.util.image.data",
+        return_value=(..., "array"),
+    )
+    main = mocker.patch("image_secrets.backend.decode.main", retuen_value="Message")
+    save_array = mocker.patch(
+        "image_secrets.backend.util.image.save_array",
+        return_value=tmpdir / "image.png",
+    )
+
+    decode.api(image_data, delimiter, lsb_n, False)
+    read_bytes.assert_called_once_with(image_data)
+    data.assert_called_once_with("bytes read")
+    main.assert_called_once_with("array", delimiter, lsb_n, False)
+    save_array.assert_called_once_with("array", image_dir=API_IMAGES)

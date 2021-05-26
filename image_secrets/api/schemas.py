@@ -2,20 +2,26 @@
 from pydantic import BaseModel
 
 
-class DecodeSchema(BaseModel):
-    """Response model for information about decoding."""
+class Token(BaseModel):
+    """Response model for access token."""
 
-    filename: str
-    custom_delimiter: str
-    least_significant_bit_amount: int
-    reversed_encoding: bool
-
-    def header_dict(self) -> dict:
-        """Return a dictionary to be shown in api headers."""
-        return {key.replace("_", "-"): repr(value) for key, value in self}
+    access_token: str
+    token_type: str
 
 
-class EncodeSchema(DecodeSchema):
-    """Response model for information about encoding."""
+class Message(BaseModel):
+    """Response model for a single detail field."""
 
-    message: str
+    detail: str
+
+
+class Field(Message):
+    """Response model for invalid field value."""
+
+    field: str
+
+
+class Conflict(Field):
+    """Response model for conflicting field value."""
+
+    value: str

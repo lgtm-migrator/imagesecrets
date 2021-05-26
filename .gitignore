@@ -1,9 +1,6 @@
 # Enviroment
 /.env
 
-# Useless profile pictures
-/lightning_pass/users/profile_pictures/
-
 ### Python template
 # Byte-compiled / optimized / DLL files
 __pycache__/

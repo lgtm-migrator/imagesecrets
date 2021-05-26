@@ -6,7 +6,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 import uvicorn
 
-from image_secrets.api.interface import app
+from image_secrets.api import interface
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=80)
+    uvicorn.run(interface.app, host="0.0.0.0", port=80)

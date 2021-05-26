@@ -6,7 +6,6 @@ before_script:
 stages:
     - build
     - test
-    - deploy
 
 install:
     stage: build
@@ -21,22 +20,6 @@ install:
 pytest:
     stage: test
     script:
-        - python -m poetry run pytest
-    tags:
-        - ci
-
-docker:
-    stage: deploy
-    when: on_success
-    before_script:
-        - docker info
-    script:
-        - docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
-
-        - docker build --rm -t $DOCKER_TAG .
-        - docker push $DOCKER_TAG
-
-        - docker pull $DOCKER_TAG
-        - docker run --publish 127.0.0.1:8000:80 --detach $DOCKER_TAG  # localhost for now
+        - python -m poetry run pytest --cov=image_secrets
     tags:
         - ci

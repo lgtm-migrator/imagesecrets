@@ -1,61 +1,63 @@
 """Module with functions to decode text from images."""
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Optional
 
 import numpy as np
 
 from image_secrets.backend.util import image
-from image_secrets.settings import MESSAGE_DELIMITER
+from image_secrets.settings import API_IMAGES, MESSAGE_DELIMITER
 
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from _io import BytesIO
     from numpy.typing import ArrayLike
 
 
 def main(
-    data: Union[BytesIO, Path],
+    array: ArrayLike,
     delimiter: str = MESSAGE_DELIMITER,
     lsb_n: int = 1,
     reverse: bool = False,
-) -> str:
+) -> Optional[str]:
     """Decode text from an image.
 
-    :param data: Pixel image data which can be converted to numpy array by PIL
+    :param array: Numpy array with pixel image data
     :param delimiter: Message end identifier, defaults to the one in .settings
     :param lsb_n: Number of least significant bits to decode, defaults to 1
     :param reverse: Reverse decoding bool, defaults to False
 
     """
-    _, arr = image.data(data)
-    arr = prepare_array(arr, lsb_n, reverse)
-
+    arr = prepare_array(array, lsb_n, reverse)
     text = decode_text(arr, delimiter)
     return text
 
 
 def api(
-    data: bytes,
+    image_data: bytes,
     delimiter: str,
     lsb_n: int,
     reverse: bool,
-) -> str:
+    *,
+    image_dir: Path = API_IMAGES,
+) -> tuple[Optional[str], Optional[Path]]:
     """Function to be used by the corresponding decode API endpoint.
 
-    :param data: Data of the image uploaded by user
+    :param image_data: Data of the image uploaded by user
     :param delimiter: Message end identifier
     :param lsb_n: Number of least significant bits to decode
     :param reverse: Reverse decoding bool
+    :param image_dir: Directory where to save the image
 
     """
-    data = image.read_bytes(data)
-    text = main(data, delimiter, lsb_n, reverse)
-    return text
+    data = image.read_bytes(image_data)
+    _, arr = image.data(data)
+    text = main(arr, delimiter, lsb_n, reverse)
+    fp = image.save_array(arr, image_dir=image_dir) if text else None
+    return text, fp
 
 
-def prepare_array(array: ArrayLike, lsb_n: int, reverse: bool) -> ArrayLike:
+def prepare_array(array: ArrayLike, lsb_n: int, reverse: bool) -> Optional[ArrayLike]:
     """Prepare an array into a form from which it is easy to decode text.
 
     :param array: The array to work with
@@ -69,7 +71,7 @@ def prepare_array(array: ArrayLike, lsb_n: int, reverse: bool) -> ArrayLike:
         )
 
     shape = (-1, 8)
-    if reverse:
+    if reverse:  # pragma: no cover
         array = np.flip(array)
     arr = np.unpackbits(array).reshape(shape)
     arr = np.packbits(arr[:, -lsb_n:])  # cut unnecessary bits and pack the rest

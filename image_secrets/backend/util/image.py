@@ -4,8 +4,12 @@ from __future__ import annotations
 from io import BytesIO
 from typing import TYPE_CHECKING, Union
 
+import magic
 import numpy as np
 from PIL import Image
+
+from image_secrets.backend.util import main
+from image_secrets.settings import API_IMAGES
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -14,7 +18,16 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
 
-def read_bytes(data_: bytes) -> TBytesIO:
+def png_filetype(data_: bytes, /) -> bool:
+    """Check that the given file data are part of a png image.
+
+    :param data_: Image data to check
+
+    """
+    return magic.from_buffer(buffer=data_, mime=True) == "image/png"
+
+
+def read_bytes(data_: bytes, /) -> TBytesIO:
     """Read and return the bytes created by ``FileUpload``.
 
     :param data_: The data to read
@@ -34,11 +47,14 @@ def data(file: Union[TBytesIO, Path], /) -> tuple[tuple[int, int, int], ArrayLik
     return arr.shape, arr
 
 
-def save_array(arr: ArrayLike, filepath: Path, /) -> None:
+def save_array(arr: ArrayLike, /, *, image_dir: Path = API_IMAGES) -> Path:
     """Save a new image.
 
     :param arr: The numpy array with the pixel data
-    :param filepath: The path where the image should be saved
+    :param image_dir: Directory where to save the image
 
     """
-    Image.fromarray(np.uint8(arr)).convert("RGB").save(str(filepath))
+    filename = f"{main.token_hex(16)}.png"
+    fp = image_dir / filename
+    Image.fromarray(np.uint8(arr)).convert("RGB").save(str(fp))
+    return fp

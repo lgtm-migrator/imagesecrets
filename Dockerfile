@@ -14,4 +14,4 @@ COPY . /app/
 
 RUN pytest
 
-ENTRYPOINT ["python", "bin/run_api.py"]
+CMD uvicorn image_secrets.api.interface:app --host=0.0.0.0 --port=$PORT

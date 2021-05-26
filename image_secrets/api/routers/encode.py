@@ -1,94 +1,81 @@
-"""Router for the encoding endpoint."""
-from fastapi import (
-    APIRouter,
-    BackgroundTasks,
-    Depends,
-    File,
-    HTTPException,
-    Query,
-    UploadFile,
-)
-from fastapi.responses import FileResponse
+"""Message encoding router."""
+from typing import Optional, Union
 
-from image_secrets.api import config
-from image_secrets.api.dependencies import get_settings
-from image_secrets.api.schemas import EncodeSchema
+from fastapi import APIRouter, Depends, File, Form, UploadFile, status
+from fastapi.responses import FileResponse, JSONResponse
+
+from image_secrets.api import dependencies, exceptions, responses
+from image_secrets.api.routers.users.main import manager
 from image_secrets.backend import encode
+from image_secrets.backend.database.image import crud, schemas
+from image_secrets.backend.database.user import models
+from image_secrets.backend.util import image
 from image_secrets.settings import MESSAGE_DELIMITER
 
 router = APIRouter(
     tags=["encode"],
-    dependencies=[Depends(get_settings)],
+    dependencies=[Depends(dependencies.get_config)],
 )
 
 
 @router.get(
     "/encode",
-    response_model=dict[str, str],
-    summary="Information about encode route",
+    response_model=list[Optional[schemas.Image]],
+    status_code=status.HTTP_200_OK,
+    summary="Encoded images",
+    responses=responses.AUTHORIZATION | responses.FORBIDDEN,
 )
-async def encode_home(
-    settings: config.Settings = Depends(get_settings),
-) -> dict[str, str]:
-    return {"app-name": settings.app_name}
+async def get(
+    current_user: models.User = Depends(manager),
+) -> list[Optional[schemas.Image]]:
+    """Return all encoded images.
+
+    \f
+    :param current_user: Current user dependency
+
+    """
+    await current_user.fetch_related("encoded_images")
+    # not using from_tortoise_orm because it would try to prefetch the owner FK relation
+    images = [schemas.Image.from_orm(img) async for img in current_user.encoded_images]
+    return images
 
 
 @router.post(
     "/encode",
+    status_code=status.HTTP_201_CREATED,
     response_class=FileResponse,
     summary="Encode a message into an image",
-    responses={
-        200: {
-            "content": {"image/png": {}},
-            "description": "Return an image with the encoded message.",
-        },
-        400: {
-            "description": "Encoding Failure",
-            "content": {
-                "application/json": {
-                    "example": {
-                        "detail": "Something went wrong with encoding.",
-                    },
-                },
-            },
-        },
-    },
+    responses=responses.AUTHORIZATION | responses.FORBIDDEN | responses.MEDIA,
 )
 async def encode_message(
-    background_tasks: BackgroundTasks,
-    *,
-    message: str = Query(
+    current_user: models.User = Depends(manager),
+    message: str = Form(
         ...,
-        title="message to encode",
+        title="Message to encode",
         description="The message to encode into the image.",
         min_length=1,
         example="My secret message!",
     ),
     file: UploadFile = File(
         ...,
+        media_type="image/png",
         description="The image in which to encode the message.",
     ),
-    delim: str = Query(
+    delim: str = Form(
         MESSAGE_DELIMITER,
+        alias="custom-delimiter",
         description="""String which is going to be appended to the end of your message
         so that the message can be decoded later.""",
-        alias="custom-delimiter",
         min_length=1,
-        example="<>my-custom-delimiter<>",
     ),
-    lsb_n: int = Query(
+    lsb_n: int = Form(
         1,
-        title="Number of least significant bits to alter.",
+        alias="least-significant-bit-amount",
+        description="Number of least significant bits to alter.",
         ge=1,
         le=8,
-        alias="least-significant-bit-amount",
     ),
-    rev: bool = Query(
-        False,
-        alias="reversed-encoding",
-        description="Message will be encoded starting from the last pixel instead of the first one.",
-    ),
-):
+) -> Union[FileResponse, JSONResponse]:
     """Encode a message into an image.
 
     - **message**: The message to encode into the image
@@ -96,47 +83,60 @@ async def encode_message(
     - **custom-delimiter**: String which is going to be appended to the end of your message
         so that the message can be decoded later.
     - **least-significant-bit-amount**: Number of least significant bits to alter.
-    - **reversed-encoding**: Message will be encoded starting from the last pixel instead of the first one.
 
     \f
-    :param background_tasks: background tasks instance to delete the newly created file after response
+    :param current_user: Current user dependency
     :param message: Message to encode
     :param file: Source image
     :param delim: Message delimiter, defaults to 'MESSAGE_DELIMITER'
     :param lsb_n: Number of lsb to use, defaults to 1
-    :param rev: Reverse encoding bool, defaults to False
+
+    :raises UnsupportedMediaType: if file is not a png image
 
     """
-    schema = EncodeSchema(
-        message=message,
-        filename=file.filename,
-        custom_delimiter=delim,
-        least_significant_bit_amount=lsb_n,
-        reversed_encoding=rev,
-    )
-    header_dict = schema.header_dict()
+    headers = {
+        "image-name": file.filename,
+        "message": message,
+        "delimiter": delim,
+        "lsb_amount": repr(lsb_n),
+    }
+    image_data = await file.read()
 
-    data = await file.read()
+    if not image.png_filetype(image_data):
+        raise exceptions.UnsupportedMediaType(headers=headers)
+
     try:
-        fp = encode.api(message, data, delim, lsb_n, rev)
+        fp = encode.api(
+            message=message,
+            file=image_data,
+            delimiter=delim,
+            lsb_n=lsb_n,
+            reverse=False,
+        )
     except ValueError as e:
-        raise HTTPException(
-            status_code=400,
-            detail=e.args,
-            headers=header_dict,
-        ) from e
-
-    background_tasks.add_task(fp.unlink)
+        return JSONResponse(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            content={"detail": e.args[0], "field": "file"},
+            headers=headers,
+        )
+    image_schema = schemas.ImageCreate(
+        delimiter=delim,
+        lsb_amount=lsb_n,
+        message=message,
+        image_name=file.filename,
+        filename=fp.name,
+    )
+    await crud.create_encoded(owner_id=current_user.id, data=image_schema)
     return FileResponse(
-        fp,
+        path=fp,
+        status_code=status.HTTP_201_CREATED,
         media_type="image/png",
-        filename=file.filename,
-        headers=header_dict,
+        filename=image_schema.filename,
+        headers=headers,
     )
 
 
 __all__ = [
-    "encode_home",
     "encode_message",
     "router",
 ]
