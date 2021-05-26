@@ -38,7 +38,7 @@ async def user_loader(username: str) -> Optional[models.User]:
     """
     try:
         return await crud.get(crud.DBIdentifier(column="username", value=username))
-    except DoesNotExist as e:
+    except DoesNotExist as e:  # pragma: no cover
         raise NotAuthenticated(status_code=status.HTTP_404_NOT_FOUND) from e
 
 

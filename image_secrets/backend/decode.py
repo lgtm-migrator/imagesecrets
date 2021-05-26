@@ -71,7 +71,7 @@ def prepare_array(array: ArrayLike, lsb_n: int, reverse: bool) -> Optional[Array
         )
 
     shape = (-1, 8)
-    if reverse:
+    if reverse:  # pragma: no cover
         array = np.flip(array)
     arr = np.unpackbits(array).reshape(shape)
     arr = np.packbits(arr[:, -lsb_n:])  # cut unnecessary bits and pack the rest

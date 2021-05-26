@@ -23,7 +23,7 @@ router = APIRouter(
     response_model=list[Optional[schemas.Image]],
     status_code=status.HTTP_200_OK,
     summary="Encoded images",
-    responses=responses.AUTHORIZATION | responses.FORBIDDEN | responses.IMAGE_TOO_SMALL,
+    responses=responses.AUTHORIZATION | responses.FORBIDDEN,
 )
 async def get(
     current_user: models.User = Depends(manager),
@@ -106,11 +106,18 @@ async def encode_message(
         raise exceptions.UnsupportedMediaType(headers=headers)
 
     try:
-        fp = encode.api(message, image_data, delim, lsb_n, False)
+        fp = encode.api(
+            message=message,
+            file=image_data,
+            delimiter=delim,
+            lsb_n=lsb_n,
+            reverse=False,
+        )
     except ValueError as e:
         return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             content={"detail": e.args[0], "field": "file"},
+            headers=headers,
         )
     image_schema = schemas.ImageCreate(
         delimiter=delim,
@@ -121,7 +128,8 @@ async def encode_message(
     )
     await crud.create_encoded(owner_id=current_user.id, data=image_schema)
     return FileResponse(
-        fp,
+        path=fp,
+        status_code=status.HTTP_201_CREATED,
         media_type="image/png",
         filename=image_schema.filename,
         headers=headers,

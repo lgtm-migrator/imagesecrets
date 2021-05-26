@@ -41,7 +41,7 @@ def main(
             f"The image size ({size:,.0f}) is not enough for the message ({msg_len:,.0f})",
         )
 
-    if reverse:
+    if reverse:  # pragma: no cover
         msg_arr, img_arr = np.flip(msg_arr), np.flip(img_arr)  # all axes get flipped
 
     enc_arr = array.edit_column(
