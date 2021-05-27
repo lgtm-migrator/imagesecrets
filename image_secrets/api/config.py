@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     message_delimiter: str = MESSAGE_DELIMITER
     image_folder: DirectoryPath = API_IMAGES
 
-    pg_dsn: PostgresDsn = os.getenv("PG_DSN")
+    pg_dsn: PostgresDsn = os.getenv("DATABASE_URL")
     secret_key: str = os.getenv("SECRET_KEY")
 
     class Config:

@@ -1,25 +1,51 @@
 image: python:latest
 
-before_script:
-    - python --version
-
 stages:
-    - build
     - test
-
-install:
-    stage: build
-    script:
-        - python -m pip install --upgrade pip
-        - python -m pip install poetry
-        - python -m poetry --version
-        - python -m poetry install --no-interaction --no-ansi
-    tags:
-        - ci
+    - build
+    - deploy
 
 pytest:
     stage: test
+    before_script:
+        - python --version
     script:
+        - python -m pip install poetry
+        - python -m poetry --version
+        - python -m poetry install --no-interaction --no-ansi
         - python -m poetry run pytest --cov=image_secrets
     tags:
-        - ci
+        - docker
+
+docker:
+    stage: build
+    image: docker:latest
+    when: on_success
+    only:
+        - master
+    services:
+        - docker:dind
+    before_script:
+        - docker --version
+    script:
+        - docker login --username="$DOCKER_USERNAME" --password="$DOCKER_PASSWORD"
+        - docker build . -t "$DOCKER_USERNAME"/imagesecrets
+        - docker push "$DOCKER_USERNAME"/imagesecrets:latest
+    tags:
+        - docker
+
+heroku:
+    stage: deploy
+    image: ruby:latest
+    rules:
+        - if: $CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE == "push"
+          when: always
+        - when: never
+    before_script:
+        - apt-get update -qy
+        - apt-get install -y ruby-dev
+        - gem install dpl
+    script:
+        - dpl --provider=heroku --app=$HEROKU_APP --api-key=$HEROKU_API_KEY
+    tags:
+        - docker

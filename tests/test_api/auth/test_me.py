@@ -33,7 +33,6 @@ def test_get(api_client: TestClient, auth_token: tuple[User, dict[str, str]]) ->
     json_ = response.json()
     assert json_["username"] == user.username
     assert json_["email"] == user.email
-    assert json_["created"] == json_["modified"]
     assert not json_["decoded_images"]
     assert not json_["encoded_images"]
 
