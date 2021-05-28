@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "imagesecrets-api"
-version = "0.1.0"
+version = "0.2.0"
 description = "A tool for encoding and decoding messages into/from images."
 authors = ["Lukas Kucera <lukas.kucera.g@protonmail.com>"]
 license = "MIT"
@@ -33,6 +33,7 @@ python-dotenv = "^0.17.1"
 python-magic = "^0.4.14"
 
 [tool.poetry.dev-dependencies]
+pre-commit = "^2.13.0"
 pytest = "^6.2.3"
 pytest-mock = "^3.6.1"
 pytest-cov = "^2.12.0"
