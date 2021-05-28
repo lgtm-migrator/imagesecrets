@@ -18,11 +18,12 @@ RESTful API for encoding/decoding messages into/from images.
 * Great documentation via OpenAPI
 
 ## What I've learned
-*   Python - Improved knowledge of testing, asynchronous development and ORMs
-*   FastAPI - Gained great experience with the framework
-*   Numpy - Used for working with image pixel data
-*   Databases - Learnt how to use SQLAlchemy and Tortoise ORM for asynchronous database development
-*   DevOps - CI/CD pipeline, production database and Heroku
+* Python - Improved knowledge of testing, asynchronous development, ORMs, coverage
+* FastAPI - Gained great experience with the framework
+* NumPy - Used for reading and editing image pixel data
+* Databases - Learned how to use SQLAlchemy and Tortoise ORM for asynchronous database development
+* DevOps - CI/CD pipeline, production database and Heroku
+* API development - REST principles, JSON Web Tokens, data serialization
 
 ## License
-*   Developed under the [MIT](https://gitlab.com/Lkms19/lightning-pass/-/blob/master/LICENSE) license.
+* Developed under the [MIT](https://gitlab.com/Lkms19/lightning-pass/-/blob/master/LICENSE) license.

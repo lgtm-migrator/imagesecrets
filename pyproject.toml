@@ -33,6 +33,7 @@ python-dotenv = "^0.17.1"
 python-magic = "^0.4.14"
 
 [tool.poetry.dev-dependencies]
+pre-commit = "^2.13.0"
 pytest = "^6.2.3"
 pytest-mock = "^3.6.1"
 pytest-cov = "^2.12.0"
