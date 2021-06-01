@@ -2,9 +2,10 @@
 import os
 
 from dotenv import load_dotenv
-from pydantic import BaseSettings, DirectoryPath, PostgresDsn
+from fastapi_mail import ConnectionConfig, config
+from pydantic import BaseSettings, DirectoryPath, EmailStr, PostgresDsn
 
-from image_secrets.settings import API_IMAGES, ENV, MESSAGE_DELIMITER
+from image_secrets.settings import API_IMAGES, ENV, MESSAGE_DELIMITER, TEMPLATES
 
 load_dotenv()
 
@@ -28,6 +29,19 @@ class Settings(BaseSettings):
 
 settings = Settings()
 
+# monkey patch one of fastapi_mail path validation functions
+# because it is broken when application is not run from parent folder
+config.validate_path = lambda _: True
+email_config = ConnectionConfig(
+    MAIL_USERNAME=os.getenv("MAIL_USERNAME"),
+    MAIL_PASSWORD=os.getenv("MAIL_PASSWORD"),
+    MAIL_PORT=int(os.getenv("MAIL_PORT")),
+    MAIL_SERVER=os.getenv("MAIL_SERVER"),
+    MAIL_TLS=True,
+    MAIL_SSL=False,
+    MAIL_FROM=EmailStr(os.getenv("MAIL_FROM")),
+    TEMPLATE_FOLDER=str(TEMPLATES),
+)
 
 __all__ = [
     "Settings",

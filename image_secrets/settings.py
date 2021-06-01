@@ -4,6 +4,7 @@ from pathlib import Path
 _parent = Path(__file__).parent
 ENV = _parent.parent / ".env"
 ICON = _parent / "static/favicon.ico"
+TEMPLATES = _parent / "templates"
 
 MESSAGE_DELIMITER = "<{~stop-here~}>"
 

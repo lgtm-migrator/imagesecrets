@@ -12,7 +12,7 @@ app = FastAPI(
     dependencies=[Depends(dependencies.get_config)],
     title="ImageSecrets",
     description="Encode and decode messages from images!",
-    version="0.1.0",
+    version="0.2.0",
     responses=responses.VALIDATION,
 )
 
