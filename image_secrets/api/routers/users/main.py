@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Optional
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_login import LoginManager
+from fastapi_mail import FastMail
 from tortoise.exceptions import DoesNotExist, IntegrityError
 
 from image_secrets.api import dependencies, responses
@@ -16,8 +17,6 @@ from image_secrets.backend.email import send_welcome
 from image_secrets.backend.util.main import parse_unique_integrity
 
 if TYPE_CHECKING:
-    from fastapi_mail import FastMail
-
     from image_secrets.backend.database.user import models
 
 config = dependencies.get_config()

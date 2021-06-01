@@ -21,10 +21,8 @@ loop = asyncio.get_event_loop()
 @pytest.fixture(scope="module")
 def client() -> FastMail:
     """Return email client in a test mode."""
-    mail_client = get_mail()
-    mail_client.config.SUPPRESS_SEND = 1
-    mail_client.config.USE_CREDENTIALS = False
-    return mail_client
+    # already patched by autouse fixture
+    return get_mail()
 
 
 @pytest.mark.parametrize(

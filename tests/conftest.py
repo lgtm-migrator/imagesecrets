@@ -46,6 +46,14 @@ def api_settings(tmpdir) -> config_.Settings:
     # need to monkey patch error parsing for sqlite
     main.parse_unique_integrity = sqlite_parsing
 
+    # patch SMTP client
+    from image_secrets.api import dependencies
+
+    fm = dependencies.get_mail()
+    fm.config.SUPPRESS_SEND = 1
+    fm.config.USE_CREDENTIALS = False
+    dependencies.get_mail = lambda: fm
+
     return config_.settings
 
 

@@ -8,8 +8,6 @@ stages:
 
 pytest:
     stage: test
-    variables:
-        MAIL_PORT: $MAIL_PORT
     before_script:
         - python --version
         - python -m pip install poetry
