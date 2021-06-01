@@ -21,7 +21,7 @@ def get_config() -> Settings:
 @fn.cache
 def get_mail() -> FastMail:
     """Return SMTP mail client."""
-    return FastMail(config.email_config)
+    return FastMail(config.settings.email_config())
 
 
 __all__ = [

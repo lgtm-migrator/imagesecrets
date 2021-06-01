@@ -1,5 +1,6 @@
 image: python:latest
 
+
 stages:
     - test
     - build
@@ -7,13 +8,15 @@ stages:
 
 pytest:
     stage: test
+    variables:
+        MAIL_PORT: $MAIL_PORT
     before_script:
         - python --version
-    script:
         - python -m pip install poetry
-        - python -m poetry --version
-        - python -m poetry install --no-interaction --no-ansi
-        - python -m poetry run pytest --cov=image_secrets
+        - poetry --version
+    script:
+        - poetry install --no-interaction --no-ansi
+        - poetry run pytest --cov=image_secrets
     tags:
         - docker
 
