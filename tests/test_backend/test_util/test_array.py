@@ -79,23 +79,11 @@ def test_edit_column(
     start_from_end: bool,
 ) -> None:
     """Test the edit column function."""
-    new = np.array(
-        [
-            [179, 93, 47],
-            [227, 246, 65],
-            [208, 229, 24],
-            [12, 254, 162],
-            [37, 124, 21],
-            [237, 81, 254],
-            [64, 103, 112],
-            [175, 216, 94],
-        ],
-        dtype=np.uint8,
-    )
+    new = np.array([36, 56, 157, 61, 8, 95, 39, 140] * 24)
 
     bitlike_shape = (-1, 8)
 
-    test_image_array = test_image_array.reshape(bitlike_shape)
+    test_image_array = test_image_array.reshape(bitlike_shape)[: 192 // 8].copy()
     new = new.reshape(-1, col_num)[: test_image_array.shape[0], :]
 
     if start_from_end:
