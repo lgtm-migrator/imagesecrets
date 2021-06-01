@@ -17,18 +17,18 @@ if TYPE_CHECKING:
 @pytest.mark.parametrize("message_len", [0, 10, 11, 100, 192])
 def test_prepare_image(
     mocker: MockFixture,
-    random_image_arr: ArrayLike,
+    test_image_array: ArrayLike,
     message_len: int,
 ) -> None:
     """Test the prepare_image function."""
     mocker.patch(
         "image_secrets.backend.util.image.data",
-        return_value=(random_image_arr.shape, random_image_arr),
+        return_value=(test_image_array.shape, test_image_array),
     )
     shape, base_arr, unpacked_arr = encode.prepare_image(..., message_len)
 
     assert shape[-1] == 3
-    assert shape == random_image_arr.shape
+    assert shape == test_image_array.shape
 
     assert base_arr.ndim == 1
     assert base_arr.dtype == np.uint8
@@ -42,14 +42,13 @@ def test_prepare_image(
 def test_api(
     tmpdir,
     mocker: MockFixture,
-    random_image_arr: ArrayLike,
     test_image_array: ArrayLike,
 ) -> None:
     """Test the api encoding function."""
     tmpdir = Path(tmpdir.mkdir("tmp/"))
 
     mocker.patch("image_secrets.backend.util.image.read_bytes", return_value=...)
-    mocker.patch("image_secrets.backend.encode.main", return_value=random_image_arr)
+    mocker.patch("image_secrets.backend.encode.main", return_value=test_image_array)
 
     result = encode.api(..., ..., ..., ..., ..., image_dir=tmpdir)
 

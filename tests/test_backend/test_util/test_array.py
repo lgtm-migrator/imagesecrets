@@ -63,57 +63,90 @@ r = fn.partial(np.random.randint, low=0, high=255, size=192, dtype=np.uint8)
 
 
 @pytest.mark.parametrize(
-    "new, col_num, start_from_end",
+    "col_num, start_from_end",
     [
-        (r(), 1, True),
-        (r(), 2, True),
-        (r(), 3, True),
-        (r(), 1, False),
-        (r(), 2, False),
-        (r(), 3, False),
+        (1, True),
+        (2, True),
+        (3, True),
+        (1, False),
+        (2, False),
+        (3, False),
     ],
 )
 def test_edit_column(
-    random_image_arr: ArrayLike,
-    new: ArrayLike,
+    test_image_array: ArrayLike,
     col_num: int,
     start_from_end: bool,
 ) -> None:
     """Test the edit column function."""
+    new = np.array(
+        [
+            [179, 93, 47],
+            [227, 246, 65],
+            [208, 229, 24],
+            [12, 254, 162],
+            [37, 124, 21],
+            [237, 81, 254],
+            [64, 103, 112],
+            [175, 216, 94],
+        ],
+        dtype=np.uint8,
+    )
+
     bitlike_shape = (-1, 8)
 
-    random_image_arr = random_image_arr.reshape(bitlike_shape)
-    new = new.reshape(-1, col_num)[: random_image_arr.shape[0], :]
+    test_image_array = test_image_array.reshape(bitlike_shape)
+    new = new.reshape(-1, col_num)[: test_image_array.shape[0], :]
 
     if start_from_end:
-        random_image_arr[:, -col_num:] = new
+        test_image_array[:, -col_num:] = new
     else:
-        random_image_arr[:, :col_num] = new
+        test_image_array[:, :col_num] = new
 
     result = array.edit_column(
-        random_image_arr.reshape(bitlike_shape),
+        test_image_array.reshape(bitlike_shape),
         new,
         col_num,
         start_from_end,
     )
 
-    np.testing.assert_array_equal(result, random_image_arr)
+    np.testing.assert_array_equal(result, test_image_array)
 
 
-r = np.random.randint(0, 2, size=(20, 8), dtype=np.uint8)
-
-
-@pytest.mark.parametrize("unpacked", [r, r, r, r, r, r])
-def test_pack_and_concatenate(random_image_arr, unpacked) -> None:
+def test_pack_and_concatenate(test_image_array) -> None:
     """Test the pack and concatenate function."""
+    unpacked = np.array(
+        [
+            [0, 0, 0, 0, 1, 1, 1, 0],
+            [1, 0, 0, 0, 0, 0, 1, 0],
+            [0, 0, 0, 0, 1, 1, 1, 1],
+            [1, 1, 1, 1, 0, 1, 1, 0],
+            [0, 1, 0, 0, 1, 0, 1, 1],
+            [1, 1, 0, 1, 1, 1, 0, 0],
+            [0, 0, 1, 1, 0, 1, 1, 1],
+            [1, 1, 0, 0, 0, 1, 1, 1],
+            [1, 0, 1, 1, 1, 1, 0, 1],
+            [0, 0, 1, 0, 0, 1, 0, 0],
+            [1, 0, 0, 1, 0, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 0, 1],
+            [0, 0, 1, 1, 0, 0, 1, 1],
+            [1, 0, 0, 1, 0, 1, 0, 0],
+            [0, 0, 0, 1, 0, 1, 0, 0],
+            [0, 1, 1, 0, 0, 0, 0, 1],
+            [0, 0, 0, 1, 1, 0, 1, 0],
+            [1, 1, 0, 0, 1, 1, 0, 0],
+            [1, 1, 0, 0, 1, 0, 0, 1],
+            [1, 1, 1, 1, 1, 0, 1, 1],
+        ],
+    )
 
     result = array.pack_and_concatenate(
         unpacked.ravel(),
-        random_image_arr.ravel(),
+        test_image_array.ravel(),
         (-1,),
     )
 
     np.testing.assert_array_equal(
-        result.ravel()[: -random_image_arr.size],
+        result.ravel()[: -test_image_array.size],
         np.packbits(unpacked),
     )

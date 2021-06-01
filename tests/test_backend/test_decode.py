@@ -1,7 +1,6 @@
 """Test the module used for decoding."""
 from __future__ import annotations
 
-import random as rn
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -17,15 +16,15 @@ if TYPE_CHECKING:
 
 
 @pytest.mark.parametrize("lsb_n", [1, 2, 3, 4, 5, 6, 7, 8])
-def test_prepare_array(random_image_arr: ArrayLike, lsb_n: int) -> None:
+def test_prepare_array(test_image_array: ArrayLike, lsb_n: int) -> None:
     """Test the prepare array function."""
-    result = decode.prepare_array(random_image_arr, lsb_n, False)
+    result = decode.prepare_array(test_image_array, lsb_n, False)
 
-    assert np.ceil(random_image_arr.size / result.size) == np.ceil(8 / lsb_n)
+    assert np.ceil(test_image_array.size / result.size) == np.ceil(8 / lsb_n)
     assert result.ndim == 1
 
     np.testing.assert_array_equal(
-        np.unpackbits(random_image_arr).reshape(-1, 8)[:, -lsb_n:],
+        np.unpackbits(test_image_array).reshape(-1, 8)[:, -lsb_n:],
         np.unpackbits(result).reshape(-1, lsb_n),
     )
 
@@ -40,8 +39,7 @@ def test_prepare_array_raises(lsb_n: int):
 @pytest.mark.parametrize("text", ["", " ", "hello", "987654321", "~!@#$%^&*()_"])
 def test_decode_text(text: str) -> None:
     """Test the decode text function."""
-    random_noise = "".join(map(chr, (rn.randint(0, 255) for _ in range(1000))))
-    ascii_msg = map(ord, f"{text}dlm{random_noise}")
+    ascii_msg = map(ord, f"{text}dlm___decode noise")
 
     result = decode.decode_text(np.fromiter(ascii_msg, dtype=np.uint8), "dlm")
 
@@ -50,12 +48,10 @@ def test_decode_text(text: str) -> None:
 
 
 def test_decode_text_raises(
-    random_image_arr: ArrayLike,
     test_image_array: ArrayLike,
 ) -> None:
     """Test that the decode_text function raises StopIteration with wrong input."""
     with pytest.raises(StopIteration):
-        decode.decode_text(random_image_arr.ravel(), "fake delimiter")
         decode.decode_text(test_image_array.ravel(), "fake delimiter")
 
 

@@ -34,11 +34,11 @@ def test_data(test_image_path: Path) -> None:
     assert shape[-1] == 3
 
 
-def test_save(tmpdir, random_image_arr) -> None:
+def test_save(tmpdir, test_image_array) -> None:
     """Test the save function."""
     tmp_dir = Path(tmpdir.mkdir("tmp/"))
 
-    fp = save_array(random_image_arr, image_dir=tmp_dir)
+    fp = save_array(test_image_array, image_dir=tmp_dir)
     assert fp.is_file()
 
 

@@ -131,21 +131,6 @@ def test_image_array(test_image_path: Path) -> Generator[ArrayLike, None, None]:
         yield np.asarray(img, dtype=np.uint8)
 
 
-@pytest.fixture(scope="function")
-def random_image_arr() -> ArrayLike:
-    """Return array containing data about a random image."""
-    return np.random.randint(0, 255, size=(8, 8, 3), dtype=np.uint8)
-
-
-@pytest.fixture(scope="function")
-def random_image(random_image_arr: ArrayLike, tmpdir) -> bytes:
-    """Return an image file created in a temporary directory."""
-    tmpdir = Path(tmpdir.mkdir("tmpdir/"))
-    fp = tmpdir / "random_image.png"
-    Image.fromarray(random_image_arr).convert("RGB").save(fp)
-    return open(fp, mode="rb").read()
-
-
 @pytest.fixture(scope="session")
 def delimiter_array() -> ArrayLike:
     """Return a delimiter array, string form = 'dlm'."""
