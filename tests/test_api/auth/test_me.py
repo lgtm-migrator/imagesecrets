@@ -183,10 +183,13 @@ def test_password_put(
     auth_token: tuple[User, dict[str, str]],
 ) -> None:
     """Test a successful password put request."""
-    auth = mocker.patch("image_secrets.backend.password.auth", return_value=True)
+    authenticate = mocker.patch(
+        "image_secrets.backend.database.user.crud.authenticate",
+        return_value=True,
+    )
     hash_ = mocker.patch("image_secrets.backend.password.hash_", return_value="123456")
     update = mocker.patch(
-        "image_secrets.backend.database.users.update",
+        "image_secrets.backend.database.user.crud.update",
         return_value=...,
     )
 
@@ -201,7 +204,10 @@ def test_password_put(
         json={"old": "old_password", "new": "new_password"},
     )
 
-    auth.assert_called_once_with(username=user.username, password_="old_password")
+    authenticate.assert_called_once_with(
+        username=user.username,
+        password_="old_password",
+    )
     hash_.assert_called_once_with("new_password")
     update.assert_called_once_with(user.id, password_hash="123456")
 
@@ -219,7 +225,11 @@ def test_password_put_401(
     auth_token: tuple[User, dict[str, str]],
 ) -> None:
     """Test a password put request with invalid password in request body"""
-    auth = mocker.patch("image_secrets.backend.password.auth", return_value=False)
+    auth = mocker.patch(
+        "image_secrets.backend.database.user.crud.authenticate",
+        return_value=False,
+    )
+    hash_ = mocker.patch("image_secrets.backend.password.hash_", return_value="...")
 
     token = auth_token[1]
     user = auth_token[0]
@@ -233,6 +243,7 @@ def test_password_put_401(
     )
 
     auth.assert_called_once_with(username=user.username, password_="old_password")
+    hash_.assert_not_called()
 
     assert response.status_code == 401
     assert response.reason == "Unauthorized"

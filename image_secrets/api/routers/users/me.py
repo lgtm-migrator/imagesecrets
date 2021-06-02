@@ -106,7 +106,7 @@ async def delete(
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Change user password",
 )
-async def password(
+async def password_put(
     data: api_schemas.ChangePassword,
     background_tasks: BackgroundTasks,
     current_user: models.User = Depends(manager),
