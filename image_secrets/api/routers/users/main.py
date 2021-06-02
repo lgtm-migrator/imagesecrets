@@ -3,7 +3,15 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Optional
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    Depends,
+    HTTPException,
+    Query,
+    Response,
+    status,
+)
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_login import LoginManager
 from fastapi_mail import FastMail
@@ -13,6 +21,7 @@ from image_secrets.api import dependencies, responses
 from image_secrets.api import schemas as api_schemas
 from image_secrets.api.exceptions import DetailExists, NotAuthenticated
 from image_secrets.backend import email
+from image_secrets.backend.database.token import crud as token_crud
 from image_secrets.backend.database.user import crud, schemas
 from image_secrets.backend.util.main import parse_unique_integrity
 
@@ -54,7 +63,7 @@ async def user_loader(username: str) -> Optional[models.User]:
 )
 async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
-) -> dict[str, str]:
+) -> Optional[dict[str, str]]:
     """Login into an account and obtain access token.
 
     - **username**: Account username
@@ -88,7 +97,7 @@ async def register(
     user: schemas.UserCreate,
     background_tasks: BackgroundTasks,
     email_client: FastMail = Depends(dependencies.get_mail),
-) -> schemas.User:
+) -> Optional[schemas.User]:
     """Register a new user.
 
     - **username**: New account username
@@ -128,7 +137,7 @@ async def register(
     response_model=api_schemas.Message,
     summary="Request a password reset token",
 )
-def reset_token(
+async def forgot_password(
     data: api_schemas.ResetEmail,
     background_tasks: BackgroundTasks,
     email_client: FastMail = Depends(dependencies.get_mail),
@@ -143,13 +152,47 @@ def reset_token(
     :param email_client: Email SMTP client instance
 
     """
-
-    # todo: create token
+    user_email = data.email
+    user_id = await crud.get_id(crud.DBIdentifier(column="email", value=user_email))
+    token = await token_crud.create(owner_id=user_id)
 
     background_tasks.add_task(
         email.send_reset,
         client=email_client,
-        recipient=data.email,
-        token=...,
+        recipient=user_email,
+        token=token,
     )
     return {"detail": "email with the password reset token has been sent"}
+
+
+@router.post(
+    "/reset-password",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Reset account password",
+    responses=responses.AUTHORIZATION,
+)
+async def reset_password(
+    token: str = Query(
+        ...,
+        description="Forgot password authorization token",
+    ),
+    password: str = ...,
+) -> Optional[Response]:
+    """Reset account password.
+
+    - **token**: Forgot password token received via email
+    - **password**: New password
+
+    \f
+    :param token: Forgot password authorization token
+
+    """
+    user_id = await token_crud.check(token)
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid forgot password token",
+        )
+    # hashing is handled
+    await crud.update(user_id, password_hash=password)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

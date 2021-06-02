@@ -3,6 +3,8 @@ from __future__ import annotations
 
 from typing import Any, NamedTuple, Optional, Union
 
+from tortoise.exceptions import DoesNotExist
+
 from image_secrets.backend import password
 from image_secrets.backend.database.user import models, schemas
 
@@ -27,6 +29,17 @@ async def get(identifier: DBIdentifier) -> Optional[models.User]:
     """
     identifier_dict = {identifier.column: identifier.value}
     return await models.User.get(**identifier_dict)
+
+
+async def get_id(identifier: DBIdentifier) -> int:
+    """Return User's database id.
+
+    :param identifier: DBIdentifier to identify which user to return
+
+    """
+    identifier_dict = {identifier.column: identifier.value}
+    result = await models.User.get(**identifier_dict).only("id")
+    return int(result.id)
 
 
 async def create(user: schemas.UserCreate) -> models.User:
@@ -59,6 +72,9 @@ async def update(user_id: int, **attributes: Any) -> models.User:
     :param attributes: Keyword arguments with attributes to update
 
     """
+    if pwd := attributes.get("password_hash"):
+        hashed = password.hash_(pwd)
+        attributes["password_hash"] = hashed
     await models.User.filter(id=user_id).update(**attributes)
     return await get(DBIdentifier(column="id", value=user_id))
 
@@ -70,11 +86,8 @@ async def authenticate(username: str, password_: str) -> bool:
     :param password_: User's password
 
     """
-    hashed = await models.User.filter(username=username).values_list(
-        "password_hash",
-        flat=True,
-    )
     try:
-        return password.auth(password_, hashed[0])
-    except IndexError:
+        result = await models.User.get(username=username).only("password_hash")
+    except DoesNotExist:
         return False
+    return password.auth(password_, result.password_hash)

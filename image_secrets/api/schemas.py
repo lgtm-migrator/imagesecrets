@@ -27,14 +27,20 @@ class Token(BaseModel):
     token_type: str
 
 
+class ChangePassword(BaseModel):
+    """Change User password schema."""
+
+    old: str
+    new: constr(min_length=6)
+
+
 class ResetEmail(BaseModel):
     """Schema for requesting a reset password token."""
 
     email: EmailStr
 
 
-class ChangePassword(BaseModel):
-    """Change User password schema."""
+class ResetPassword(BaseModel):
+    """Schema for requesting a new password for an account."""
 
-    old: str
-    new: constr(min_length=6)
+    password: str

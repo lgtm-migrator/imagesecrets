@@ -8,7 +8,7 @@ class Token(models.Model):
     id = fields.IntField(pk=True, index=True)
     created = fields.DatetimeField(auto_now_add=True, index=True)
 
-    token = fields.CharField(max_length=128, index=True)
+    token_hash = fields.CharField(max_length=128, index=True)
 
     owner = fields.OneToOneField("models.User", on_delete=fields.CASCADE)
 

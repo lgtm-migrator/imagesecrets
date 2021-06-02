@@ -43,6 +43,11 @@ def token_hex(length: int, /) -> str:
     return secrets.token_hex(nbytes)
 
 
+def token_url() -> str:
+    """Return random and URL safe token."""
+    return secrets.token_urlsafe()
+
+
 def parse_unique_integrity(*, error: IntegrityError) -> Optional[tuple[str, str]]:
     """Parse a database uniqueness IntegrityError and return the conflicting field and value."""
     err = str(error)
