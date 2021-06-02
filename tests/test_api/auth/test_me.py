@@ -9,6 +9,7 @@ import pytest
 
 if TYPE_CHECKING:
     from fastapi.testclient import TestClient
+    from pytest_mock import MockFixture
 
     from image_secrets.backend.database.user.models import User
 
@@ -174,3 +175,65 @@ def test_delete(
     with pytest.raises(JSONDecodeError):
         response.json()
     assert not response.headers
+
+
+def test_password_put(
+    mocker: MockFixture,
+    api_client: TestClient,
+    auth_token: tuple[User, dict[str, str]],
+) -> None:
+    """Test a successful password put request."""
+    auth = mocker.patch("image_secrets.backend.password.auth", return_value=True)
+    hash_ = mocker.patch("image_secrets.backend.password.hash_", return_value="123456")
+    update = mocker.patch(
+        "image_secrets.backend.database.users.update",
+        return_value=...,
+    )
+
+    token = auth_token[1]
+    user = auth_token[0]
+
+    response = api_client.put(
+        f"{URL}/password",
+        headers={
+            "authorization": f'{token["token_type"].capitalize()} {token["access_token"]}',
+        },
+        json={"old": "old_password", "new": "new_password"},
+    )
+
+    auth.assert_called_once_with(username=user.username, password_="old_password")
+    hash_.assert_called_once_with("new_password")
+    update.assert_called_once_with(user.id, password_hash="123456")
+
+    response.raise_for_status()
+    assert response.status_code == 204
+    assert response.reason == "No Content"
+    with pytest.raises(JSONDecodeError):
+        response.json()
+    assert not response.headers
+
+
+def test_password_put_401(
+    mocker: MockFixture,
+    api_client: TestClient,
+    auth_token: tuple[User, dict[str, str]],
+) -> None:
+    """Test a password put request with invalid password in request body"""
+    auth = mocker.patch("image_secrets.backend.password.auth", return_value=False)
+
+    token = auth_token[1]
+    user = auth_token[0]
+
+    response = api_client.put(
+        f"{URL}/password",
+        headers={
+            "authorization": f'{token["token_type"].capitalize()} {token["access_token"]}',
+        },
+        json={"old": "old_password", "new": "new_password"},
+    )
+
+    auth.assert_called_once_with(username=user.username, password_="old_password")
+
+    assert response.status_code == 401
+    assert response.reason == "Unauthorized"
+    assert response.json() == {"detail": "incorrect password"}

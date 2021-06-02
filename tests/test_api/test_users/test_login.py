@@ -38,7 +38,7 @@ def test_ok(
         ),
     )
 
-    auth = mocker.patch("image_secrets.backend.util.password.auth", return_value=True)
+    auth = mocker.patch("image_secrets.backend.password.auth", return_value=True)
     response = api_client.post(
         URL,
         data={"username": username, "password": password},
@@ -65,7 +65,7 @@ def test_401_in_db(
     insert_user: User,
 ) -> None:
     """Test invalid login post request with an existing user in a database."""
-    auth = mocker.patch("image_secrets.backend.util.password.auth", return_value=False)
+    auth = mocker.patch("image_secrets.backend.password.auth", return_value=False)
     response = api_client.post(
         URL,
         data={"username": insert_user.username, "password": "test_pwd"},
@@ -80,7 +80,7 @@ def test_401_in_db(
 
 def test_401_not_in_db(api_client: TestClient, mocker: MockFixture) -> None:
     """Test invalid login post with a user which does not exist in a database."""
-    auth = mocker.patch("image_secrets.backend.util.password.auth")
+    auth = mocker.patch("image_secrets.backend.password.auth")
     response = api_client.post(
         URL,
         data={"username": "test_username", "password": "test_pwd"},
