@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
     from image_secrets.backend.database.user.models import User
 
-URL = "/login"
+URL = "/users/login"
 
 
 @pytest.mark.parametrize(

@@ -100,9 +100,9 @@ def auth_token(
     mocker: MockFixture,
 ) -> tuple[User, dict[str, str]]:
     """Return authorized user and a token."""
-    mocker.patch("image_secrets.backend.util.password.auth", return_value=True)
+    mocker.patch("image_secrets.backend.password.auth", return_value=True)
     response = api_client.post(
-        "/login",
+        "/users/login",
         data={"username": insert_user.username, "password": insert_user.password_hash},
     )
     return insert_user, response.json()

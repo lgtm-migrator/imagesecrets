@@ -15,7 +15,10 @@ URL = "/users/register"
 
 @pytest.mark.parametrize(
     "username, email, password",
-    [("string", "user@example.com", "pass"), ("123456", "user@string.com", "secret!!")],
+    [
+        ("string", "user@example.com", "password"),
+        ("123456", "user@string.com", "secret!!"),
+    ],
 )
 def test_ok(api_client: TestClient, username: str, email: str, password: str) -> None:
     """Test successful post request on the register route."""
