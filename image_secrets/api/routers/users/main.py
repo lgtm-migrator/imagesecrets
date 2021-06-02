@@ -123,7 +123,7 @@ async def register(
 
 
 @router.post(
-    "forgot-password",
+    "/forgot-password",
     status_code=status.HTTP_202_ACCEPTED,
     response_model=api_schemas.Message,
     summary="Request a password reset token",

@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 from tortoise.contrib.fastapi import register_tortoise
 
 from image_secrets.backend.database.image import models as image_models
+from image_secrets.backend.database.token import models as token_models
 from image_secrets.backend.database.user import models as user_models
 
 if TYPE_CHECKING:
@@ -22,6 +23,6 @@ def init(app: FastAPI, db_url: str) -> None:
     register_tortoise(
         app,
         db_url=db_url,
-        modules={"models": [user_models, image_models]},
+        modules={"models": [user_models, image_models, token_models]},
         generate_schemas=True,
     )

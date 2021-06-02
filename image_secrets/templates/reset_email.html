@@ -4,9 +4,9 @@
 
 <pre>
 You have requested to reset your password at ImageSecrets.
-Please use the token below for a change password POST request.
+Please use the URL below for POST request with your new password.
 
-<br>{{ body.token }}<br>
+https://imagesecrets.herokuapp.com/users/reset-password?token={{ body.token }}
 
 If you did not make this request, you can ignore this email and no changes will be made to your account.
 </pre>
