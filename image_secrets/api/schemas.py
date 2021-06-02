@@ -1,19 +1,5 @@
 """Module with pydantic schemas."""
-from pydantic import BaseModel
-
-
-class ChangePassword(BaseModel):
-    """Change User password schema."""
-
-    old: str
-    new: str
-
-
-class Token(BaseModel):
-    """Response model for access token."""
-
-    access_token: str
-    token_type: str
+from pydantic import BaseModel, EmailStr, constr
 
 
 class Message(BaseModel):
@@ -32,3 +18,23 @@ class Conflict(Field):
     """Response model for conflicting field value."""
 
     value: str
+
+
+class Token(BaseModel):
+    """Response model for access token."""
+
+    access_token: str
+    token_type: str
+
+
+class ResetEmail(BaseModel):
+    """Schema for requesting a reset password token."""
+
+    email: EmailStr
+
+
+class ChangePassword(BaseModel):
+    """Change User password schema."""
+
+    old: str
+    new: constr(min_length=6)

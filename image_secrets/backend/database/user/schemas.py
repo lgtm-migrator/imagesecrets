@@ -29,7 +29,7 @@ class UserBase(_UserBase):
 class UserCreate(UserBase):
     """Create new User schema."""
 
-    password: SecretStr
+    password: SecretStr = Field(..., min_length=6)
 
 
 class UserUpdate(UserBase):

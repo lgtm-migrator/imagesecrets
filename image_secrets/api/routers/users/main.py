@@ -10,10 +10,10 @@ from fastapi_mail import FastMail
 from tortoise.exceptions import DoesNotExist, IntegrityError
 
 from image_secrets.api import dependencies, responses
+from image_secrets.api import schemas as api_schemas
 from image_secrets.api.exceptions import DetailExists, NotAuthenticated
-from image_secrets.api.schemas import Token
+from image_secrets.backend import email
 from image_secrets.backend.database.user import crud, schemas
-from image_secrets.backend.email import send_welcome
 from image_secrets.backend.util.main import parse_unique_integrity
 
 if TYPE_CHECKING:
@@ -25,7 +25,7 @@ router = APIRouter(
     tags=["users"],
     dependencies=[Depends(dependencies.get_config)],
 )
-manager = LoginManager(config.secret_key, "/login")
+manager = LoginManager(config.secret_key, "/users/login")
 manager.not_authenticated_exception = NotAuthenticated
 
 
@@ -48,7 +48,7 @@ async def user_loader(username: str) -> Optional[models.User]:
 @router.post(
     "/login",
     status_code=status.HTTP_200_OK,
-    response_model=Token,
+    response_model=api_schemas.Token,
     summary="Login for access token",
     responses=responses.AUTHORIZATION,
 )
@@ -114,9 +114,42 @@ async def register(
             value=value,
         ) from e
     background_tasks.add_task(
-        send_welcome,
+        email.send_welcome,
         client=email_client,
         recipient=user.email,
         username=user.username,
     )
     return await schemas.User.from_tortoise_orm(db_user)
+
+
+@router.post(
+    "forgot-password",
+    status_code=status.HTTP_202_ACCEPTED,
+    response_model=api_schemas.Message,
+    summary="Request a password reset token",
+)
+def reset_token(
+    data: api_schemas.ResetEmail,
+    background_tasks: BackgroundTasks,
+    email_client: FastMail = Depends(dependencies.get_mail),
+) -> dict[str, str]:
+    """Send a reset password email with a password reset token.
+
+    - **email**: User email of the user which needs to reset the account password
+
+    \f
+    :param data: Schema with necessary information to send the reset token
+    :param background_tasks: Starlette ``BackgroundTasks`` instance
+    :param email_client: Email SMTP client instance
+
+    """
+
+    # todo: create token
+
+    background_tasks.add_task(
+        email.send_reset,
+        client=email_client,
+        recipient=data.email,
+        token=...,
+    )
+    return {"detail": "email with the password reset token has been sent"}

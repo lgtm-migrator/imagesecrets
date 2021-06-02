@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Response, status
 from tortoise.exceptions import IntegrityError
 
 from image_secrets.api import dependencies, exceptions, responses
@@ -108,12 +108,14 @@ async def delete(
 )
 async def password(
     data: api_schemas.ChangePassword,
+    background_tasks: BackgroundTasks,
     current_user: models.User = Depends(manager),
 ) -> Optional[Response]:
     """Change account password.
 
     \f
     :param data: Password data
+    :param background_tasks: Starlette ``BackgroundTasks`` instance
     :param current_user: Current user dependency
 
     """
@@ -124,5 +126,8 @@ async def password(
             detail="incorrect password",
         )
     hashed = password.hash_(data.new)
-    await crud.update(current_user.id, password_hash=hashed)
+
+    # no reason to wait for this, should never fail except 500
+    background_tasks.add_task(crud.update, current_user.id, password_hash=hashed)
+
     return Response(status_code=status.HTTP_204_NO_CONTENT)
