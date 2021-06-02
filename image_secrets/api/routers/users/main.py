@@ -21,6 +21,7 @@ if TYPE_CHECKING:
 
 config = dependencies.get_config()
 router = APIRouter(
+    prefix="/users",
     tags=["users"],
     dependencies=[Depends(dependencies.get_config)],
 )
@@ -77,7 +78,7 @@ async def login(
 
 
 @router.post(
-    "/users/register",
+    "/register",
     status_code=status.HTTP_201_CREATED,
     response_model=schemas.User,
     summary="New user registration",

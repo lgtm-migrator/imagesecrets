@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from image_secrets.backend.util.password import auth, hash_
+from image_secrets.backend.password import auth, hash_
 
 if TYPE_CHECKING:
     from pytest_mock import MockFixture

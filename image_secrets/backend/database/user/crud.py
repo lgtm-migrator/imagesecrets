@@ -3,8 +3,8 @@ from __future__ import annotations
 
 from typing import Any, NamedTuple, Optional, Union
 
+from image_secrets.backend import password
 from image_secrets.backend.database.user import models, schemas
-from image_secrets.backend.util import password
 
 
 class DBIdentifier(NamedTuple):

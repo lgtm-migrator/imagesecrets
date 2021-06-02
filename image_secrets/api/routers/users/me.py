@@ -8,11 +8,13 @@ from __future__ import annotations
 
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from tortoise.exceptions import IntegrityError
 
 from image_secrets.api import dependencies, exceptions, responses
+from image_secrets.api import schemas as api_schemas
 from image_secrets.api.routers.users.main import manager
+from image_secrets.backend import password
 from image_secrets.backend.database.user import crud, models, schemas
 from image_secrets.backend.util.main import parse_unique_integrity
 
@@ -96,4 +98,31 @@ async def delete(
 
     """
     await crud.delete(current_user.id)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.put(
+    "/me/password",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Change user password",
+)
+async def password(
+    data: api_schemas.ChangePassword,
+    current_user: models.User = Depends(manager),
+) -> Optional[Response]:
+    """Change account password.
+
+    \f
+    :param data: Password data
+    :param current_user: Current user dependency
+
+    """
+    auth = await crud.authenticate(username=current_user.username, password_=data.old)
+    if not auth:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="incorrect password",
+        )
+    hashed = password.hash_(data.new)
+    await crud.update(current_user.id, password_hash=hashed)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

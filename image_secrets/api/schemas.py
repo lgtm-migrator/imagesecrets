@@ -2,6 +2,13 @@
 from pydantic import BaseModel
 
 
+class ChangePassword(BaseModel):
+    """Change User password schema."""
+
+    old: str
+    new: str
+
+
 class Token(BaseModel):
     """Response model for access token."""
 

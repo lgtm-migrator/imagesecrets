@@ -83,7 +83,9 @@ def test_edit_column(
 
     bitlike_shape = (-1, 8)
 
-    test_image_array = test_image_array.reshape(bitlike_shape)[: 192 // 8].copy()
+    test_image_array = test_image_array.reshape(bitlike_shape)[
+        : new.shape[0] // bitlike_shape[1]
+    ].copy()
     new = new.reshape(-1, col_num)[: test_image_array.shape[0], :]
 
     if start_from_end:

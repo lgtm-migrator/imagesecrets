@@ -2,7 +2,7 @@
 import functools as fn
 from typing import Optional
 
-from pydantic import EmailStr, Field, SecretStr, constr
+from pydantic import EmailStr, Field, SecretStr
 from tortoise.contrib.pydantic import pydantic_model_creator
 
 from image_secrets.backend.database.image import schemas
