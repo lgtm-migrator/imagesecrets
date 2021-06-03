@@ -205,12 +205,13 @@ async def reset_password(
     :param password: New password
 
     """
-    user_id = await token_crud.get_owner_id(token)
-    if not user_id:
+    try:
+        user_id = await token_crud.get_owner_id(token)
+    except DoesNotExist as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="invalid forgot password token",
-        )
+        ) from e
     # password hashing is handled by the update function
     await crud.update(user_id, password_hash=password)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
