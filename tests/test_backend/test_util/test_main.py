@@ -2,15 +2,16 @@
 from __future__ import annotations
 
 import string
+from typing import TYPE_CHECKING
 
 import pytest
 from tortoise.exceptions import IntegrityError
 
-from image_secrets.backend.util.main import (
-    parse_unique_integrity,
-    partial_init,
-    token_hex,
-)
+from image_secrets.backend.regex import INTEGRITY_FIELD
+from image_secrets.backend.util import main
+
+if TYPE_CHECKING:
+    from pytest_mock import MockFixture
 
 
 def test_partial_init() -> None:
@@ -24,7 +25,7 @@ def test_partial_init() -> None:
         def __repr__(self) -> str:
             return f"{self.args!r}, {self.kwargs!r}"
 
-    partial = partial_init(Test, test="test")
+    partial = main.partial_init(Test, test="test")
     assert partial.__name__ == "Partial"
     assert partial.mro()[1] is Test
     assert partial.__base__ is Test
@@ -39,9 +40,9 @@ def test_partial_init() -> None:
 @pytest.mark.parametrize("length", [16, 64, 33, 0, -8, 101])
 def test_token_hex(length) -> None:
     """Test the token_hex function."""
-    char_set = {i for i in (string.ascii_lowercase + string.digits)}
+    char_set = set(string.ascii_lowercase + string.digits)
 
-    token = token_hex(length)
+    token = main.token_hex(length)
 
     length = abs(length)
 
@@ -49,16 +50,33 @@ def test_token_hex(length) -> None:
     assert all(i in char_set for i in token)
 
 
+def test_token_url(mocker: MockFixture) -> None:
+    """Test the token url function."""
+    return_val = "dioM9FGKE-3bDqq5ff-r0r6Nuu1kMZ494fujIkNX7vU"
+    mock = mocker.patch("secrets.token_urlsafe", return_value=return_val)
+
+    result = main.token_url()
+
+    mock.assert_called_once()
+    assert result == return_val
+
+
+@pytest.mark.xfail
 def test_parse_unique_integrity() -> None:
     """Test the parse_unique_integrity function."""
-    err = IntegrityError("DETAIL  KEY (username)=(123456) already exists.")
-    result = parse_unique_integrity(error=err)
-    assert result[0] == "username"
-    assert result[1] == "123456"
+    key = "username"
+    value = "123456"
+
+    err = IntegrityError(f"DETAIL  KEY ({key})=({value}) already exists.")
+    result = main.parse_unique_integrity(error=err)
+
+    assert result[0] == key
+    assert result[1] == value
 
 
+@pytest.mark.xfail
 def test_parse_unique_integrity_fail() -> None:
     """Test that the parse_unique_integrity functions raises ValueError if no result found."""
     err = IntegrityError("invalid error")
     with pytest.raises(ValueError):
-        parse_unique_integrity(error=err)
+        main.parse_unique_integrity(error=err)

@@ -19,8 +19,7 @@ def test_read_bytes(bytes_: bytes) -> None:
     :param bytes_: Bytes to read
 
     """
-    num = np.random.randint(0, 10)
-    assert read_bytes(bytes_).read(num) == bytes_[:num]
+    assert read_bytes(bytes_).read(5) == bytes_[:5]
 
 
 def test_data(test_image_path: Path) -> None:
@@ -51,6 +50,6 @@ def test_png_filetype(test_image_path) -> None:
 
 def test_png_filetype_fail() -> None:
     """Test that png_filetype returns False if not a png file is passed in."""
-    with open(Path(__file__), "rb") as image_data:
+    with open(Path(__file__), mode="rb") as image_data:
         result = png_filetype(image_data.read())
     assert not result

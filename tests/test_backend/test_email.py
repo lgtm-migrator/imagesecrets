@@ -46,3 +46,26 @@ def test_send_welcome(client: FastMail, recipient: str, username: str) -> None:
     assert out["To"] == recipient
     assert out["Subject"] == "Welcome to ImageSecrets"
     assert not out.defects
+
+
+@pytest.mark.parametrize(
+    "recipient, token",
+    [("email@example.com", "9876543210"), ("email@test.abc", "QWERTYASDF")],
+)
+def test_send_reset(client: FastMail, recipient: str, token: str) -> None:
+    """Test the send_welcome function."""
+    coro = email.send_reset(
+        client=client,
+        recipient=EmailStr(recipient),
+        token=token,
+    )
+    with client.record_messages() as outbox:
+        loop.run_until_complete(coro)
+
+        assert len(outbox) == 1
+        out: MIMEMultipart = outbox[0]
+
+    assert out["From"] == "string@example.com"
+    assert out["To"] == recipient
+    assert out["Subject"] == "Reset Password"
+    assert not out.defects

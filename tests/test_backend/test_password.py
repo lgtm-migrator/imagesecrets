@@ -12,10 +12,16 @@ if TYPE_CHECKING:
 
 
 @pytest.mark.parametrize("password", ["", "321", "my-password"])
-def test_hash_(password: str) -> None:
+def test_hash_(mocker: MockFixture, password: str) -> None:
     """Test the hash function."""
+    gensalt = mocker.patch(
+        "bcrypt.gensalt",
+        return_value=b"$2b$12$SHamHx8Sd9lxkp/KA2cPhu",
+    )
+
     result = hash_(password)
 
+    gensalt.assert_called_once()
     assert isinstance(result, str)
     assert result[:4] == "$2b$"
     assert len(result) == 60

@@ -59,9 +59,6 @@ def test_message_bit_array(
     assert length == expected_arr.size // bits
 
 
-r = fn.partial(np.random.randint, low=0, high=255, size=192, dtype=np.uint8)
-
-
 @pytest.mark.parametrize(
     "col_num, start_from_end",
     [
