@@ -71,6 +71,30 @@ def test_patch(
     assert json_["email"] == email
 
 
+def test_patch_empty(
+    api_client: TestClient,
+    auth_token: tuple[User, dict[str, str]],
+) -> None:
+    """Test successful empty patch request"""
+    token = auth_token[1]
+    user = auth_token[0]
+
+    response = api_client.patch(
+        URL,
+        headers={
+            "authorization": f'{token["token_type"].capitalize()} {token["access_token"]}',
+        },
+        data={},
+    )
+
+    response.raise_for_status()
+    assert response.status_code == 200
+    assert response.reason == "OK"
+    json_ = response.json()
+    assert json_["username"] == user.username
+    assert json_["email"] == user.email
+
+
 @pytest.mark.parametrize("username", ["test-name", "123456"])
 def test_patch_409(
     api_client: TestClient,

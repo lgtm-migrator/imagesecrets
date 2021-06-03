@@ -1,8 +1,6 @@
 """CRUD operations with a Token."""
 from __future__ import annotations
 
-from typing import Optional
-
 from image_secrets.backend import password
 from image_secrets.backend.database.token.models import Token
 from image_secrets.backend.util.main import token_url
