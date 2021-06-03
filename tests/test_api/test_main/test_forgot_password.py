@@ -26,3 +26,17 @@ def test_ok(api_client: TestClient, mocker: MockFixture, insert_user: User) -> N
     assert response.json() == {
         "detail": "email with the password reset token has been sent",
     }
+
+
+def test_ok_no_user(api_client: TestClient, mocker: MockFixture) -> None:
+    """Test a successful request without any known user in database."""
+    sleep = mocker.patch("asyncio.sleep", return_value=None)
+
+    response = api_client.post(URL, data={"email": "unknown@email.com"})
+
+    sleep.assert_called_once_with(1)
+    response.raise_for_status()
+    assert response.status_code == 202
+    assert response.json() == {
+        "detail": "email with the password reset token has been sent",
+    }

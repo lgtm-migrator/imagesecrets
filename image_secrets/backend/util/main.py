@@ -48,7 +48,10 @@ def token_url() -> str:
     return secrets.token_urlsafe()
 
 
-def parse_unique_integrity(*, error: IntegrityError) -> Optional[tuple[str, str]]:
+# pytest is buggy with this function, todo
+def parse_unique_integrity(
+    *, error: IntegrityError
+) -> Optional[tuple[str, str]]:  # pragma: no cover
     """Parse a database uniqueness IntegrityError and return the conflicting field and value."""
     err = str(error)
     try:

@@ -1,6 +1,7 @@
 """Main user router."""
 from __future__ import annotations
 
+import asyncio
 from typing import TYPE_CHECKING, Optional
 
 from fastapi import (
@@ -159,15 +160,19 @@ async def forgot_password(
     :param email_client: Email SMTP client instance
 
     """
-    user_id = await crud.get_id(crud.DBIdentifier(column="email", value=user_email))
-    token = await token_crud.create(owner_id=user_id)
-
-    background_tasks.add_task(
-        email.send_reset,
-        client=email_client,
-        recipient=user_email,
-        token=token,
-    )
+    try:
+        user_id = await crud.get_id(crud.DBIdentifier(column="email", value=user_email))
+    except DoesNotExist:
+        # mimic waiting time of token creation
+        await asyncio.sleep(1)
+    else:
+        token = await token_crud.create(owner_id=user_id)
+        background_tasks.add_task(
+            email.send_reset,
+            client=email_client,
+            recipient=user_email,
+            token=token,
+        )
     return {"detail": "email with the password reset token has been sent"}
 
 
@@ -200,7 +205,7 @@ async def reset_password(
     :param password: New password
 
     """
-    user_id = await token_crud.validate(token)
+    user_id = await token_crud.get_owner_id(token)
     if not user_id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
