@@ -27,18 +27,24 @@ async def send_welcome(client: FastMail, recipient: EmailStr, username: str) -> 
     await client.send_message(message, template_name="welcome_email.html")
 
 
-async def send_reset(client: FastMail, recipient: EmailStr, token: str) -> None:
+async def send_reset(
+    client: FastMail,
+    recipient: EmailStr,
+    username: str,
+    token: str,
+) -> None:
     """Send a reset password email.
 
     :param client: Email SMTP client
     :param recipient: Recipient of the email
+    :param username: Username of the recipient
     :param token: The reset password token
 
     """
     message = MessageSchema(
         subject="Reset Password",
         recipients=[recipient],
-        body={"token": token},
+        body={"token": token, "name": username},
         subtype="html",
     )
     await client.send_message(message, template_name="reset_email.html")

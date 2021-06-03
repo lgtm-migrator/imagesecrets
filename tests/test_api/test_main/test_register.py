@@ -8,9 +8,35 @@ import pytest
 
 if TYPE_CHECKING:
     from fastapi.testclient import TestClient
+    from pytest_mock import MockFixture
+
+    from image_secrets.backend.database.user.models import User
 
 
 URL = "/users/register"
+
+
+@pytest.fixture()
+def return_user() -> User:
+    """Return a fake database user entry."""
+    from image_secrets.backend.database.user.models import User
+
+    user = User(
+        username="test_usernamne",
+        email="test_email@example.com",
+        password_hash="test_hash",
+    )
+    return user
+
+
+@pytest.fixture()
+def mock_user_crud_create(mocker: MockFixture, return_user: User):
+    """Return mocked user.crud.create function."""
+    async_mock = mocker.AsyncMock(return_value=return_user)
+    return mocker.patch(
+        "image_secrets.backend.database.user.crud.create",
+        side_effect=async_mock,
+    )
 
 
 @pytest.mark.parametrize(
