@@ -7,6 +7,7 @@ from fastapi import (
     APIRouter,
     BackgroundTasks,
     Depends,
+    Form,
     HTTPException,
     Query,
     Response,
@@ -15,6 +16,7 @@ from fastapi import (
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_login import LoginManager
 from fastapi_mail import FastMail
+from pydantic import EmailStr
 from tortoise.exceptions import DoesNotExist, IntegrityError
 
 from image_secrets.api import dependencies, responses
@@ -138,21 +140,25 @@ async def register(
     summary="Request a password reset token",
 )
 async def forgot_password(
-    data: api_schemas.ResetEmail,
     background_tasks: BackgroundTasks,
     email_client: FastMail = Depends(dependencies.get_mail),
+    user_email: EmailStr = Form(
+        ...,
+        alias="email",
+        description="Your account email",
+        example="string@example.com",
+    ),
 ) -> dict[str, str]:
     """Send a reset password email with a password reset token.
 
-    - **email**: User email of the user which needs to reset the account password
+    - **email**: Account email of the user which needs to have their password reset
 
     \f
-    :param data: Schema with necessary information to send the reset token
+    :param user_email: Email of the account which will have password changed
     :param background_tasks: Starlette ``BackgroundTasks`` instance
     :param email_client: Email SMTP client instance
 
     """
-    user_email = data.email
     user_id = await crud.get_id(crud.DBIdentifier(column="email", value=user_email))
     token = await token_crud.create(owner_id=user_id)
 
@@ -175,24 +181,31 @@ async def reset_password(
     token: str = Query(
         ...,
         description="Forgot password authorization token",
+        example="YcEK0RFG0kITiKJ5PsSmPLFLgOkipiBCJqvK9jD7dwk",
     ),
-    password: str = ...,
+    password: str = Form(
+        ...,
+        description="New password for your account",
+        min_length=6,
+        example="SuperSecret123",
+    ),
 ) -> Optional[Response]:
     """Reset account password.
 
     - **token**: Forgot password token received via email
-    - **password**: New password
+    - **password**: New password for your account
 
     \f
     :param token: Forgot password authorization token
+    :param password: New password
 
     """
-    user_id = await token_crud.check(token)
+    user_id = await token_crud.validate(token)
     if not user_id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid forgot password token",
+            detail="invalid forgot password token",
         )
-    # hashing is handled
+    # password hashing is handled by the update function
     await crud.update(user_id, password_hash=password)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

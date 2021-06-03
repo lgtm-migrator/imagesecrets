@@ -1,5 +1,5 @@
 """Module with pydantic schemas."""
-from pydantic import BaseModel, EmailStr, constr
+from pydantic import BaseModel
 
 
 class Message(BaseModel):
@@ -25,22 +25,3 @@ class Token(BaseModel):
 
     access_token: str
     token_type: str
-
-
-class ChangePassword(BaseModel):
-    """Change User password schema."""
-
-    old: str
-    new: constr(min_length=6)
-
-
-class ResetEmail(BaseModel):
-    """Schema for requesting a reset password token."""
-
-    email: EmailStr
-
-
-class ResetPassword(BaseModel):
-    """Schema for requesting a new password for an account."""
-
-    password: str

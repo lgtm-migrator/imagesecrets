@@ -20,7 +20,7 @@ async def create(owner_id: int) -> str:
     return token
 
 
-async def check(token: str) -> bool:
+async def validate(token: str) -> bool:
     """Return whether a token matched any token hash in database.
 
     :param token: The token to check

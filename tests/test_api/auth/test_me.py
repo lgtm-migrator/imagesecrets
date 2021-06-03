@@ -60,7 +60,7 @@ def test_patch(
         headers={
             "authorization": f'{token["token_type"].capitalize()} {token["access_token"]}',
         },
-        json={"username": username, "email": email},
+        data={"username": username, "email": email},
     )
 
     response.raise_for_status()
@@ -92,7 +92,7 @@ def test_patch_409(
         headers={
             "authorization": f'{token["token_type"].capitalize()} {token["access_token"]}',
         },
-        json={"username": username},
+        data={"username": username},
     )
 
     assert response.status_code == 409
@@ -103,7 +103,7 @@ def test_patch_409(
     assert json_["value"].lstrip() == "user.username"
 
 
-@pytest.mark.parametrize("username", ["", "00000", "1" * 129])
+@pytest.mark.parametrize("username", ["00000", "1" * 129])
 def test_patch_422_username(
     api_client: TestClient,
     auth_token: tuple[User, dict[str, str]],
@@ -117,9 +117,8 @@ def test_patch_422_username(
         headers={
             "authorization": f'{token["token_type"].capitalize()} {token["access_token"]}',
         },
-        json={"username": username},
+        data={"username": username},
     )
-
     assert response.status_code == 422
     assert response.reason == "Unprocessable Entity"
     assert response.json() == {
@@ -130,7 +129,7 @@ def test_patch_422_username(
 
 @pytest.mark.parametrize(
     "email",
-    ["", "@", "email@email", "email.com", "email@email.", "@email.com"],
+    ["@", "email@email", "email.com", "email@email.", "@email.com"],
 )
 def test_patch_422_email(
     api_client: TestClient,
@@ -145,7 +144,7 @@ def test_patch_422_email(
         headers={
             "authorization": f'{token["token_type"].capitalize()} {token["access_token"]}',
         },
-        json={"email": email},
+        data={"email": email},
     )
 
     assert response.status_code == 422
@@ -201,7 +200,7 @@ def test_password_put(
         headers={
             "authorization": f'{token["token_type"].capitalize()} {token["access_token"]}',
         },
-        json={"old": "old_password", "new": "new_password"},
+        data={"old": "old_password", "new": "new_password"},
     )
 
     authenticate.assert_called_once_with(
@@ -239,7 +238,7 @@ def test_password_put_401(
         headers={
             "authorization": f'{token["token_type"].capitalize()} {token["access_token"]}',
         },
-        json={"old": "old_password", "new": "new_password"},
+        data={"old": "old_password", "new": "new_password"},
     )
 
     auth.assert_called_once_with(username=user.username, password_="old_password")

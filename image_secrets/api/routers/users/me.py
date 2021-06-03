@@ -8,11 +8,19 @@ from __future__ import annotations
 
 from typing import Optional
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Response, status
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    Depends,
+    Form,
+    HTTPException,
+    Response,
+    status,
+)
+from pydantic import EmailStr
 from tortoise.exceptions import IntegrityError
 
 from image_secrets.api import dependencies, exceptions, responses
-from image_secrets.api import schemas as api_schemas
 from image_secrets.api.routers.users.main import manager
 from image_secrets.backend import password
 from image_secrets.backend.database.user import crud, models, schemas
@@ -52,8 +60,19 @@ async def get(
     responses=responses.CONFLICT,
 )
 async def patch(
-    update_schema: schemas.UserUpdate,
     current_user: models.User = Depends(manager),
+    username: Optional[str] = Form(
+        None,
+        description="Your new account username",
+        min_length=6,
+        max_length=128,
+        example="MyUsername",
+    ),
+    email: Optional[EmailStr] = Form(
+        None,
+        description="Your new account email",
+        example="string@example.com",
+    ),
 ) -> Optional[schemas.User]:
     """Update account details
 
@@ -61,17 +80,23 @@ async def patch(
     - **email**: New account email
 
     \f
-    :param update_schema: Schema with necessary information to update the user details
     :param current_user: Current user dependency
+    :param username: New username for the currently authenticated user
+    :param email: New email for the currently authenticated user
 
     :raises DetailExists: if either of the new values are already claimed in the database
 
     """
+    if not username and not email:
+        return await schemas.User.from_tortoise_orm(current_user)
+
+    update_dict = {
+        field: value
+        for field, value in {"username": username, "email": email}.items()
+        if value
+    }
     try:
-        user = await crud.update(
-            current_user.id,
-            **update_schema.dict(exclude_unset=True),
-        )
+        user = await crud.update(current_user.id, **update_dict)
     except IntegrityError as e:
         field, value = parse_unique_integrity(error=e)
         raise exceptions.DetailExists(
@@ -107,25 +132,40 @@ async def delete(
     summary="Change user password",
 )
 async def password_put(
-    data: api_schemas.ChangePassword,
     background_tasks: BackgroundTasks,
     current_user: models.User = Depends(manager),
+    old: str = Form(
+        ...,
+        description="Your current account password",
+        min_length=6,
+        example="MyPassword",
+    ),
+    new: str = Form(
+        ...,
+        description="New account password",
+        min_length=6,
+        example="MyNewPassword",
+    ),
 ) -> Optional[Response]:
     """Change account password.
 
+    - **old**: Current account password
+    - **new**: New account password
+
     \f
-    :param data: Password data
     :param background_tasks: Starlette ``BackgroundTasks`` instance
     :param current_user: Current user dependency
+    :param old: Current password of the currently authenticated user
+    :param new: New password of the currently authenticated
 
     """
-    auth = await crud.authenticate(username=current_user.username, password_=data.old)
+    auth = await crud.authenticate(username=current_user.username, password_=old)
     if not auth:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="incorrect password",
         )
-    hashed = password.hash_(data.new)
+    hashed = password.hash_(new)
 
     # no reason to wait for this, should never fail except 500
     background_tasks.add_task(crud.update, current_user.id, password_hash=hashed)

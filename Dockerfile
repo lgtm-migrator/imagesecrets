@@ -2,6 +2,7 @@ FROM python:3.9-slim
 
 MAINTAINER lukas.kucera.g@protonmail.com
 
+# python-magic linux only depenency
 RUN apt-get update && apt-get install -y libmagic1
 
 RUN pip install poetry
@@ -17,4 +18,5 @@ COPY . /app/
 RUN pytest
 
 EXPOSE $PORT
-CMD uvicorn image_secrets.api.interface:app --host=0.0.0.0 --port=$PORT
+ENTRYPOINT ["uvicorn", "image_secrets.api.interface:app", "--host", "0.0.0.0", "--port"]
+CMD ["$PORT"]
