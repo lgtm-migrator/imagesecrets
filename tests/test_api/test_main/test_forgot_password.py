@@ -22,7 +22,7 @@ def test_ok(api_client: TestClient, mocker: MockFixture, insert_user: User) -> N
     response.raise_for_status()
     assert response.status_code == 202
     assert response.json() == {
-        "detail": "email with the password reset token has been sent",
+        "detail": "email with password reset token has been sent",
     }
 
 
@@ -32,9 +32,9 @@ def test_ok_no_user(api_client: TestClient, mocker: MockFixture) -> None:
 
     response = api_client.post(URL, data={"email": "unknown@email.com"})
 
-    sleep.assert_called_once_with(1)
+    sleep.assert_called_with(1)
     response.raise_for_status()
     assert response.status_code == 202
     assert response.json() == {
-        "detail": "email with the password reset token has been sent",
+        "detail": "email with password reset token has been sent",
     }

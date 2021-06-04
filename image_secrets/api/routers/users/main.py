@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import asyncio
+from contextlib import suppress
 from typing import TYPE_CHECKING, Optional
 
 from fastapi import (
@@ -166,14 +167,14 @@ async def forgot_password(
         # mimic waiting time of token creation
         await asyncio.sleep(1)
     else:
-        token = await token_crud.create(owner_id=user_id)
+        token = await token_crud.create_new(owner_id=user_id)
         background_tasks.add_task(
             email.send_reset,
             client=email_client,
             recipient=user_email,
             token=token,
         )
-    return {"detail": "email with the password reset token has been sent"}
+    return {"detail": "email with password reset token has been sent"}
 
 
 @router.post(

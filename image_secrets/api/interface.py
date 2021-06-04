@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from fastapi import Depends, FastAPI, status
 
-from image_secrets.api import config, dependencies, handlers, responses
+from image_secrets.api import config, dependencies, handlers, responses, tasks
 from image_secrets.api.routers import decode, encode, users
 from image_secrets.backend.database import base
 
@@ -25,6 +25,7 @@ app.include_router(users.main)
 app.include_router(users.me)
 
 handlers.init(app)
+tasks.init(app)
 
 
 @app.get(

@@ -39,12 +39,20 @@ def api_settings(tmpdir) -> config_.Settings:
     )
     config_.settings = test_settings
 
+    # need to monkey patch specific functions connected to PostgreSQL
     def sqlite_parsing(error: str) -> list[str]:
         """Return parsed sqlite error message."""
         return str(error).split(":")
 
-    # need to monkey patch error parsing for sqlite
     main.parse_unique_integrity = sqlite_parsing
+    from image_secrets.api import tasks
+
+    async def clear_tokens():
+        ...
+
+    tasks.clear_tokens = lambda: clear_tokens()
+
+    ##
 
     # patch SMTP client
     from image_secrets.api import dependencies

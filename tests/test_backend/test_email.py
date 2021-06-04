@@ -49,23 +49,21 @@ def test_send_welcome(client: FastMail, recipient: str, username: str) -> None:
 
 
 @pytest.mark.parametrize(
-    "recipient, username, token",
+    "recipient, token",
     [
-        ("email@example.com", "name", "9876543210"),
-        ("email@test.abc", "test_name", "QWERTYASDF"),
+        ("email@example.com", "9876543210"),
+        ("email@test.abc", "QWERTYASDF"),
     ],
 )
 def test_send_reset(
     client: FastMail,
     recipient: str,
-    username: str,
     token: str,
 ) -> None:
     """Test the send_welcome function."""
     coro = email.send_reset(
         client=client,
         recipient=EmailStr(recipient),
-        username=username,
         token=token,
     )
     with client.record_messages() as outbox:

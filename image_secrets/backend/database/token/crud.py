@@ -1,23 +1,49 @@
 """CRUD operations with a Token."""
 from __future__ import annotations
 
-from tortoise.exceptions import DoesNotExist
+from tortoise.exceptions import DoesNotExist, IntegrityError
 
 from image_secrets.backend import password
 from image_secrets.backend.database.token.models import Token
 from image_secrets.backend.util.main import token_url
 
 
-async def create(owner_id: int) -> str:
+async def create(token_hash: str, owner_id: int) -> Token:
     """Create a new token and insert it's hash into database.
+
+    :param token_hash: Hash of the token to insert
+    :param owner_id: User foreign key
+
+    """
+    token = await Token.create(token_hash=token_hash, owner_id=owner_id)
+    return token
+
+
+async def create_new(owner_id: int) -> str:
+    """Ensure that a new token is created.
+
+    If a token already exists, delete it and create a new one
 
     :param owner_id: User foreign key
 
     """
     token = token_url()
     token_hash = password.hash_(token)
-    await Token.create(token_hash=token_hash, owner_id=owner_id)
+    try:
+        await create(token_hash=token_hash, owner_id=owner_id)
+    except IntegrityError:
+        await delete(owner_id=owner_id)
+        await create(token_hash=token_hash, owner_id=owner_id)
     return token
+
+
+async def delete(owner_id: int) -> None:
+    """Delete a token from database.
+
+    :param owner_id: User foreign key tied to the token
+
+    """
+    await Token.filter(owner_id=owner_id).delete()
 
 
 async def get_owner_id(token: str) -> int:
