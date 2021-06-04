@@ -12,7 +12,7 @@ from PIL import Image
 from tortoise.contrib.test import finalizer, initializer
 
 from image_secrets.api import config as config_
-from image_secrets.backend.database import image_models, user_models
+from image_secrets.backend.database import image_models, token_models, user_models
 from image_secrets.backend.util import main
 
 if TYPE_CHECKING:
@@ -53,6 +53,7 @@ def api_settings(tmpdir) -> config_.Settings:
     fm.config.SUPPRESS_SEND = 1
     fm.config.USE_CREDENTIALS = False
     dependencies.get_mail = lambda: fm
+    ##
 
     return config_.settings
 
@@ -64,7 +65,7 @@ def api_client(request, api_settings) -> Generator[TestClient, None, None]:
     from image_secrets.api.interface import app
 
     initializer(
-        [user_models, image_models],
+        [user_models, image_models, token_models],
         db_url=api_settings.pg_dsn,
         app_label="models",
     )

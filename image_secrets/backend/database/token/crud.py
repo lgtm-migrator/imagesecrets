@@ -1,8 +1,6 @@
 """CRUD operations with a Token."""
 from __future__ import annotations
 
-from typing import Optional
-
 from tortoise.exceptions import DoesNotExist
 
 from image_secrets.backend import password

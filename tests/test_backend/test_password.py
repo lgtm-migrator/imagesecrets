@@ -21,7 +21,7 @@ def test_hash_(mocker: MockFixture, password: str) -> None:
 
     result = hash_(password)
 
-    gensalt.assert_called_once()
+    gensalt.assert_called_once_with()
     assert isinstance(result, str)
     assert result[:4] == "$2b$"
     assert len(result) == 60

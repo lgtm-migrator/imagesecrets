@@ -50,7 +50,7 @@ async def create(user: schemas.UserCreate) -> models.User:
     """
     hashed = password.hash_(user.password.get_secret_value())
     db_user = await models.User.create(
-        **user.dict(exclude_unset=True),
+        **user.dict(exclude={"password"}),
         password_hash=hashed,
     )
     return db_user

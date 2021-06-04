@@ -29,7 +29,11 @@ class Image(Model):
 class DecodedImage(Image):
     """Tortoise decoded image model."""
 
-    owner = fields.ForeignKeyField("models.User", related_name="decoded_images")
+    owner = fields.ForeignKeyField(
+        "models.User",
+        related_name="decoded_images",
+        on_delete=fields.CASCADE,
+    )
 
     class Meta:
         """Tortoise metaclass."""
@@ -40,7 +44,11 @@ class DecodedImage(Image):
 class EncodedImage(Image):
     """Tortoise encoded image model."""
 
-    owner = fields.ForeignKeyField("models.User", related_name="encoded_images")
+    owner = fields.ForeignKeyField(
+        "models.User",
+        related_name="encoded_images",
+        on_delete=fields.CASCADE,
+    )
 
     class Meta:
         """Tortoise metaclass."""
