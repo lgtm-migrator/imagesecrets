@@ -1,7 +1,7 @@
 """Module with functions to decode text from images."""
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -10,6 +10,7 @@ from image_secrets.settings import API_IMAGES, MESSAGE_DELIMITER
 
 if TYPE_CHECKING:
     from pathlib import Path
+    from typing import Optional
 
     from numpy.typing import ArrayLike
 
@@ -74,7 +75,8 @@ def prepare_array(array: ArrayLike, lsb_n: int, reverse: bool) -> Optional[Array
     if reverse:  # pragma: no cover
         array = np.flip(array)
     arr = np.unpackbits(array).reshape(shape)
-    arr = np.packbits(arr[:, -lsb_n:])  # cut unnecessary bits and pack the rest
+    # cut unnecessary bits and pack the rest
+    arr = np.packbits(arr[:, -lsb_n:])
     return arr
 
 

@@ -2,9 +2,26 @@ image: python:latest
 
 
 stages:
+    - lint
     - test
     - build
     - deploy
+
+
+pre-commit:
+    stage: lint
+    before_script:
+        - python --version
+        - python -m pip install poetry
+        - poetry --version
+        - poetry install --no-interaction --no-ansi
+        - poetry run pre-commit --version
+        - poetry run pre-commit autoupdate
+    script:
+        - poetry run pre-commit run --all-files
+    tags:
+        - docker
+
 
 pytest:
     stage: test
@@ -38,10 +55,9 @@ docker:
 heroku:
     stage: deploy
     image: ruby:latest
-    rules:
-        - if: $CI_COMMIT_BRANCH == "master"
-          when: always
-        - when: never
+    when: on_success
+    only:
+        - master
     before_script:
         - apt-get update -qy
         - apt-get install -y ruby-dev

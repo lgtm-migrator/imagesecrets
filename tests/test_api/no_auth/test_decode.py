@@ -35,7 +35,7 @@ def test_post(
 ) -> None:
     """Test the post request of the encode route."""
     response = api_client.post(
-        f"/decode",
+        "/decode",
         files=api_image_file
         | {
             "custom-delimiter": delimiter,

@@ -12,7 +12,8 @@ from image_secrets.backend.util import array
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
-np.array = fn.partial(np.array, dtype=np.uint8)  # no need to repeat dtype again
+# no need to repeat dtype again
+np.array = fn.partial(np.array, dtype=np.uint8)
 
 
 @pytest.mark.parametrize(
@@ -54,7 +55,6 @@ def test_message_bit_array(
 
     arr, length = array.message_bit(message, "dlm", bits)
 
-    # numpy testing for better visual array differences, raises AssertionError same way like assert
     np.testing.assert_array_equal(arr, expected_arr)
     assert length == expected_arr.size // bits
 

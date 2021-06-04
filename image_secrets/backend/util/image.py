@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from io import BytesIO
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
 
 import magic
 import numpy as np
@@ -13,6 +13,7 @@ from image_secrets.settings import API_IMAGES
 
 if TYPE_CHECKING:
     from pathlib import Path
+    from typing import Union
 
     from _io import BytesIO as TBytesIO
     from numpy.typing import ArrayLike

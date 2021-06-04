@@ -1,7 +1,7 @@
 """Exception handlers for api."""
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING
 
 from fastapi import Request, status
 from fastapi.encoders import jsonable_encoder
@@ -11,6 +11,8 @@ from fastapi.responses import JSONResponse
 from image_secrets.api.exceptions import DetailExists, NotAuthenticated
 
 if TYPE_CHECKING:
+    from typing import Any, Optional
+
     from fastapi import FastAPI
 
 

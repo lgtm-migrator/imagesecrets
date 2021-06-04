@@ -2,15 +2,16 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
 
 import numpy as np
 
 from image_secrets.backend.util import array, image
-from image_secrets.backend.util import main as main_util
 from image_secrets.settings import API_IMAGES, MESSAGE_DELIMITER
 
 if TYPE_CHECKING:
+    from typing import Union
+
     from _io import BytesIO
     from numpy.typing import ArrayLike
 

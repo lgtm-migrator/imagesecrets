@@ -1,12 +1,15 @@
 """CRUD operations with a user in database."""
 from __future__ import annotations
 
-from typing import Any, NamedTuple, Optional, Union
+from typing import TYPE_CHECKING, NamedTuple
 
 from tortoise.exceptions import DoesNotExist
 
 from image_secrets.backend import password
 from image_secrets.backend.database.user import models, schemas
+
+if TYPE_CHECKING:
+    from typing import Any, Optional, Union
 
 
 class DBIdentifier(NamedTuple):

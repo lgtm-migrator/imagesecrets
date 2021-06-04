@@ -34,5 +34,5 @@ def test_auth(mocker: MockFixture) -> None:
 
     result = auth("plain", "hashed")
 
-    checkpw.assert_called_once_with("plain".encode(), "hashed".encode())
+    checkpw.assert_called_once_with(b"plain", b"hashed")
     assert result

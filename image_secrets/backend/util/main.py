@@ -5,11 +5,13 @@ import functools as fn
 import math
 import re
 import secrets
-from typing import TYPE_CHECKING, Any, Optional, Type
+from typing import TYPE_CHECKING
 
 from image_secrets.backend.regex import INTEGRITY_FIELD
 
 if TYPE_CHECKING:
+    from typing import Any, Optional, Type
+
     from tortoise.exceptions import IntegrityError
 
 
