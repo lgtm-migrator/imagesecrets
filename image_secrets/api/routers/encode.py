@@ -15,6 +15,7 @@ from image_secrets.settings import MESSAGE_DELIMITER
 router = APIRouter(
     tags=["encode"],
     dependencies=[Depends(dependencies.get_config)],
+    responses=responses.AUTHORIZATION,
 )
 
 
@@ -23,7 +24,6 @@ router = APIRouter(
     response_model=list[Optional[schemas.Image]],
     status_code=status.HTTP_200_OK,
     summary="Encoded images",
-    responses=responses.AUTHORIZATION | responses.FORBIDDEN,
 )
 async def get(
     current_user: models.User = Depends(manager),
@@ -45,7 +45,7 @@ async def get(
     status_code=status.HTTP_201_CREATED,
     response_class=FileResponse,
     summary="Encode a message into an image",
-    responses=responses.AUTHORIZATION | responses.FORBIDDEN | responses.MEDIA,
+    responses=responses.MEDIA,
 )
 async def encode_message(
     current_user: models.User = Depends(manager),

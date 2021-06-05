@@ -50,7 +50,6 @@ def token_url() -> str:
     return secrets.token_urlsafe()
 
 
-# pytest is buggy with this function, todo
 def parse_unique_integrity(
     *, error: IntegrityError
 ) -> Optional[tuple[str, str]]:  # pragma: no cover

@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import asyncio
-from contextlib import suppress
 from typing import TYPE_CHECKING, Optional
 
 from fastapi import (
@@ -43,17 +42,17 @@ manager.not_authenticated_exception = NotAuthenticated
 
 
 @manager.user_loader
-async def user_loader(username: str) -> Optional[models.User]:
+async def user_loader(user_id: int) -> Optional[models.User]:
     """Load a user based on current jwt token.
 
-    :param username: Username stored in the sub field of the jwt token
+    :param user_id: User database id in the sub field of the jwt token
 
     :raises NotAuthenticated: if no user with the given username was found
         (username changed, account was deleted)
 
     """
     try:
-        return await crud.get(crud.DBIdentifier(column="username", value=username))
+        return await crud.get(crud.DBIdentifier(column="id", value=user_id))
     except DoesNotExist as e:  # pragma: no cover
         raise NotAuthenticated(status_code=status.HTTP_404_NOT_FOUND) from e
 
@@ -86,7 +85,9 @@ async def login(
             detail="incorrect username or password",
         )
 
-    access_token = manager.create_access_token(data={"sub": form_data.username})
+    identifier = crud.DBIdentifier(column="username", value=form_data.username)
+    user_id = await crud.get_id(identifier)
+    access_token = manager.create_access_token(data={"sub": user_id})
     return {"access_token": access_token, "token_type": "bearer"}
 
 
@@ -184,6 +185,7 @@ async def forgot_password(
     responses=responses.AUTHORIZATION,
 )
 async def reset_password(
+    background_tasks: BackgroundTasks,
     token: str = Query(
         ...,
         description="Forgot password authorization token",
@@ -202,6 +204,7 @@ async def reset_password(
     - **password**: New password for your account
 
     \f
+    :param background_tasks: Starlette ``BackgroundTasks`` instance
     :param token: Forgot password authorization token
     :param password: New password
 
@@ -214,5 +217,5 @@ async def reset_password(
             detail="invalid forgot password token",
         ) from e
     # password hashing is handled by the update function
-    await crud.update(user_id, password_hash=password)
+    background_tasks.add_task(crud.update, user_id, password_hash=password)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

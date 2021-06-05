@@ -210,7 +210,6 @@ def test_password_put(
         "image_secrets.backend.database.user.crud.authenticate",
         return_value=True,
     )
-    hash_ = mocker.patch("image_secrets.backend.password.hash_", return_value="123456")
     update = mocker.patch(
         "image_secrets.backend.database.user.crud.update",
         return_value=...,
@@ -218,21 +217,22 @@ def test_password_put(
 
     token = auth_token[1]
     user = auth_token[0]
+    old_password = "old_password"
+    new_password = "new_password"
 
     response = api_client.put(
         f"{URL}/password",
         headers={
             "authorization": f'{token["token_type"].capitalize()} {token["access_token"]}',
         },
-        data={"old": "old_password", "new": "new_password"},
+        data={"old": old_password, "new": new_password},
     )
 
     authenticate.assert_called_once_with(
         username=user.username,
-        password_="old_password",
+        password_=old_password,
     )
-    hash_.assert_called_once_with("new_password")
-    update.assert_called_once_with(user.id, password_hash="123456")
+    update.assert_called_once_with(user.id, password_hash=new_password)
 
     response.raise_for_status()
     assert response.status_code == 204

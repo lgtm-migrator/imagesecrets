@@ -29,7 +29,8 @@ def test_repeat(mock_sleep) -> None:
     @tasks.repeat(seconds=1)
     async def test_coro() -> None:
         """Testing coroutine."""
+        raise RuntimeError
 
     loop.create_task(test_coro())
 
-    ...
+    mock_sleep.assert_not_called()

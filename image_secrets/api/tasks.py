@@ -32,7 +32,7 @@ _F = Callable[[], Coroutine[Any, Any, None]]
 def repeat(*, seconds: int) -> Callable[[_F], _F]:
     """Decorate a coroutine to be run in an infinite loop.
 
-    :param seconds: How often to repeat the decorated coroutine
+    :param seconds: How often to repeat coroutine call
 
     """
 
@@ -50,7 +50,10 @@ def repeat(*, seconds: int) -> Callable[[_F], _F]:
             async def loop() -> None:
                 """Execute decorated function and sleep for the given amount of seconds."""
                 while 1:
-                    await func()
+                    try:
+                        await func()
+                    except RuntimeError:
+                        break
                     await asyncio.sleep(seconds)
 
             asyncio.ensure_future(loop())
@@ -62,7 +65,7 @@ def repeat(*, seconds: int) -> Callable[[_F], _F]:
 
 # since tests are in SQLite, these PostgreSQL specific function can't be tested
 # that's the reason for excluding it in coverage report
-@repeat(seconds=10)  # 10 minutes
+@repeat(seconds=600)  # 10 minutes
 async def clear_tokens() -> None:  # pragma: no cover
     """Clear all expired tokens in database."""
     tokens = Token.filter(

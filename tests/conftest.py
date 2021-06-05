@@ -16,6 +16,7 @@ from image_secrets.backend.database import image_models, token_models, user_mode
 from image_secrets.backend.util import main
 
 if TYPE_CHECKING:
+    from fastapi_mail import FastMail
     from numpy.typing import ArrayLike
     from pytest_mock import MockFixture
 
@@ -30,8 +31,9 @@ def app_name() -> str:
 
 @pytest.fixture(scope="function", autouse=True)
 def api_settings(tmpdir) -> config_.Settings:
-    """Return settings for the testing environment."""
+    """Return settings for testing environment."""
     db_url = "sqlite://:memory:"
+    # need to construct so there is no field validation
     test_settings = config_.Settings.construct(
         image_folder=str(Path(tmpdir.mkdir("images/")).absolute()),
         pg_dsn=db_url,
@@ -45,25 +47,32 @@ def api_settings(tmpdir) -> config_.Settings:
         return str(error).split(":")
 
     main.parse_unique_integrity = sqlite_parsing
+
+    return config_.settings
+
+
+@pytest.fixture(autouse=True)
+def patch_tasks(api_settings) -> None:
+    """Patch tasks with dummy functions."""
     from image_secrets.api import tasks
 
     async def clear_tokens():
-        ...
+        """Test function to clear tokens."""
 
     tasks.clear_tokens = lambda: clear_tokens()
 
-    ##
 
-    # patch SMTP client
+@pytest.fixture(autouse=True)
+def email_client(api_settings) -> FastMail:
+    """Return test email client."""
     from image_secrets.api import dependencies
 
     fm = dependencies.get_mail()
     fm.config.SUPPRESS_SEND = 1
     fm.config.USE_CREDENTIALS = False
     dependencies.get_mail = lambda: fm
-    ##
 
-    return config_.settings
+    return dependencies.get_mail()
 
 
 @pytest.fixture(scope="function")

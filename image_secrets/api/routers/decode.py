@@ -15,6 +15,7 @@ from image_secrets.settings import MESSAGE_DELIMITER
 router = APIRouter(
     tags=["decode"],
     dependencies=[Depends(dependencies.get_config)],
+    responses=responses.AUTHORIZATION,
 )
 
 
@@ -23,7 +24,6 @@ router = APIRouter(
     response_model=list[Optional[schemas.Image]],
     status_code=status.HTTP_200_OK,
     summary="Decoded images",
-    responses=responses.AUTHORIZATION | responses.FORBIDDEN,
 )
 async def get(
     current_user: models.User = Depends(manager),
@@ -45,10 +45,7 @@ async def get(
     response_model=schemas.Image,
     status_code=status.HTTP_201_CREATED,
     summary="Decode a message",
-    responses=responses.MESSAGE_NOT_FOUND
-    | responses.AUTHORIZATION
-    | responses.FORBIDDEN
-    | responses.MEDIA,
+    responses=responses.MESSAGE_NOT_FOUND | responses.MEDIA,
 )
 async def post(
     current_user: models.User = Depends(manager),

@@ -22,7 +22,6 @@ from tortoise.exceptions import IntegrityError
 
 from image_secrets.api import dependencies, exceptions, responses
 from image_secrets.api.routers.users.main import manager
-from image_secrets.backend import password
 from image_secrets.backend.database.user import crud, models, schemas
 from image_secrets.backend.util.main import parse_unique_integrity
 
@@ -30,7 +29,7 @@ router = APIRouter(
     prefix="/users",
     tags=["me"],
     dependencies=[Depends(dependencies.get_config), Depends(manager)],
-    responses=responses.AUTHORIZATION | responses.FORBIDDEN,
+    responses=responses.AUTHORIZATION,
 )
 
 
@@ -165,9 +164,6 @@ async def password_put(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="incorrect password",
         )
-    hashed = password.hash_(new)
-
-    # no reason to wait for this, should never fail except 500
-    background_tasks.add_task(crud.update, current_user.id, password_hash=hashed)
-
+    # password hashing is handled by the update function
+    background_tasks.add_task(crud.update, current_user.id, password_hash=new)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
