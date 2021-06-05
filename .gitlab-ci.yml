@@ -11,10 +11,7 @@ stages:
 pre-commit:
     stage: lint
     before_script:
-        - python --version
-        - python -m pip install poetry
-        - poetry --version
-        - poetry install --no-interaction --no-ansi
+        - bash scripts/install.sh
         - poetry run pre-commit --version
         - poetry run pre-commit autoupdate
     script:
@@ -26,11 +23,8 @@ pre-commit:
 pytest:
     stage: test
     before_script:
-        - python --version
-        - python -m pip install poetry
-        - poetry --version
+        - scripts/install.sh
     script:
-        - poetry install --no-interaction --no-ansi
         - poetry run pytest --cov=image_secrets
     tags:
         - docker
