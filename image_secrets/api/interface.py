@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from fastapi import Depends, FastAPI, status
 
+import image_secrets
 from image_secrets.api import config, dependencies, handlers, responses, tasks
 from image_secrets.api.routers import decode, encode, users
 from image_secrets.backend.database import base
@@ -12,7 +13,7 @@ app = FastAPI(
     dependencies=[Depends(dependencies.get_config)],
     title="ImageSecrets",
     description="Encode and decode messages from images!",
-    version="0.2.0",
+    version=image_secrets.__version__,
     responses=responses.VALIDATION,
 )
 

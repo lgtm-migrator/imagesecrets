@@ -1,3 +1,19 @@
+## [0.3.0] 05-06-2021
+
+### Bug Fixes
+
+* LoginManager no longer depends on account username
+
+### New Features
+
+* Database - New Token table
+* API - New endpoints for password changes + authentication token sent via email
+* Other - Welcome email
+
+### Internal Changes
+
+* New lint stage in CI/CD
+
 ## [0.2.0] 28-05-2021
 
 ### Bug Fixes
