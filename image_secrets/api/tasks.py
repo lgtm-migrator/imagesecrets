@@ -54,7 +54,7 @@ def repeat(*, seconds: int) -> Callable[[_F], _F]:
                         await func()
                     except RuntimeError:
                         break
-                    await asyncio.sleep(seconds)
+                    await asyncio.sleep(seconds)  # pragma: no cover
 
             asyncio.ensure_future(loop())
 
