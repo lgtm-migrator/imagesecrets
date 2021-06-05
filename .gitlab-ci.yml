@@ -23,9 +23,9 @@ pre-commit:
 pytest:
     stage: test
     before_script:
-        - scripts/install.sh
+        - bash scripts/install.sh
     script:
-        - poetry run pytest --cov=image_secrets
+        - bash scripts/test.sh
     tags:
         - docker
 
