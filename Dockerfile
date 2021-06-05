@@ -18,5 +18,4 @@ COPY . /app/
 RUN pytest
 
 EXPOSE $PORT
-ENTRYPOINT ["uvicorn", "image_secrets.api.interface:app", "--host", "0.0.0.0", "--port"]
-CMD ["$PORT"]
+CMD uvicorn image_secrets.api.interface:app --host 0.0.0.0 --port $PORT
