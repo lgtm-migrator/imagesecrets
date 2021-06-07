@@ -193,8 +193,8 @@ def test_delete(
     )
 
     response.raise_for_status()
-    assert response.status_code == 204
-    assert response.reason == "No Content"
+    assert response.status_code == 202
+    assert response.reason == "Accepted"
     with pytest.raises(JSONDecodeError):
         response.json()
     assert not response.headers
@@ -235,8 +235,8 @@ def test_password_put(
     update.assert_called_once_with(user.id, password_hash=new_password)
 
     response.raise_for_status()
-    assert response.status_code == 204
-    assert response.reason == "No Content"
+    assert response.status_code == 202
+    assert response.reason == "Accepted"
     with pytest.raises(JSONDecodeError):
         response.json()
     assert not response.headers

@@ -23,7 +23,7 @@ from tortoise.exceptions import IntegrityError
 from image_secrets.api import dependencies, exceptions, responses
 from image_secrets.api.routers.users.main import manager
 from image_secrets.backend.database.user import crud, models, schemas
-from image_secrets.backend.util.main import parse_unique_integrity
+from image_secrets.backend.util.main import ExcludeUnsetDict, parse_unique_integrity
 
 router = APIRouter(
     prefix="/users",
@@ -86,14 +86,11 @@ async def patch(
     :raises DetailExists: if either of the new values are already claimed in the database
 
     """
-    if not username and not email:
+    update_dict = ExcludeUnsetDict(username=username, email=email).exclude_unset()
+    if not update_dict:
+        # no values to update so we can return right away
         return await schemas.User.from_tortoise_orm(current_user)
 
-    update_dict = {
-        field: value
-        for field, value in {"username": username, "email": email}.items()
-        if value
-    }
     try:
         user = await crud.update(current_user.id, **update_dict)
     except IntegrityError as e:
@@ -109,25 +106,27 @@ async def patch(
 
 @router.delete(
     "/me",
-    status_code=status.HTTP_204_NO_CONTENT,
+    status_code=status.HTTP_202_ACCEPTED,
     summary="Delete an Account",
 )
 async def delete(
+    background_tasks: BackgroundTasks,
     current_user: models.User = Depends(manager),
 ) -> Optional[Response]:
     """Delete a user and all extra information connected to it.
 
     \f
+    :param background_tasks: Starlette ``BackgroundTasks`` instance
     :param current_user: Current user dependency
 
     """
-    await crud.delete(current_user.id)
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+    background_tasks.add_task(crud.delete, current_user.id)
+    return Response(status_code=status.HTTP_202_ACCEPTED)
 
 
 @router.put(
     "/me/password",
-    status_code=status.HTTP_204_NO_CONTENT,
+    status_code=status.HTTP_202_ACCEPTED,
     summary="Change user password",
 )
 async def password_put(
@@ -166,4 +165,4 @@ async def password_put(
         )
     # password hashing is handled by the update function
     background_tasks.add_task(crud.update, current_user.id, password_hash=new)
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+    return Response(status_code=status.HTTP_202_ACCEPTED)

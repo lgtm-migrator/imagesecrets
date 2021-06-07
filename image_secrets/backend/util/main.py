@@ -5,13 +5,11 @@ import functools as fn
 import math
 import re
 import secrets
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Optional, Type
 
 from image_secrets.backend.regex import INTEGRITY_FIELD
 
 if TYPE_CHECKING:
-    from typing import Any, Optional, Type
-
     from tortoise.exceptions import IntegrityError
 
 
@@ -35,6 +33,14 @@ def partial_init(cls: Type, *args: Optional[Any], **kwargs: Optional[Any]):
     return Partial
 
 
+class ExcludeUnsetDict(dict):
+    """Dict subclass with added ``exclude_unset`` method."""
+
+    def exclude_unset(self) -> dict:
+        """Return dictionary with all items which are truthy."""
+        return {key: value for key, value in self.items() if value}
+
+
 def token_hex(length: int, /) -> str:
     """Return a random token hex.
 
@@ -51,7 +57,8 @@ def token_url() -> str:
 
 
 def parse_unique_integrity(
-    *, error: IntegrityError
+    *,
+    error: IntegrityError,
 ) -> Optional[tuple[str, str]]:  # pragma: no cover
     """Parse a database uniqueness IntegrityError and return the conflicting field and value."""
     err = str(error)

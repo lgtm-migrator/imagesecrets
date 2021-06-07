@@ -190,3 +190,24 @@ async def test_authenticate_fail_no_db_entry(insert_user: User) -> None:
     )
 
     assert not result
+
+
+@pytest.mark.parametrize(
+    "column, value, result",
+    [
+        ("username", "test_username", {"username": "test_username"}),
+        ("email", "test_email@email.com", {"email", "test_email@email.com"}),
+        ("column", "test_value", {"column": "test_value"}),
+    ],
+)
+def test_user_identifier_to_dict(
+    column: str,
+    value: str,
+    result: dict[str, str],
+) -> None:
+    """Test the user identifier NamedTuple to_dict method."""
+    base = crud.DBIdentifier(column=column, value=value)
+    returned = base.to_dict()
+
+    assert issubclass(type(base), tuple)
+    assert returned == result

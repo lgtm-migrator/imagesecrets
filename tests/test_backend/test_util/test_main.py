@@ -37,6 +37,28 @@ def test_partial_init() -> None:
     assert initialized.kwargs["test"] == "test"
 
 
+@pytest.mark.parametrize(
+    "init, result",
+    [
+        ({}, {}),
+        ({"field": None}, {}),
+        ({"field": "value"}, {"field", "value"}),
+        (
+            {"test1": "ok1", "test2": None, "test3": "ok3"},
+            {"test1": "ok1", "test3": "ok3"},
+        ),
+        ({"field1": None, "field2": None, "field3": "value3"}, {"field3": "value3"}),
+    ],
+)
+def test_exclude_unset_dict(init: dict, result: dict) -> None:
+    """Test the ExcludeUnsetDict exclude unset method."""
+    base = main.ExcludeUnsetDict(**init)
+    returned = base.exclude_unset()
+
+    assert issubclass(type(base), dict)
+    assert returned == result
+
+
 @pytest.mark.parametrize("length", [16, 64, 33, 0, -8, 101])
 def test_token_hex(length) -> None:
     """Test the token_hex function."""
