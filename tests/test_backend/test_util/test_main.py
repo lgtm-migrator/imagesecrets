@@ -42,7 +42,7 @@ def test_partial_init() -> None:
     [
         ({}, {}),
         ({"field": None}, {}),
-        ({"field": "value"}, {"field", "value"}),
+        ({"field": "value"}, {"field": "value"}),
         (
             {"test1": "ok1", "test2": None, "test3": "ok3"},
             {"test1": "ok1", "test3": "ok3"},

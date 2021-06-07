@@ -196,7 +196,7 @@ async def test_authenticate_fail_no_db_entry(insert_user: User) -> None:
     "column, value, result",
     [
         ("username", "test_username", {"username": "test_username"}),
-        ("email", "test_email@email.com", {"email", "test_email@email.com"}),
+        ("email", "test_email@email.com", {"email": "test_email@email.com"}),
         ("column", "test_value", {"column": "test_value"}),
     ],
 )
