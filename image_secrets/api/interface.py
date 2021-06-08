@@ -14,6 +14,7 @@ app = FastAPI(
     title="ImageSecrets",
     description="Encode and decode messages from images!",
     version=image_secrets.__version__,
+    # will be set manually
     docs_url=None,
     redoc_url=None,
     responses=responses.VALIDATION,
@@ -45,7 +46,7 @@ async def home(
     return {"app-name": settings.app_name}
 
 
-app.openapi = openapi.custom(app)
+app.openapi = openapi.custom(app, swagger=True, redoc=True)
 
 
 __all__ = [
