@@ -57,14 +57,16 @@ def custom(
 
         if app.openapi_schema:
             return app.openapi_schema
+
         openapi_schema = utils.get_openapi(
             title="ImageSecrets",
             version=image_secrets.__version__,
             description="Encode and decode messages from images!",
             routes=app.routes,
         )
-
+        openapi_schema["info"]["x-logo"] = {"url": config.icon_url}
         app.openapi_schema = openapi_schema
+
         return openapi_schema
 
     return schema

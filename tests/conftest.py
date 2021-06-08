@@ -118,14 +118,18 @@ def auth_token(
     api_client,
     insert_user,
     mocker: MockFixture,
-) -> tuple[User, dict[str, str]]:
+) -> tuple[dict[str, str], User]:
     """Return authorized user and a token."""
     mocker.patch("image_secrets.backend.password.auth", return_value=True)
     response = api_client.post(
         "/users/login",
         data={"username": insert_user.username, "password": insert_user.password_hash},
-    )
-    return insert_user, response.json()
+    ).json()
+
+    token_header = {
+        "authorization": f'{response["token_type"].capitalize()} {response["access_token"]}',
+    }
+    return token_header, insert_user
 
 
 @pytest.fixture(scope="function")

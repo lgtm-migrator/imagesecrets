@@ -21,15 +21,13 @@ URL = "/encode"
 
 def test_get_empty(
     api_client: TestClient,
-    auth_token: tuple[User, dict[str, str]],
+    auth_token: tuple[dict[str, str], User],
 ) -> None:
     """Test the get request with no stored images."""
-    token = auth_token[1]
+    header = auth_token[0]
     response = api_client.get(
         URL,
-        headers={
-            "authorization": f'{token["token_type"].capitalize()} {token["access_token"]}',
-        },
+        headers=header,
     )
 
     response.raise_for_status()
@@ -41,10 +39,10 @@ def test_get_empty(
     assert response.headers["content-length"] == "2"
 
 
-def test_get(api_client: TestClient, auth_token: tuple[User, dict[str, str]]) -> None:
+def test_get(api_client: TestClient, auth_token: tuple[dict[str, str], User]) -> None:
     """Test successful get request."""
-    token = auth_token[1]
-    user = auth_token[0]
+    header = auth_token[0]
+    user = auth_token[1]
 
     from image_secrets.backend.database.image.models import EncodedImage
 
@@ -61,9 +59,7 @@ def test_get(api_client: TestClient, auth_token: tuple[User, dict[str, str]]) ->
 
     response = api_client.get(
         URL,
-        headers={
-            "authorization": f'{token["token_type"].capitalize()} {token["access_token"]}',
-        },
+        headers=header,
     )
 
     response.raise_for_status()
@@ -93,7 +89,7 @@ def test_get(api_client: TestClient, auth_token: tuple[User, dict[str, str]]) ->
 )
 def test_post(
     api_client: TestClient,
-    auth_token: tuple[User, dict[str, str]],
+    auth_token: tuple[dict[str, str], User],
     api_image_file,
     test_image_path: Path,
     mocker: MockFixture,
@@ -109,7 +105,7 @@ def test_post(
         return_value=test_image_path,
     )
 
-    token = auth_token[1]
+    header = auth_token[0]
     response = api_client.post(
         URL,
         files=api_image_file,
@@ -118,9 +114,7 @@ def test_post(
             "custom-delimiter": delimiter,
             "least-significant-bit-amount": lsb_n,
         },
-        headers={
-            "authorization": f'{token["token_type"].capitalize()} {token["access_token"]}',
-        },
+        headers=header,
     )
 
     encode_api.assert_called_once_with(
@@ -148,18 +142,16 @@ def test_post(
 def test_post_image_too_small(
     api_client: TestClient,
     api_image_file,
-    auth_token: tuple[User, dict[str, str]],
+    auth_token: tuple[dict[str, str], User],
 ) -> None:
     """Test a post request with a message longer than fits into the uploaded image."""
-    token = auth_token[1]
+    header = auth_token[0]
     msg = "test" * 1000
     response = api_client.post(
         URL,
         files=api_image_file,
         data={"message": msg},
-        headers={
-            "authorization": f'{token["token_type"].capitalize()} {token["access_token"]}',
-        },
+        headers=header,
     )
 
     assert response.status_code == 422
@@ -175,19 +167,17 @@ def test_post_image_too_small(
 
 def test_post_415(
     api_client: TestClient,
-    auth_token: tuple[User, dict[str, str]],
+    auth_token: tuple[dict[str, str], User],
 ) -> None:
     """Test a post request with invalid media type."""
-    token = auth_token[1]
+    header = auth_token[0]
     response = api_client.post(
         URL,
         files={
             "file": (Path(__file__).name, open(__file__).read(), "image/png"),
         },
         data={"message": "test"},
-        headers={
-            "authorization": f'{token["token_type"].capitalize()} {token["access_token"]}',
-        },
+        headers=header,
     )
 
     assert response.status_code == 415
@@ -197,18 +187,16 @@ def test_post_415(
 
 def test_get_images(
     api_client: TestClient,
-    auth_token: tuple[User, dict[str, str]],
+    auth_token: tuple[dict[str, str], User],
     insert_encoded: EncodedImage,
 ) -> None:
     """Test a successful get request for encoded images with specified name."""
-    token = auth_token[1]
+    header = auth_token[0]
     response = api_client.get(
         f"{URL}/{insert_encoded.image_name}",
-        headers={
-            "authorization": f'{token["token_type"].capitalize()} {token["access_token"]}',
-        },
+        headers=header,
     )
-    print(response.json())
+
     assert response.status_code == 200
     assert response.reason == "OK"
     json_ = response.json()
@@ -223,16 +211,14 @@ def test_get_images(
 @pytest.mark.parametrize("image_name", ["test_name", "test_url", "10"])
 def test_get_images_404(
     api_client: TestClient,
-    auth_token: tuple[User, dict[str, str]],
+    auth_token: tuple[dict[str, str], User],
     image_name: str,
 ) -> None:
     """Test a successful get request for encoded images without finding any results."""
-    token = auth_token[1]
+    header = auth_token[0]
     response = api_client.get(
         f"{URL}/{image_name}",
-        headers={
-            "authorization": f'{token["token_type"].capitalize()} {token["access_token"]}',
-        },
+        headers=header,
     )
 
     assert response.status_code == 404
