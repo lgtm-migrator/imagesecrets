@@ -1,15 +1,70 @@
 """CRUD operation with images via database."""
-from tortoise.exceptions import DoesNotExist
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Optional
 
 from image_secrets.backend.database.image import models, schemas
 
+if TYPE_CHECKING:
+    from image_secrets.backend.database.user.models import User
 
-async def get(name: str) -> models.Image:
-    """Return image stored in database."""
-    try:
-        return await models.EncodedImage.get(image_name=name)
-    except DoesNotExist:
-        return await models.DecodedImage.get(image_name=name)
+
+async def _get(
+    relation: str,
+    user: User,
+    image_name: Optional[str] = None,
+) -> list[Optional[models.Image]]:
+    """Return User images stored in database.
+
+    :param relation: Either decoded_images or encoded_images
+    :param user: User model stored in database
+    :param image_name: Constraint for image_name field, defaults to None
+        (all images are returned)
+
+    """
+    await user.fetch_related(relation)
+    field = getattr(user, relation)
+
+    images = [
+        # not using ``from_tortoise_orm`` because it would try to prefetch the owner FK relation
+        # resulting in a very messy result
+        # every image would have their ``owner`` field
+        # with the full ``User`` model
+        schemas.Image.from_orm(img)
+        async for img in field
+        # short-circuit if no constraint given
+        if not image_name
+        # user might omit extension
+        or image_name in {img.image_name, img.image_name.rstrip(".png")}
+    ]
+
+    return images
+
+
+async def get_decoded(
+    user: User,
+    image_name: Optional[str] = None,
+) -> list[Optional[models.Image]]:
+    """Return User decoded images stored in database.
+
+    :param user: User model stored in database
+    :param image_name: Optional name of the images to return
+
+    """
+    return await _get(relation="decoded_images", user=user, image_name=image_name)
+
+
+async def get_encoded(
+    user: User,
+    image_name: Optional[str] = None,
+) -> list[Optional[models.Image]]:
+    """Return User encoded images stored in database.
+
+    :param user: User model stored in database
+    :param image_name: Optional name of the images to return
+
+    """
+    return await _get(relation="encoded_images", user=user, image_name=image_name)
 
 
 async def create_decoded(

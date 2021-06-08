@@ -34,9 +34,7 @@ async def get(
     :param current_user: Current user dependency
 
     """
-    await current_user.fetch_related("encoded_images")
-    # not using from_tortoise_orm because it would try to prefetch the owner FK relation
-    images = [schemas.Image.from_orm(img) async for img in current_user.encoded_images]
+    images = await crud.get_encoded(user=current_user)
     return images
 
 
@@ -154,18 +152,11 @@ async def get_images(
     :param current_user: Current user dependency
 
     """
-    await current_user.fetch_related("encoded_images")
-    images = [
-        # not using from_tortoise_orm because it would try to prefetch the owner FK relation
-        schemas.Image.from_orm(img)
-        async for img in current_user.encoded_images
-        # full match or missing image extension
-        if image_name in {img.image_name, img.image_name.rstrip(".png")}
-    ]
+    images = await crud.get_encoded(user=current_user)
     if not images:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"no image(s) with name {image_name!r} found",
+            detail=f"no encoded image(s) with name {image_name!r} found",
         )
     return images
 
