@@ -39,6 +39,7 @@ def api_settings(tmpdir) -> config_.Settings:
         image_folder=str(Path(tmpdir.mkdir("images/")).absolute()),
         pg_dsn=db_url,
         secret_key="test_key",
+        icon_url="test_icon_url",
     )
     config_.settings = test_settings
 
