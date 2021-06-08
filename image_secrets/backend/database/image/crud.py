@@ -34,8 +34,12 @@ async def _get(
         async for img in field
         # short-circuit if no constraint given
         if not image_name
-        # user might omit extension
-        or image_name in {img.image_name, img.image_name.rstrip(".png")}
+        or image_name
+        in {
+            img.image_name,
+            # user might omit extension
+            img.image_name.rstrip(".png"),
+        }
     ]
 
     return images
