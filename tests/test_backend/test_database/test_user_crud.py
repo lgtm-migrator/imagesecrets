@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 @pytest.fixture()
 def user() -> User:
-    """Return an encoded image."""
+    """Return an user."""
     from image_secrets.backend.database.user import models
 
     user = models.User(

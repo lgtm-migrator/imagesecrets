@@ -20,6 +20,7 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike
     from pytest_mock import MockFixture
 
+    from image_secrets.backend.database.image.models import DecodedImage, EncodedImage
     from image_secrets.backend.database.user.models import User
 
 
@@ -124,6 +125,44 @@ def auth_token(
         data={"username": insert_user.username, "password": insert_user.password_hash},
     )
     return insert_user, response.json()
+
+
+@pytest.fixture(scope="function")
+def insert_decoded(api_client, insert_user) -> DecodedImage:
+    """Return decoded_image inserted into a clean database."""
+    from image_secrets.backend.database.image.models import DecodedImage
+
+    img = DecodedImage(
+        filename="test_filename",
+        image_name="test_image_name",
+        message="test_message",
+        delimiter="test_delimiter",
+        lsb_amount=2,
+        owner_id=insert_user.id,
+    )
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(img.save())
+
+    return img
+
+
+@pytest.fixture(scope="function")
+def insert_encoded(api_client, insert_user) -> EncodedImage:
+    """Return encoded_image inserted into a clean database."""
+    from image_secrets.backend.database.image.models import EncodedImage
+
+    img = EncodedImage(
+        filename="test_filename",
+        image_name="test_image_name",
+        message="test_message",
+        delimiter="test_delimiter",
+        lsb_amount=2,
+        owner_id=insert_user.id,
+    )
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(img.save())
+
+    return img
 
 
 @pytest.fixture(scope="session")

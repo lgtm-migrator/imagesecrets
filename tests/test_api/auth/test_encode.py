@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from fastapi.testclient import TestClient
     from pytest_mock import MockFixture
 
+    from image_secrets.backend.database.image.models import EncodedImage
     from image_secrets.backend.database.user.models import User
 
 
@@ -192,3 +193,49 @@ def test_post_415(
     assert response.status_code == 415
     assert response.reason == "Unsupported Media Type"
     assert response.json()["detail"] == "only .png images are supported"
+
+
+def test_get_images(
+    api_client: TestClient,
+    auth_token: tuple[User, dict[str, str]],
+    insert_encoded: EncodedImage,
+) -> None:
+    """Test a successful get request for encoded images with specified name."""
+    token = auth_token[1]
+    response = api_client.get(
+        f"{URL}/{insert_encoded.image_name}",
+        headers={
+            "authorization": f'{token["token_type"].capitalize()} {token["access_token"]}',
+        },
+    )
+    print(response.json())
+    assert response.status_code == 200
+    assert response.reason == "OK"
+    json_ = response.json()
+    assert isinstance(json_, list)
+    image = json_[0]
+    assert image["image_name"] == insert_encoded.image_name
+    assert image["message"] == insert_encoded.message
+    assert image["delimiter"] == insert_encoded.delimiter
+    assert image["lsb_amount"] == insert_encoded.lsb_amount
+
+
+@pytest.mark.parametrize("image_name", ["test_name", "test_url", "10"])
+def test_get_images_404(
+    api_client: TestClient,
+    auth_token: tuple[User, dict[str, str]],
+    image_name: str,
+) -> None:
+    """Test a successful get request for encoded images without finding any results."""
+    token = auth_token[1]
+    response = api_client.get(
+        f"{URL}/{image_name}",
+        headers={
+            "authorization": f'{token["token_type"].capitalize()} {token["access_token"]}',
+        },
+    )
+
+    assert response.status_code == 404
+    assert response.reason == "Not Found"
+    json_ = response.json()
+    assert json_["detail"] == f"no encoded image(s) with name {image_name!r} found"
