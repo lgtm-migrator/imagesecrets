@@ -26,7 +26,7 @@ def custom(
 
     :param app: Application instance
     :param swagger: Whether to show SwaggerUI documentation
-    "param redoc: Whether to show ReDoc documentation
+    :param redoc: Whether to show ReDoc documentation
 
     """
     if swagger:
@@ -63,6 +63,7 @@ def custom(
             description="Encode and decode messages from images!",
             routes=app.routes,
         )
+
         app.openapi_schema = openapi_schema
         return openapi_schema
 

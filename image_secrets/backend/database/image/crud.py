@@ -1,6 +1,15 @@
 """CRUD operation with images via database."""
+from tortoise.exceptions import DoesNotExist
 
 from image_secrets.backend.database.image import models, schemas
+
+
+async def get(name: str) -> models.Image:
+    """Return image stored in database."""
+    try:
+        return await models.EncodedImage.get(image_name=name)
+    except DoesNotExist:
+        return await models.DecodedImage.get(image_name=name)
 
 
 async def create_decoded(

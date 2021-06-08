@@ -21,7 +21,7 @@ from pydantic import EmailStr
 from tortoise.exceptions import IntegrityError
 
 from image_secrets.api import dependencies, exceptions, responses
-from image_secrets.api.routers.users.main import manager
+from image_secrets.api.routers.user.main import manager
 from image_secrets.backend.database.user import crud, models, schemas
 from image_secrets.backend.util.main import ExcludeUnsetDict, parse_unique_integrity
 
