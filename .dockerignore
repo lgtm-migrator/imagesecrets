@@ -85,7 +85,6 @@ venv/
 .ropeproject
 */.ropeproject
 */*/.ropeproject
-*/*/*/.ropeproject
 
 # Vim swap files
 *.swp
