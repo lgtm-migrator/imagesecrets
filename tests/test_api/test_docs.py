@@ -44,3 +44,32 @@ def test_redoc(api_client: TestClient, mocker: MockFixture, api_settings) -> Non
     response.raise_for_status()
     assert response.status_code == 200
     assert response.json() == "test_redoc"
+
+
+def test_openapi_schema(api_settings) -> None:
+    """Test the generated OpenAPI schema."""
+    import image_secrets
+    from image_secrets.api.interface import app
+
+    schema = app.openapi()
+    info = schema["info"]
+
+    assert info["title"] == api_settings.app_name
+    assert info["version"] == image_secrets.__version__
+    assert info["x-logo"] == {"url": api_settings.icon_url}
+
+
+def test_openapi_schema_cached(mocker: MockFixture, api_settings) -> None:
+    """Test the that OpenAPI schema is generated only once and then cached."""
+    from image_secrets.api.interface import app
+
+    get_openapi = mocker.patch("fastapi.openapi.utils.get_openapi")
+    app.openapi_schema = None
+
+    app.openapi()
+    get_openapi.assert_called_once()
+
+    get_openapi.reset_mock()
+
+    app.openapi()
+    get_openapi.assert_not_called()
