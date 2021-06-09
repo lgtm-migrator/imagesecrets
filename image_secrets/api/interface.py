@@ -42,8 +42,13 @@ tasks.init(app)
 async def home(
     settings: config.Settings = Depends(dependencies.get_config),
 ) -> dict[str, str]:
-    """Return basic info about the home route."""
-    return {"app-name": settings.app_name}
+    """Return basic info about the API."""
+    return {
+        "app-name": settings.app_name,
+        "SwaggerUI": settings.swagger_url,
+        "ReDoc": settings.redoc_url,
+        "GitLab": settings.repository_url,
+    }
 
 
 app.openapi = openapi.custom(app, swagger=True, redoc=True)

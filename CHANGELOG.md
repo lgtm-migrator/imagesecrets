@@ -15,6 +15,7 @@ _None_
 * OpenAPI creation is now done manually
 * SwaggerUI and ReDoc endpoints are created along with OpenAPI schema
 * Refactor conftest
+* New shell scripts mainly for CI/CD
 
 ## [0.3.0] 05-06-2021
 

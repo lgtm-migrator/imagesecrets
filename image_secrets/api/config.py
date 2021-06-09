@@ -2,7 +2,7 @@
 import os
 
 from fastapi_mail import ConnectionConfig, config
-from pydantic import BaseSettings, DirectoryPath, EmailStr, PostgresDsn
+from pydantic import BaseSettings, DirectoryPath, EmailStr, HttpUrl, PostgresDsn
 
 from image_secrets.settings import API_IMAGES, MESSAGE_DELIMITER, TEMPLATES
 
@@ -18,10 +18,14 @@ class Settings(BaseSettings):
 
     message_delimiter: str = MESSAGE_DELIMITER
     image_folder: DirectoryPath = API_IMAGES
-    icon_url: str = os.getenv("ICON_URL")
 
     pg_dsn: PostgresDsn = os.getenv("DATABASE_URL")
     secret_key: str = os.getenv("SECRET_KEY")
+
+    icon_url: HttpUrl = os.getenv("ICON_URL")
+    swagger_url: HttpUrl = os.getenv("SWAGGER_URL")
+    redoc_url: HttpUrl = os.getenv("REDOC_URL")
+    repository_url: HttpUrl = os.getenv("REPOSITORY_URL")
 
     @staticmethod
     def email_config() -> ConnectionConfig:
