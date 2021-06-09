@@ -23,6 +23,10 @@ class DBIdentifier(NamedTuple):
     column: str
     value: Union[int, str]
 
+    def to_dict(self) -> dict[str, Union[int, str]]:
+        """Return column: value dictionary."""
+        return {self.column: self.value}
+
 
 async def get(identifier: DBIdentifier) -> Optional[models.User]:
     """Return User's model stored in a database.
@@ -30,8 +34,7 @@ async def get(identifier: DBIdentifier) -> Optional[models.User]:
     :param identifier: DBIdentifier to identify which user to return
 
     """
-    identifier_dict = {identifier.column: identifier.value}
-    return await models.User.get(**identifier_dict)
+    return await models.User.get(**identifier.to_dict())
 
 
 async def get_id(identifier: DBIdentifier) -> int:
@@ -40,8 +43,7 @@ async def get_id(identifier: DBIdentifier) -> int:
     :param identifier: DBIdentifier to identify which user to return
 
     """
-    identifier_dict = {identifier.column: identifier.value}
-    result = await models.User.get(**identifier_dict).only("id")
+    result = await models.User.get(**identifier.to_dict()).only("id")
     return int(result.id)
 
 

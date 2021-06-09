@@ -17,15 +17,13 @@ if TYPE_CHECKING:
 URL = "/users/me"
 
 
-def test_get(api_client: TestClient, auth_token: tuple[User, dict[str, str]]) -> None:
+def test_get(api_client: TestClient, auth_token: tuple[dict[str, str], User]) -> None:
     """Test the get request."""
-    token = auth_token[1]
-    user = auth_token[0]
+    header = auth_token[0]
+    user = auth_token[1]
     response = api_client.get(
         URL,
-        headers={
-            "authorization": f'{token["token_type"].capitalize()} {token["access_token"]}',
-        },
+        headers=header,
     )
 
     response.raise_for_status()
@@ -44,22 +42,20 @@ def test_get(api_client: TestClient, auth_token: tuple[User, dict[str, str]]) ->
 )
 def test_patch(
     api_client: TestClient,
-    auth_token: tuple[User, dict[str, str]],
+    auth_token: tuple[dict[str, str], User],
     username: str,
     email: str,
 ) -> None:
     """Test successful patch request."""
-    token = auth_token[1]
-    user = auth_token[0]
+    header = auth_token[0]
+    user = auth_token[1]
 
     assert not user.username == username
     assert not user.email == email
 
     response = api_client.patch(
         URL,
-        headers={
-            "authorization": f'{token["token_type"].capitalize()} {token["access_token"]}',
-        },
+        headers=header,
         data={"username": username, "email": email},
     )
 
@@ -73,17 +69,15 @@ def test_patch(
 
 def test_patch_empty(
     api_client: TestClient,
-    auth_token: tuple[User, dict[str, str]],
+    auth_token: tuple[dict[str, str], User],
 ) -> None:
     """Test successful empty patch request"""
-    token = auth_token[1]
-    user = auth_token[0]
+    header = auth_token[0]
+    user = auth_token[1]
 
     response = api_client.patch(
         URL,
-        headers={
-            "authorization": f'{token["token_type"].capitalize()} {token["access_token"]}',
-        },
+        headers=header,
         data={},
     )
 
@@ -98,7 +92,7 @@ def test_patch_empty(
 @pytest.mark.parametrize("username", ["test-name", "123456"])
 def test_patch_409(
     api_client: TestClient,
-    auth_token: tuple[User, dict[str, str]],
+    auth_token: tuple[dict[str, str], User],
     username: str,
 ) -> None:
     """Test failing patch request with a database conflict error."""
@@ -109,13 +103,11 @@ def test_patch_409(
         User.create(username=username, email="email@email.com", password_hash="pwd"),
     )
 
-    token = auth_token[1]
+    header = auth_token[0]
 
     response = api_client.patch(
         URL,
-        headers={
-            "authorization": f'{token["token_type"].capitalize()} {token["access_token"]}',
-        },
+        headers=header,
         data={"username": username},
     )
 
@@ -130,17 +122,15 @@ def test_patch_409(
 @pytest.mark.parametrize("username", ["00000", "1" * 129])
 def test_patch_422_username(
     api_client: TestClient,
-    auth_token: tuple[User, dict[str, str]],
+    auth_token: tuple[dict[str, str], User],
     username: str,
 ) -> None:
     """Test a failing patch request with an invalid username in the body."""
-    token = auth_token[1]
+    header = auth_token[0]
 
     response = api_client.patch(
         URL,
-        headers={
-            "authorization": f'{token["token_type"].capitalize()} {token["access_token"]}',
-        },
+        headers=header,
         data={"username": username},
     )
     assert response.status_code == 422
@@ -157,17 +147,15 @@ def test_patch_422_username(
 )
 def test_patch_422_email(
     api_client: TestClient,
-    auth_token: tuple[User, dict[str, str]],
+    auth_token: tuple[dict[str, str], User],
     email: str,
 ) -> None:
     """Test a failing patch request with an invalid email in the body."""
-    token = auth_token[1]
+    header = auth_token[0]
 
     response = api_client.patch(
         URL,
-        headers={
-            "authorization": f'{token["token_type"].capitalize()} {token["access_token"]}',
-        },
+        headers=header,
         data={"email": email},
     )
 
@@ -181,20 +169,18 @@ def test_patch_422_email(
 
 def test_delete(
     api_client: TestClient,
-    auth_token: tuple[User, dict[str, str]],
+    auth_token: tuple[dict[str, str], User],
 ) -> None:
     """Test a successful delete request."""
-    token = auth_token[1]
+    header = auth_token[0]
     response = api_client.delete(
         URL,
-        headers={
-            "authorization": f'{token["token_type"].capitalize()} {token["access_token"]}',
-        },
+        headers=header,
     )
 
     response.raise_for_status()
-    assert response.status_code == 204
-    assert response.reason == "No Content"
+    assert response.status_code == 202
+    assert response.reason == "Accepted"
     with pytest.raises(JSONDecodeError):
         response.json()
     assert not response.headers
@@ -203,7 +189,7 @@ def test_delete(
 def test_password_put(
     mocker: MockFixture,
     api_client: TestClient,
-    auth_token: tuple[User, dict[str, str]],
+    auth_token: tuple[dict[str, str], User],
 ) -> None:
     """Test a successful password put request."""
     authenticate = mocker.patch(
@@ -215,16 +201,14 @@ def test_password_put(
         return_value=...,
     )
 
-    token = auth_token[1]
-    user = auth_token[0]
+    header = auth_token[0]
+    user = auth_token[1]
     old_password = "old_password"
     new_password = "new_password"
 
     response = api_client.put(
         f"{URL}/password",
-        headers={
-            "authorization": f'{token["token_type"].capitalize()} {token["access_token"]}',
-        },
+        headers=header,
         data={"old": old_password, "new": new_password},
     )
 
@@ -235,8 +219,8 @@ def test_password_put(
     update.assert_called_once_with(user.id, password_hash=new_password)
 
     response.raise_for_status()
-    assert response.status_code == 204
-    assert response.reason == "No Content"
+    assert response.status_code == 202
+    assert response.reason == "Accepted"
     with pytest.raises(JSONDecodeError):
         response.json()
     assert not response.headers
@@ -245,7 +229,7 @@ def test_password_put(
 def test_password_put_401(
     mocker: MockFixture,
     api_client: TestClient,
-    auth_token: tuple[User, dict[str, str]],
+    auth_token: tuple[dict[str, str], User],
 ) -> None:
     """Test a password put request with invalid password in request body"""
     auth = mocker.patch(
@@ -254,14 +238,12 @@ def test_password_put_401(
     )
     hash_ = mocker.patch("image_secrets.backend.password.hash_", return_value="...")
 
-    token = auth_token[1]
-    user = auth_token[0]
+    header = auth_token[0]
+    user = auth_token[1]
 
     response = api_client.put(
         f"{URL}/password",
-        headers={
-            "authorization": f'{token["token_type"].capitalize()} {token["access_token"]}',
-        },
+        headers=header,
         data={"old": "old_password", "new": "new_password"},
     )
 

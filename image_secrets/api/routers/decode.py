@@ -1,11 +1,11 @@
 """Message decoding router."""
 from typing import Optional, Union
 
-from fastapi import APIRouter, Depends, File, Form, UploadFile, status
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 from fastapi.responses import JSONResponse
 
 from image_secrets.api import dependencies, exceptions, responses
-from image_secrets.api.routers.users.main import manager
+from image_secrets.api.routers.user.main import manager
 from image_secrets.backend import decode
 from image_secrets.backend.database.image import crud, schemas
 from image_secrets.backend.database.user import models
@@ -34,9 +34,7 @@ async def get(
     :param current_user: Current user dependency
 
     """
-    await current_user.fetch_related("decoded_images")
-    # not using from_tortoise_orm because it would try to prefetch the owner FK relation
-    images = [schemas.Image.from_orm(img) async for img in current_user.decoded_images]
+    images = await crud.get_decoded(user=current_user)
     return images
 
 
@@ -113,6 +111,33 @@ async def post(
     )
     db_image = await crud.create_decoded(owner_id=current_user.id, data=db_schema)
     return await schemas.Image.from_tortoise_orm(db_image)
+
+
+@router.get(
+    "/decode/{image_name}",
+    response_model=Optional[list[schemas.Image]],
+    status_code=status.HTTP_200_OK,
+    summary="Decoded image",
+    responses=responses.NOT_FOUND,
+)
+async def get_images(
+    image_name: str,
+    current_user: models.User = Depends(manager),
+) -> Optional[list[schemas.Image]]:
+    """Return decoded image with the specified name.
+
+    \f
+    :param image_name: Name of the image
+    :param current_user: Current user dependency
+
+    """
+    images = await crud.get_decoded(user=current_user, image_name=image_name)
+    if not images:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"no decoded image(s) with name {image_name!r} found",
+        )
+    return images
 
 
 __all__ = ["decode", "router"]

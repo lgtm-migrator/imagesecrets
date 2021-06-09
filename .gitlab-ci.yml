@@ -11,10 +11,7 @@ stages:
 pre-commit:
     stage: lint
     before_script:
-        - python --version
-        - python -m pip install poetry
-        - poetry --version
-        - poetry install --no-interaction --no-ansi
+        - bash scripts/install.sh
         - poetry run pre-commit --version
         - poetry run pre-commit autoupdate
     script:
@@ -26,12 +23,9 @@ pre-commit:
 pytest:
     stage: test
     before_script:
-        - python --version
-        - python -m pip install poetry
-        - poetry --version
+        - bash scripts/install.sh
     script:
-        - poetry install --no-interaction --no-ansi
-        - poetry run pytest --cov=image_secrets
+        - bash scripts/test.sh
     tags:
         - docker
 
@@ -59,9 +53,7 @@ heroku:
     only:
         - master
     before_script:
-        - apt-get update -qy
-        - apt-get install -y ruby-dev
-        - gem install dpl
+        - bash scripts/install_dpl.sh
     script:
         - dpl --provider=heroku --app=$HEROKU_APP --api-key=$HEROKU_API_KEY
     tags:

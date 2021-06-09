@@ -98,5 +98,4 @@ def decode_text(array: ArrayLike, delimiter) -> Optional[str]:
         text += chr(num)
         if text.endswith(delimiter):
             return text[:-delim_len]
-    else:
-        raise StopIteration("No message found after scanning the whole image.")
+    raise StopIteration("No message found after scanning the whole image.")

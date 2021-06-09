@@ -1,7 +1,6 @@
 """Test the decode router with authenticated user."""
 from __future__ import annotations
 
-import asyncio
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -11,6 +10,7 @@ if TYPE_CHECKING:
     from fastapi.testclient import TestClient
     from pytest_mock import MockFixture
 
+    from image_secrets.backend.database.image.models import DecodedImage
     from image_secrets.backend.database.user.models import User
 
 URL = "/decode"
@@ -18,15 +18,13 @@ URL = "/decode"
 
 def test_get_empty(
     api_client: TestClient,
-    auth_token: tuple[User, dict[str, str]],
+    auth_token: tuple[dict[str, str], User],
 ) -> None:
     """Test the get request with no stored images."""
-    token = auth_token[1]
+    header = auth_token[0]
     response = api_client.get(
         URL,
-        headers={
-            "authorization": f'{token["token_type"].capitalize()} {token["access_token"]}',
-        },
+        headers=header,
     )
 
     response.raise_for_status()
@@ -38,29 +36,17 @@ def test_get_empty(
     assert response.headers["content-length"] == "2"
 
 
-def test_get(api_client: TestClient, auth_token: tuple[User, dict[str, str]]) -> None:
+def test_get(
+    api_client: TestClient,
+    auth_token: tuple[dict[str, str], User],
+    insert_decoded: DecodedImage,
+) -> None:
     """Test the get request."""
-    token = auth_token[1]
-    user = auth_token[0]
-
-    from image_secrets.backend.database.image.models import DecodedImage
-
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(
-        DecodedImage.create(
-            filename="filename",
-            image_name="image_name",
-            message="message",
-            delimiter="delimiter",
-            owner_id=user.id,
-        ),
-    )
+    header = auth_token[0]
 
     response = api_client.get(
         URL,
-        headers={
-            "authorization": f'{token["token_type"].capitalize()} {token["access_token"]}',
-        },
+        headers=header,
     )
 
     response.raise_for_status()
@@ -69,10 +55,10 @@ def test_get(api_client: TestClient, auth_token: tuple[User, dict[str, str]]) ->
     json_ = response.json()
     assert isinstance(json_, list)
     image = json_[0]
-    assert image["image_name"] == "image_name"
-    assert image["message"] == "message"
-    assert image["delimiter"] == "delimiter"
-    assert image["lsb_amount"] == 1
+    assert image["image_name"] == insert_decoded.image_name
+    assert image["message"] == insert_decoded.message
+    assert image["delimiter"] == insert_decoded.delimiter
+    assert image["lsb_amount"] == insert_decoded.lsb_amount
 
 
 @pytest.mark.parametrize(
@@ -90,7 +76,7 @@ def test_get(api_client: TestClient, auth_token: tuple[User, dict[str, str]]) ->
 )
 def test_post(
     api_client: TestClient,
-    auth_token: tuple[User, dict[str, str]],
+    auth_token: tuple[dict[str, str], User],
     api_image_file,
     test_image_path: Path,
     mocker: MockFixture,
@@ -105,14 +91,12 @@ def test_post(
         return_value=("decoded>test", test_image_path),
     )
 
-    token = auth_token[1]
+    header = auth_token[0]
     response = api_client.post(
         URL,
         files=api_image_file,
         data={"custom-delimiter": delimiter, "least-significant-bit-amount": lsb_n},
-        headers={
-            "authorization": f'{token["token_type"].capitalize()} {token["access_token"]}',
-        },
+        headers=header,
     )
 
     decode_api.assert_called_once_with(
@@ -134,7 +118,7 @@ def test_post(
 
 def test_post_200(
     api_client: TestClient,
-    auth_token: tuple[User, dict[str, str]],
+    auth_token: tuple[dict[str, str], User],
     mocker: MockFixture,
     test_image_path: Path,
     api_image_file,
@@ -147,14 +131,12 @@ def test_post_200(
     )
     decode_api.side_effect = StopIteration("test exception")
 
-    token = auth_token[1]
+    header = auth_token[0]
     response = api_client.post(
         URL,
         files=api_image_file,
         data={"custom-delimiter": "delimiter", "least-significant-bit-amount": 1},
-        headers={
-            "authorization": f'{token["token_type"].capitalize()} {token["access_token"]}',
-        },
+        headers=header,
     )
 
     decode_api.assert_called_once_with(
@@ -175,20 +157,60 @@ def test_post_200(
 
 def test_post_415(
     api_client: TestClient,
-    auth_token: tuple[User, dict[str, str]],
+    auth_token: tuple[dict[str, str], User],
 ) -> None:
     """Test a post request with invalid media type."""
-    token = auth_token[1]
+    header = auth_token[0]
     response = api_client.post(
         URL,
         files={
             "file": (Path(__file__).name, open(__file__).read(), "image/png"),
         },
-        headers={
-            "authorization": f'{token["token_type"].capitalize()} {token["access_token"]}',
-        },
+        headers=header,
     )
 
     assert response.status_code == 415
     assert response.reason == "Unsupported Media Type"
     assert response.json()["detail"] == "only .png images are supported"
+
+
+def test_get_images(
+    api_client: TestClient,
+    auth_token: tuple[dict[str, str], User],
+    insert_decoded: DecodedImage,
+) -> None:
+    """Test a successful get request for decoded images with specified name."""
+    header = auth_token[0]
+    response = api_client.get(
+        f"{URL}/{insert_decoded.image_name}",
+        headers=header,
+    )
+
+    assert response.status_code == 200
+    assert response.reason == "OK"
+    json_ = response.json()
+    assert isinstance(json_, list)
+    image = json_[0]
+    assert image["image_name"] == insert_decoded.image_name
+    assert image["message"] == insert_decoded.message
+    assert image["delimiter"] == insert_decoded.delimiter
+    assert image["lsb_amount"] == insert_decoded.lsb_amount
+
+
+@pytest.mark.parametrize("image_name", ["test_name", "test_url", "10"])
+def test_get_images_404(
+    api_client: TestClient,
+    auth_token: tuple[dict[str, str], User],
+    image_name: str,
+) -> None:
+    """Test a successful get request for decoded images without finding any results."""
+    header = auth_token[0]
+    response = api_client.get(
+        f"{URL}/{image_name}",
+        headers=header,
+    )
+
+    assert response.status_code == 404
+    assert response.reason == "Not Found"
+    json_ = response.json()
+    assert json_["detail"] == f"no decoded image(s) with name {image_name!r} found"

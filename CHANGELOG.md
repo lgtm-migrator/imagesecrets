@@ -1,3 +1,21 @@
+## [0.4.0] 09-06-2021
+
+### Bug Fixes
+
+_None_
+
+### New Features
+
+* API - New endpoints for single image access
+* Frontend - New icon for both Swagger and ReDoc
+* Gitlab - New build passing/failing badge
+
+### Internal Changes
+
+* OpenAPI creation is now done manually
+* SwaggerUI and ReDoc endpoints are created along with OpenAPI schema
+* Refactor conftest
+
 ## [0.3.0] 05-06-2021
 
 ### Bug Fixes

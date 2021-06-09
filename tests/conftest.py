@@ -20,6 +20,7 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike
     from pytest_mock import MockFixture
 
+    from image_secrets.backend.database.image.models import DecodedImage, EncodedImage
     from image_secrets.backend.database.user.models import User
 
 
@@ -38,6 +39,7 @@ def api_settings(tmpdir) -> config_.Settings:
         image_folder=str(Path(tmpdir.mkdir("images/")).absolute()),
         pg_dsn=db_url,
         secret_key="test_key",
+        icon_url="test_icon_url",
     )
     config_.settings = test_settings
 
@@ -116,14 +118,56 @@ def auth_token(
     api_client,
     insert_user,
     mocker: MockFixture,
-) -> tuple[User, dict[str, str]]:
+) -> tuple[dict[str, str], User]:
     """Return authorized user and a token."""
     mocker.patch("image_secrets.backend.password.auth", return_value=True)
     response = api_client.post(
         "/users/login",
         data={"username": insert_user.username, "password": insert_user.password_hash},
+    ).json()
+
+    token_header = {
+        "authorization": f'{response["token_type"].capitalize()} {response["access_token"]}',
+    }
+    return token_header, insert_user
+
+
+@pytest.fixture(scope="function")
+def insert_decoded(api_client, insert_user) -> DecodedImage:
+    """Return decoded_image inserted into a clean database."""
+    from image_secrets.backend.database.image.models import DecodedImage
+
+    img = DecodedImage(
+        filename="test_filename",
+        image_name="test_image_name",
+        message="test_message",
+        delimiter="test_delimiter",
+        lsb_amount=2,
+        owner_id=insert_user.id,
     )
-    return insert_user, response.json()
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(img.save())
+
+    return img
+
+
+@pytest.fixture(scope="function")
+def insert_encoded(api_client, insert_user) -> EncodedImage:
+    """Return encoded_image inserted into a clean database."""
+    from image_secrets.backend.database.image.models import EncodedImage
+
+    img = EncodedImage(
+        filename="test_filename",
+        image_name="test_image_name",
+        message="test_message",
+        delimiter="test_delimiter",
+        lsb_amount=2,
+        owner_id=insert_user.id,
+    )
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(img.save())
+
+    return img
 
 
 @pytest.fixture(scope="session")

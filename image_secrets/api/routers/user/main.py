@@ -180,7 +180,7 @@ async def forgot_password(
 
 @router.post(
     "/reset-password",
-    status_code=status.HTTP_204_NO_CONTENT,
+    status_code=status.HTTP_202_ACCEPTED,
     summary="Reset account password",
     responses=responses.AUTHORIZATION,
 )
@@ -218,4 +218,4 @@ async def reset_password(
         ) from e
     # password hashing is handled by the update function
     background_tasks.add_task(crud.update, user_id, password_hash=password)
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+    return Response(status_code=status.HTTP_202_ACCEPTED)

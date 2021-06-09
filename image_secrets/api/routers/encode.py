@@ -1,11 +1,11 @@
 """Message encoding router."""
 from typing import Optional, Union
 
-from fastapi import APIRouter, Depends, File, Form, UploadFile, status
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 from fastapi.responses import FileResponse, JSONResponse
 
 from image_secrets.api import dependencies, exceptions, responses
-from image_secrets.api.routers.users.main import manager
+from image_secrets.api.routers.user.main import manager
 from image_secrets.backend import encode
 from image_secrets.backend.database.image import crud, schemas
 from image_secrets.backend.database.user import models
@@ -34,9 +34,7 @@ async def get(
     :param current_user: Current user dependency
 
     """
-    await current_user.fetch_related("encoded_images")
-    # not using from_tortoise_orm because it would try to prefetch the owner FK relation
-    images = [schemas.Image.from_orm(img) async for img in current_user.encoded_images]
+    images = await crud.get_encoded(user=current_user)
     return images
 
 
@@ -134,6 +132,33 @@ async def encode_message(
         filename=image_schema.filename,
         headers=headers,
     )
+
+
+@router.get(
+    "/encode/{image_name}",
+    response_model=Optional[list[schemas.Image]],
+    status_code=status.HTTP_200_OK,
+    summary="Encoded image",
+    responses=responses.NOT_FOUND,
+)
+async def get_images(
+    image_name: str,
+    current_user: models.User = Depends(manager),
+) -> Optional[list[schemas.Image]]:
+    """Return encoded image with the specified name.
+
+    \f
+    :param image_name: Name of the image
+    :param current_user: Current user dependency
+
+    """
+    images = await crud.get_encoded(user=current_user)
+    if not images:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"no encoded image(s) with name {image_name!r} found",
+        )
+    return images
 
 
 __all__ = [

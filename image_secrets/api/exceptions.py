@@ -26,4 +26,5 @@ class NotAuthenticated(Exception):
 
     def __init__(self, status_code: int = status.HTTP_401_UNAUTHORIZED) -> None:
         """Construct the class."""
+        super().__init__()
         self.status_code = status_code

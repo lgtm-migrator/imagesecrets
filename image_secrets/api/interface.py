@@ -4,8 +4,8 @@ from __future__ import annotations
 from fastapi import Depends, FastAPI, status
 
 import image_secrets
-from image_secrets.api import config, dependencies, handlers, responses, tasks
-from image_secrets.api.routers import decode, encode, users
+from image_secrets.api import config, dependencies, handlers, openapi, responses, tasks
+from image_secrets.api.routers import decode, encode, user
 from image_secrets.backend.database import base
 
 config_ = dependencies.get_config()
@@ -14,6 +14,9 @@ app = FastAPI(
     title="ImageSecrets",
     description="Encode and decode messages from images!",
     version=image_secrets.__version__,
+    # will be set manually
+    docs_url=None,
+    redoc_url=None,
     responses=responses.VALIDATION,
 )
 
@@ -22,8 +25,8 @@ base.init(app, config_.pg_dsn)
 
 app.include_router(decode.router)
 app.include_router(encode.router)
-app.include_router(users.main)
-app.include_router(users.me)
+app.include_router(user.main)
+app.include_router(user.me)
 
 handlers.init(app)
 tasks.init(app)
@@ -41,6 +44,9 @@ async def home(
 ) -> dict[str, str]:
     """Return basic info about the home route."""
     return {"app-name": settings.app_name}
+
+
+app.openapi = openapi.custom(app, swagger=True, redoc=True)
 
 
 __all__ = [
