@@ -31,13 +31,13 @@ class Settings(BaseSettings):
     def email_config() -> ConnectionConfig:
         """Return email connection configuration."""
         return ConnectionConfig(
-            MAIL_USERNAME=os.getenv("MAIL_USERNAME") or "username",
-            MAIL_PASSWORD=os.getenv("MAIL_PASSWORD") or "password",
-            MAIL_PORT=int(os.getenv("MAIL_PORT") or 0),
-            MAIL_SERVER=os.getenv("MAIL_SERVER") or "server",
+            MAIL_USERNAME=os.getenv("MAIL_USERNAME"),
+            MAIL_PASSWORD=os.getenv("MAIL_PASSWORD"),
+            MAIL_PORT=int(os.getenv("MAIL_PORT")),
+            MAIL_SERVER=os.getenv("MAIL_SERVER"),
             MAIL_TLS=True,
             MAIL_SSL=False,
-            MAIL_FROM=EmailStr(os.getenv("MAIL_FROM") or "string@example.com"),
+            MAIL_FROM=EmailStr(os.getenv("MAIL_FROM")),
             TEMPLATE_FOLDER=str(TEMPLATES),
         )
 

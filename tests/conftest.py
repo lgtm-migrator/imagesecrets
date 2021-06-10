@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import asyncio
+import os
 from pathlib import Path
 from typing import TYPE_CHECKING, Generator
 
@@ -44,6 +45,11 @@ def api_settings(tmpdir) -> config_.Settings:
         redoc_url="test_redoc_url",
         repository_url="test_repository_url",
     )
+    os.environ["MAIL_USERNAME"] = "test_username"
+    os.environ["MAIL_PASSWORD"] = "test_password"
+    os.environ["MAIL_PORT"] = "0"
+    os.environ["MAIL_SERVER"] = "test_server"
+    os.environ["MAIL_FROM"] = "test@email.test"
     config_.settings = test_settings
 
     # need to monkey patch specific functions connected to PostgreSQL
