@@ -10,10 +10,11 @@ if TYPE_CHECKING:
 def test_get(api_client: TestClient, api_settings) -> None:
     """Test get request on the home route."""
     response = api_client.get("/")
+
     response.raise_for_status()
     assert response.status_code == 200
     assert response.json() == {
-        "app-name": api_settings.app_name,
+        "AppName": api_settings.app_name,
         "SwaggerUI": api_settings.swagger_url,
         "ReDoc": api_settings.redoc_url,
         "GitLab": api_settings.repository_url,

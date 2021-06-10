@@ -40,10 +40,10 @@ def api_settings(tmpdir) -> config_.Settings:
         image_folder=str(Path(tmpdir.mkdir("images/")).absolute()),
         pg_dsn=db_url,
         secret_key="test_key",
-        icon_url="test_icon_url",
-        swagger_url="test_swagger_url",
-        redoc_url="test_redoc_url",
-        repository_url="test_repository_url",
+        icon_url="https://www.test_icon_url.com",
+        swagger_url="https://www.test_swagger_url.com",
+        redoc_url="https://www.test_redoc_url.com",
+        repository_url="https://www.test_repository_url.com",
     )
     os.environ["MAIL_USERNAME"] = "test_username"
     os.environ["MAIL_PASSWORD"] = "test_password"

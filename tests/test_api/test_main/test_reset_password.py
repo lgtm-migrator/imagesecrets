@@ -49,8 +49,7 @@ def test_ok(api_client: TestClient, mock_get_owner_id, mock_update) -> None:
         password_hash=password,
     )
     assert response.status_code == 202
-    with pytest.raises(JSONDecodeError):
-        assert response.json()
+    assert response.json()["detail"] == "account password updated"
 
 
 def test_401(

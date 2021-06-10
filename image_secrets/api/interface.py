@@ -4,7 +4,15 @@ from __future__ import annotations
 from fastapi import Depends, FastAPI, status
 
 import image_secrets
-from image_secrets.api import config, dependencies, handlers, openapi, responses, tasks
+from image_secrets.api import (
+    config,
+    dependencies,
+    handlers,
+    openapi,
+    responses,
+    schemas,
+    tasks,
+)
 from image_secrets.api.routers import decode, encode, user
 from image_secrets.backend.database import base
 
@@ -34,7 +42,7 @@ tasks.init(app)
 
 @app.get(
     "/",
-    response_model=dict[str, str],
+    response_model=schemas.Info,
     status_code=status.HTTP_200_OK,
     summary="Basic information about the API.",
     tags=["home"],
@@ -44,7 +52,7 @@ async def home(
 ) -> dict[str, str]:
     """Return basic info about the API."""
     return {
-        "app-name": settings.app_name,
+        "AppName": settings.app_name,
         "SwaggerUI": settings.swagger_url,
         "ReDoc": settings.redoc_url,
         "GitLab": settings.repository_url,

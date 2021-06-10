@@ -8,19 +8,12 @@ from __future__ import annotations
 
 from typing import Optional
 
-from fastapi import (
-    APIRouter,
-    BackgroundTasks,
-    Depends,
-    Form,
-    HTTPException,
-    Response,
-    status,
-)
+from fastapi import APIRouter, BackgroundTasks, Depends, Form, HTTPException, status
 from pydantic import EmailStr
 from tortoise.exceptions import IntegrityError
 
 from image_secrets.api import dependencies, exceptions, responses
+from image_secrets.api import schemas as api_schemas
 from image_secrets.api.routers.user.main import manager
 from image_secrets.backend.database.user import crud, models, schemas
 from image_secrets.backend.util.main import ExcludeUnsetDict, parse_unique_integrity
@@ -107,12 +100,13 @@ async def patch(
 @router.delete(
     "/me",
     status_code=status.HTTP_202_ACCEPTED,
+    response_model=api_schemas.Message,
     summary="Delete an Account",
 )
 async def delete(
     background_tasks: BackgroundTasks,
     current_user: models.User = Depends(manager),
-) -> Optional[Response]:
+) -> Optional[dict[str, str]]:
     """Delete a user and all extra information connected to it.
 
     \f
@@ -121,12 +115,13 @@ async def delete(
 
     """
     background_tasks.add_task(crud.delete, current_user.id)
-    return Response(status_code=status.HTTP_202_ACCEPTED)
+    return {"detail": "account deleted"}
 
 
 @router.put(
     "/me/password",
     status_code=status.HTTP_202_ACCEPTED,
+    response_model=api_schemas.Message,
     summary="Change user password",
 )
 async def password_put(
@@ -144,7 +139,7 @@ async def password_put(
         min_length=6,
         example="MyNewPassword",
     ),
-) -> Optional[Response]:
+) -> Optional[dict[str, str]]:
     """Change account password.
 
     - **old**: Current account password
@@ -165,4 +160,4 @@ async def password_put(
         )
     # password hashing is handled by the update function
     background_tasks.add_task(crud.update, current_user.id, password_hash=new)
-    return Response(status_code=status.HTTP_202_ACCEPTED)
+    return {"detail": "account password updated"}

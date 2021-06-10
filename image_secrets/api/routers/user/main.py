@@ -181,6 +181,7 @@ async def forgot_password(
 @router.post(
     "/reset-password",
     status_code=status.HTTP_202_ACCEPTED,
+    response_model=api_schemas.Message,
     summary="Reset account password",
     responses=responses.AUTHORIZATION,
 )
@@ -197,7 +198,7 @@ async def reset_password(
         min_length=6,
         example="SuperSecret123",
     ),
-) -> Optional[Response]:
+) -> Optional[dict[str, str]]:
     """Reset account password.
 
     - **token**: Forgot password token received via email
@@ -218,4 +219,4 @@ async def reset_password(
         ) from e
     # password hashing is handled by the update function
     background_tasks.add_task(crud.update, user_id, password_hash=password)
-    return Response(status_code=status.HTTP_202_ACCEPTED)
+    return {"detail": "account password updated"}
