@@ -2,11 +2,18 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
 
 from image_secrets.backend.util.image import data, png_filetype, read_bytes, save_array
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from numpy.typing import ArrayLike
+    from py.path import local
 
 
 @pytest.mark.parametrize(
@@ -33,7 +40,7 @@ def test_data(test_image_path: Path) -> None:
     assert shape[-1] == 3
 
 
-def test_save(tmpdir, test_image_array) -> None:
+def test_save(tmpdir: local, test_image_array: ArrayLike) -> None:
     """Test the save function."""
     tmp_dir = Path(tmpdir.mkdir("tmp/"))
 
@@ -41,7 +48,7 @@ def test_save(tmpdir, test_image_array) -> None:
     assert fp.is_file()
 
 
-def test_png_filetype(test_image_path) -> None:
+def test_png_filetype(test_image_path: Path) -> None:
     """Test the png_filetype function."""
     with open(test_image_path, mode="rb") as image_data:
         result = png_filetype(image_data.read())

@@ -8,6 +8,8 @@ import pytest
 from image_secrets.backend.database.image import crud
 
 if TYPE_CHECKING:
+    from unittest.mock import AsyncMock, MagicMock
+
     from pytest_mock import MockFixture
 
     from image_secrets.backend.database.image.models import DecodedImage, EncodedImage
@@ -100,7 +102,7 @@ def mock_get(mocker: MockFixture):
 
 @pytest.mark.asyncio
 async def test_create_decoded(
-    mock_create_decoded,
+    mock_create_decoded: MagicMock,
     decoded_image: DecodedImage,
     image_create: ImageCreate,
 ) -> None:
@@ -116,7 +118,7 @@ async def test_create_decoded(
 
 @pytest.mark.asyncio
 async def test_create_encoded(
-    mock_create_encoded,
+    mock_create_encoded: AsyncMock,
     encoded_image: EncodedImage,
     image_create: ImageCreate,
 ) -> None:
@@ -132,7 +134,7 @@ async def test_create_encoded(
 
 @pytest.mark.asyncio
 async def test__get_decoded_no_name(
-    mock_from_orm,
+    mock_from_orm: MagicMock,
     insert_user: User,
     insert_decoded: DecodedImage,
 ) -> None:
@@ -148,7 +150,7 @@ async def test__get_decoded_no_name(
 
 @pytest.mark.asyncio
 async def test__get_decoded_with_name(
-    mock_from_orm,
+    mock_from_orm: MagicMock,
     insert_user: User,
     insert_decoded: DecodedImage,
 ) -> None:
@@ -165,7 +167,7 @@ async def test__get_decoded_with_name(
 
 @pytest.mark.asyncio
 async def test__get_decoded_with_unknown_name(
-    mock_from_orm,
+    mock_from_orm: MagicMock,
     insert_user: User,
     insert_decoded: DecodedImage,
 ) -> None:
@@ -182,7 +184,7 @@ async def test__get_decoded_with_unknown_name(
 
 @pytest.mark.asyncio
 async def test__get_encoded_no_name(
-    mock_from_orm,
+    mock_from_orm: MagicMock,
     insert_user: User,
     insert_encoded: EncodedImage,
 ) -> None:
@@ -198,7 +200,7 @@ async def test__get_encoded_no_name(
 
 @pytest.mark.asyncio
 async def test__get_encoded_with_name(
-    mock_from_orm,
+    mock_from_orm: MagicMock,
     insert_user: User,
     insert_encoded: EncodedImage,
 ) -> None:
@@ -215,7 +217,7 @@ async def test__get_encoded_with_name(
 
 @pytest.mark.asyncio
 async def test__get_encoded_with_unknown_name(
-    mock_from_orm,
+    mock_from_orm: MagicMock,
     insert_user: User,
     insert_decoded: DecodedImage,
 ) -> None:
@@ -231,7 +233,7 @@ async def test__get_encoded_with_unknown_name(
 
 
 @pytest.mark.asyncio
-async def test_get_decoded_no_name(mock_get, insert_user: User) -> None:
+async def test_get_decoded_no_name(mock_get: AsyncMock, insert_user: User) -> None:
     """Test the get_decoded function without specifying image_name."""
     result = await crud.get_decoded(user=insert_user)
 
@@ -246,7 +248,7 @@ async def test_get_decoded_no_name(mock_get, insert_user: User) -> None:
 @pytest.mark.asyncio
 @pytest.mark.parametrize("image_name", ("test_name", "..."))
 async def test_get_decoded_with_name(
-    mock_get,
+    mock_get: AsyncMock,
     insert_user: User,
     image_name: str,
 ) -> None:
@@ -262,7 +264,7 @@ async def test_get_decoded_with_name(
 
 
 @pytest.mark.asyncio
-async def test_get_encoded_no_name(mock_get, insert_user: User) -> None:
+async def test_get_encoded_no_name(mock_get: AsyncMock, insert_user: User) -> None:
     """Test the get_decoded function without specifying image_name."""
     result = await crud.get_encoded(user=insert_user)
 
@@ -277,7 +279,7 @@ async def test_get_encoded_no_name(mock_get, insert_user: User) -> None:
 @pytest.mark.asyncio
 @pytest.mark.parametrize("image_name", ("test_name", "..."))
 async def test_get_encoded_with_name(
-    mock_get,
+    mock_get: AsyncMock,
     insert_user: User,
     image_name: str,
 ) -> None:

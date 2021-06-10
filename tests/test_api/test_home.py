@@ -6,8 +6,10 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from fastapi.testclient import TestClient
 
+    from image_secrets.api.config import Settings
 
-def test_get(api_client: TestClient, api_settings) -> None:
+
+def test_get(api_client: TestClient, api_settings: Settings) -> None:
     """Test get request on the home route."""
     response = api_client.get("/")
 

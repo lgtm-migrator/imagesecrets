@@ -12,6 +12,7 @@ from image_secrets.settings import API_IMAGES
 
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
+    from py.path import local
     from pytest_mock import MockFixture
 
 
@@ -84,7 +85,13 @@ def test_main(mocker: MockFixture, delimiter: str, lsb_n: int) -> None:
     "image_data, delimiter, lsb_n",
     [(b"image_data", "delimiter", 1)],
 )
-def test_api(mocker: MockFixture, tmpdir, image_data, delimiter, lsb_n) -> None:
+def test_api(
+    mocker: MockFixture,
+    tmpdir: local,
+    image_data: bytes,
+    delimiter: str,
+    lsb_n: int,
+) -> None:
     """Test the api decode function."""
     tmpdir = Path(tmpdir.mkdir("tmp/"))
 

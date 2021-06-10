@@ -8,6 +8,8 @@ import pytest
 from tortoise.exceptions import DoesNotExist
 
 if TYPE_CHECKING:
+    from unittest.mock import AsyncMock
+
     from fastapi.testclient import TestClient
     from pytest_mock import MockFixture
 
@@ -34,7 +36,11 @@ def mock_update(mocker: MockFixture):
     )
 
 
-def test_ok(api_client: TestClient, mock_get_owner_id, mock_update) -> None:
+def test_ok(
+    api_client: TestClient,
+    mock_get_owner_id: AsyncMock,
+    mock_update: AsyncMock,
+) -> None:
     """Test a successful request."""
     token = "token"
     password = "password"
@@ -54,7 +60,7 @@ def test_ok(api_client: TestClient, mock_get_owner_id, mock_update) -> None:
 
 def test_401(
     api_client: TestClient,
-    mock_get_owner_id,
+    mock_get_owner_id: AsyncMock,
 ) -> None:
     """Test a request with invalid token."""
     mock_get_owner_id.side_effect = DoesNotExist

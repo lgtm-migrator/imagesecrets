@@ -19,8 +19,10 @@ from image_secrets.backend.util import main
 if TYPE_CHECKING:
     from fastapi_mail import FastMail
     from numpy.typing import ArrayLike
+    from py.path import local
     from pytest_mock import MockFixture
 
+    from image_secrets.api.config import Settings
     from image_secrets.backend.database.image.models import DecodedImage, EncodedImage
     from image_secrets.backend.database.user.models import User
 
@@ -32,7 +34,7 @@ def app_name() -> str:
 
 
 @pytest.fixture(scope="function", autouse=True)
-def api_settings(tmpdir) -> config_.Settings:
+def api_settings(tmpdir: local) -> config_.Settings:
     """Return settings for testing environment."""
     db_url = "sqlite://:memory:"
     # need to construct so there is no field validation
@@ -63,7 +65,7 @@ def api_settings(tmpdir) -> config_.Settings:
 
 
 @pytest.fixture(autouse=True)
-def patch_tasks(api_settings) -> None:
+def patch_tasks(api_settings: Settings) -> None:
     """Patch tasks with dummy functions."""
     from image_secrets.api import tasks
 
@@ -74,7 +76,7 @@ def patch_tasks(api_settings) -> None:
 
 
 @pytest.fixture(autouse=True)
-def email_client(api_settings) -> FastMail:
+def email_client(api_settings: Settings) -> FastMail:
     """Return test email client."""
     from image_secrets.api import dependencies
 
@@ -87,7 +89,7 @@ def email_client(api_settings) -> FastMail:
 
 
 @pytest.fixture(scope="function")
-def api_client(request, api_settings) -> Generator[TestClient, None, None]:
+def api_client(request, api_settings: Settings) -> Generator[TestClient, None, None]:
     """Return api test client connected to fake database."""
     # settings already patched by fixture
     from image_secrets.api.interface import app
@@ -106,7 +108,7 @@ def api_client(request, api_settings) -> Generator[TestClient, None, None]:
 
 
 @pytest.fixture(scope="function")
-def insert_user(api_client) -> User:
+def insert_user(api_client: TestClient) -> User:
     """Return user inserted into a clean database."""
     from image_secrets.backend.database.user.models import User
 
@@ -124,8 +126,8 @@ def insert_user(api_client) -> User:
 
 @pytest.fixture(scope="function")
 def auth_token(
-    api_client,
-    insert_user,
+    api_client: TestClient,
+    insert_user: User,
     mocker: MockFixture,
 ) -> tuple[dict[str, str], User]:
     """Return authorized user and a token."""
@@ -142,7 +144,7 @@ def auth_token(
 
 
 @pytest.fixture(scope="function")
-def insert_decoded(api_client, insert_user) -> DecodedImage:
+def insert_decoded(api_client: TestClient, insert_user: User) -> DecodedImage:
     """Return decoded_image inserted into a clean database."""
     from image_secrets.backend.database.image.models import DecodedImage
 
@@ -161,7 +163,7 @@ def insert_decoded(api_client, insert_user) -> DecodedImage:
 
 
 @pytest.fixture(scope="function")
-def insert_encoded(api_client, insert_user) -> EncodedImage:
+def insert_encoded(api_client: TestClient, insert_user: User) -> EncodedImage:
     """Return encoded_image inserted into a clean database."""
     from image_secrets.backend.database.image.models import EncodedImage
 
@@ -182,12 +184,14 @@ def insert_encoded(api_client, insert_user) -> EncodedImage:
 @pytest.fixture(scope="session")
 def test_image_path() -> Path:
     """Return the path to the test.png image."""
-    return Path(__file__).parent / "test.png"
+    fp: Path = Path(__file__).parent / "test.png"
+    assert fp.is_file()
+    return fp
 
 
 @pytest.fixture(scope="session")
 def api_image_file(
-    test_image_path,
+    test_image_path: Path,
 ) -> dict[str, tuple[str, bytes, str]]:
     """Return the dict with file needed to use post requests."""
     return {

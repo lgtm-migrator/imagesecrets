@@ -9,6 +9,8 @@ import pytest
 from image_secrets.api import tasks
 
 if TYPE_CHECKING:
+    from unittest.mock import AsyncMock
+
     from pytest_mock import MockFixture
 
 
@@ -22,7 +24,7 @@ def mock_sleep(mocker: MockFixture):
     )
 
 
-def test_repeat(mock_sleep) -> None:
+def test_repeat(mock_sleep: AsyncMock) -> None:
     """Test a successful repeat function call."""
     loop = asyncio.get_event_loop()
 
