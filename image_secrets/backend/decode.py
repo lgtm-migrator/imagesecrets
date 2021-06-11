@@ -10,7 +10,6 @@ from image_secrets.settings import API_IMAGES, MESSAGE_DELIMITER
 
 if TYPE_CHECKING:
     from pathlib import Path
-    from typing import Optional
 
     from numpy.typing import ArrayLike
 
@@ -20,7 +19,7 @@ def main(
     delimiter: str = MESSAGE_DELIMITER,
     lsb_n: int = 1,
     reverse: bool = False,
-) -> Optional[str]:
+) -> str:
     """Decode text from an image.
 
     :param array: Numpy array with pixel image data
@@ -54,9 +53,7 @@ def api(
     data = image.read_bytes(image_data)
     _, arr = image.data(data)
     text = main(arr, delimiter, lsb_n, reverse)
-    assert isinstance(text, str)
-    fp = image.save_array(arr, image_dir=image_dir) if text else None
-    assert isinstance(fp, Path)
+    fp = image.save_array(arr, image_dir=image_dir)
     return text, fp
 
 
@@ -82,7 +79,7 @@ def prepare_array(array: ArrayLike, lsb_n: int, reverse: bool) -> ArrayLike:
     return return_arr
 
 
-def decode_text(array: ArrayLike, delimiter: str) -> Optional[str]:
+def decode_text(array: ArrayLike, delimiter: str) -> str:
     """Decode text from the given array.
 
     :param array: The array from which to decode the text
