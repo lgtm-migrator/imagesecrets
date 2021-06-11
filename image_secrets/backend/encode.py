@@ -16,6 +16,31 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
 
+def api(
+    message: str,
+    file: bytes,
+    delimiter: str,
+    lsb_n: int,
+    reverse: bool,
+    *,
+    image_dir: Path = API_IMAGES,
+) -> Path:
+    """Encode interface for the corresponding API endpoint.
+
+    :param message: Message to encode
+    :param file: Data of the image uploaded by user
+    :param delimiter: Message end identifier
+    :param lsb_n: Number of least significant bits to use
+    :param reverse: Reverse encoding bool
+    :param image_dir: Directory where to save the final image
+
+    """
+    data = image.read_bytes(file)
+    arr = main(message, data, delimiter, lsb_n, reverse)
+    fp = image.save_array(arr, image_dir=image_dir)
+    return fp
+
+
 def main(
     message: str,
     data: Union[BytesIO, Path],
@@ -54,31 +79,6 @@ def main(
     final_arr = array.pack_and_concatenate(enc_arr, img_arr, shape)
 
     return final_arr if not reverse else np.flip(final_arr)
-
-
-def api(
-    message: str,
-    file: bytes,
-    delimiter: str,
-    lsb_n: int,
-    reverse: bool,
-    *,
-    image_dir: Path = API_IMAGES,
-) -> Path:
-    """Encode interface for the corresponding API endpoint.
-
-    :param message: Message to encode
-    :param file: Data of the image uploaded by user
-    :param delimiter: Message end identifier
-    :param lsb_n: Number of least significant bits to use
-    :param reverse: Reverse encoding bool
-    :param image_dir: Directory where to save the final image
-
-    """
-    data = image.read_bytes(file)
-    arr = main(message, data, delimiter, lsb_n, reverse)
-    fp = image.save_array(arr, image_dir=image_dir)
-    return fp
 
 
 def prepare_image(

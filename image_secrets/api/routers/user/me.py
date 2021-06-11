@@ -6,7 +6,7 @@ Note: manager dependency is in every route because access to the current user in
 """
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 
 from fastapi import APIRouter, BackgroundTasks, Depends, Form, HTTPException, status
 from pydantic import EmailStr
@@ -17,9 +17,6 @@ from image_secrets.api import schemas as api_schemas
 from image_secrets.api.routers.user.main import manager
 from image_secrets.backend.database.user import crud, models, schemas
 from image_secrets.backend.util.main import ExcludeUnsetDict, parse_unique_integrity
-
-if TYPE_CHECKING:
-    ...
 
 router = APIRouter(
     prefix="/users",

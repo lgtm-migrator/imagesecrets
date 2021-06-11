@@ -14,25 +14,6 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
 
-def main(
-    array: ArrayLike,
-    delimiter: str = MESSAGE_DELIMITER,
-    lsb_n: int = 1,
-    reverse: bool = False,
-) -> str:
-    """Decode text from an image.
-
-    :param array: Numpy array with pixel image data
-    :param delimiter: Message end identifier, defaults to the one in .settings
-    :param lsb_n: Number of least significant bits to decode, defaults to 1
-    :param reverse: Reverse decoding bool, defaults to False
-
-    """
-    arr = prepare_array(array, lsb_n, reverse)
-    text = decode_text(arr, delimiter)
-    return text
-
-
 def api(
     image_data: bytes,
     delimiter: str,
@@ -55,6 +36,25 @@ def api(
     text = main(arr, delimiter, lsb_n, reverse)
     fp = image.save_array(arr, image_dir=image_dir)
     return text, fp
+
+
+def main(
+    array: ArrayLike,
+    delimiter: str = MESSAGE_DELIMITER,
+    lsb_n: int = 1,
+    reverse: bool = False,
+) -> str:
+    """Decode text from an image.
+
+    :param array: Numpy array with pixel image data
+    :param delimiter: Message end identifier, defaults to the one in .settings
+    :param lsb_n: Number of least significant bits to decode, defaults to 1
+    :param reverse: Reverse decoding bool, defaults to False
+
+    """
+    arr = prepare_array(array, lsb_n, reverse)
+    text = decode_text(arr, delimiter)
+    return text
 
 
 def prepare_array(array: ArrayLike, lsb_n: int, reverse: bool) -> ArrayLike:

@@ -41,7 +41,7 @@ def api_settings(tmpdir: local) -> config_.Settings:
     test_settings = config_.Settings.construct(
         image_folder=str(Path(tmpdir.mkdir("images/")).absolute()),
         pg_dsn=db_url,
-        secret_key="test_key",
+        secret_key="test_secret_key" * 10,
         icon_url="https://www.test_icon_url.com",
         swagger_url="https://www.test_swagger_url.com",
         redoc_url="https://www.test_redoc_url.com",

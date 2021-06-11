@@ -28,7 +28,7 @@ from image_secrets.backend.database.user import crud, schemas
 from image_secrets.backend.util.main import parse_unique_integrity
 
 if TYPE_CHECKING:
-    from image_secrets.backend.database.user import models
+    from image_secrets.backend.database.user.models import User
 
 config = dependencies.get_config()
 router = APIRouter(
@@ -36,12 +36,12 @@ router = APIRouter(
     tags=["users"],
     dependencies=[Depends(dependencies.get_config)],
 )
-manager = LoginManager(config.secret_key, "/users/login")
+manager = LoginManager(secret=config.secret_key, token_url=f"{router.prefix}/login")
 manager.not_authenticated_exception = NotAuthenticated
 
 
 @manager.user_loader
-async def user_loader(user_id: int) -> Optional[models.User]:
+async def user_loader(user_id: int) -> Optional[User]:
     """Load a user based on current jwt token.
 
     :param user_id: User database id in the sub field of the jwt token
@@ -65,7 +65,7 @@ async def user_loader(user_id: int) -> Optional[models.User]:
 )
 async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
-) -> Optional[dict[str, str]]:
+) -> dict[str, str]:
     """Login into an account and obtain access token.
 
     - **username**: Account username
@@ -198,7 +198,7 @@ async def reset_password(
         min_length=6,
         example="SuperSecret123",
     ),
-) -> Optional[dict[str, str]]:
+) -> dict[str, str]:
     """Reset account password.
 
     - **token**: Forgot password token received via email

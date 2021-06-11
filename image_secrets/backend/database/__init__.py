@@ -3,8 +3,6 @@ from tortoise import Tortoise
 
 from image_secrets.backend.database.image import models as image_models
 from image_secrets.backend.database.token import models as token_models
-
-# import image schemas so that FK relationships are not recorded
 from image_secrets.backend.database.user import models as user_models
 from image_secrets.backend.database.user import schemas
 
