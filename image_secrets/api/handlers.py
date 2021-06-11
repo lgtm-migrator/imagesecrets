@@ -33,7 +33,7 @@ async def handler(
     message: str,
     field: str,
     value: Optional[str] = None,
-    headers: Optional[Any] = None,
+    headers: Optional[dict[Any, Any]] = None,
 ) -> JSONResponse:
     """Create a json response.
 
@@ -50,7 +50,7 @@ async def handler(
     return JSONResponse(
         status_code=status_code,
         content=jsonable_encoder(content),
-        headers=headers,
+        headers=headers,  # type: ignore
     )
 
 

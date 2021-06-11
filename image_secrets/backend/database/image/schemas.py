@@ -14,7 +14,7 @@ _ImageBase = pydantic_model_creator(
 )
 
 
-class ImageCreate(_ImageBase):
+class ImageCreate(_ImageBase):  # type: ignore
     """Create image schema."""
 
     image_name: str = Field(..., max_length=128)
@@ -27,7 +27,7 @@ class ImageUpdate(BaseModel):
     image_name: str
 
 
-class Image(_ImageBase):
+class Image(_ImageBase):  # type: ignore
     """Main Image schema."""
 
     created: datetime

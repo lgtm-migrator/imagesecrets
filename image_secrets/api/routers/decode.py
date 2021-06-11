@@ -1,5 +1,7 @@
 """Message decoding router."""
-from typing import Optional, Union
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Optional, Union, cast
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 from fastapi.responses import JSONResponse
@@ -12,10 +14,13 @@ from image_secrets.backend.database.user import models
 from image_secrets.backend.util import image
 from image_secrets.settings import MESSAGE_DELIMITER
 
+if TYPE_CHECKING:
+    from image_secrets.backend.database.image.models import Image
+
 router = APIRouter(
     tags=["decode"],
     dependencies=[Depends(dependencies.get_config)],
-    responses=responses.AUTHORIZATION,
+    responses=responses.AUTHORIZATION,  # type: ignore
 )
 
 
@@ -27,7 +32,7 @@ router = APIRouter(
 )
 async def get(
     current_user: models.User = Depends(manager),
-) -> list[Optional[schemas.Image]]:
+) -> list[Optional[Image]]:
     """Return all decoded images.
 
     \f
@@ -43,7 +48,7 @@ async def get(
     response_model=schemas.Image,
     status_code=status.HTTP_201_CREATED,
     summary="Decode a message",
-    responses=responses.MESSAGE_NOT_FOUND | responses.MEDIA,
+    responses=responses.MESSAGE_NOT_FOUND | responses.MEDIA,  # type: ignore
 )
 async def post(
     current_user: models.User = Depends(manager),
@@ -85,9 +90,10 @@ async def post(
         "least-significant-bit-amount": repr(lsb_n),
     }
     image_data = await file.read()
+    assert isinstance(image_data, bytes)
 
     if not image.png_filetype(image_data):
-        raise exceptions.UnsupportedMediaType(headers=headers)
+        raise exceptions.UnsupportedMediaType(headers=headers)  # type: ignore
 
     try:
         decoded, fp = decode.api(
@@ -110,20 +116,21 @@ async def post(
         filename=fp.name,
     )
     db_image = await crud.create_decoded(owner_id=current_user.id, data=db_schema)
-    return await schemas.Image.from_tortoise_orm(db_image)
+    schema: schemas.Image = await schemas.Image.from_tortoise_orm(db_image)
+    return schema
 
 
 @router.get(
     "/decode/{image_name}",
-    response_model=Optional[list[schemas.Image]],
+    response_model=list[schemas.Image],
     status_code=status.HTTP_200_OK,
     summary="Decoded image",
-    responses=responses.NOT_FOUND,
+    responses=responses.NOT_FOUND,  # type: ignore
 )
 async def get_images(
     image_name: str,
     current_user: models.User = Depends(manager),
-) -> Optional[list[schemas.Image]]:
+) -> list[Image]:
     """Return decoded image with the specified name.
 
     \f
@@ -137,7 +144,7 @@ async def get_images(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"no decoded image(s) with name {image_name!r} found",
         )
-    return images
+    return images  # type: ignore
 
 
 __all__ = ["decode", "router"]

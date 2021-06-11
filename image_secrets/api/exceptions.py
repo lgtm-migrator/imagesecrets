@@ -1,4 +1,6 @@
 """Custom exceptions."""
+from __future__ import annotations
+
 from fastapi import HTTPException, status
 
 from image_secrets.backend.util.main import partial_init

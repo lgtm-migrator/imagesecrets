@@ -11,7 +11,6 @@ from fastapi import (
     Form,
     HTTPException,
     Query,
-    Response,
     status,
 )
 from fastapi.security import OAuth2PasswordRequestForm
@@ -62,7 +61,7 @@ async def user_loader(user_id: int) -> Optional[models.User]:
     status_code=status.HTTP_200_OK,
     response_model=api_schemas.Token,
     summary="Login for access token",
-    responses=responses.AUTHORIZATION,
+    responses=responses.AUTHORIZATION,  # type: ignore
 )
 async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
@@ -96,7 +95,7 @@ async def login(
     status_code=status.HTTP_201_CREATED,
     response_model=schemas.User,
     summary="New user registration",
-    responses=responses.CONFLICT,
+    responses=responses.CONFLICT,  # type: ignore
 )
 async def register(
     user: schemas.UserCreate,
@@ -133,7 +132,8 @@ async def register(
         recipient=user.email,
         username=user.username,
     )
-    return await schemas.User.from_tortoise_orm(db_user)
+    schema: schemas.User = await schemas.User.from_tortoise_orm(db_user)
+    return schema
 
 
 @router.post(
@@ -183,7 +183,7 @@ async def forgot_password(
     status_code=status.HTTP_202_ACCEPTED,
     response_model=api_schemas.Message,
     summary="Reset account password",
-    responses=responses.AUTHORIZATION,
+    responses=responses.AUTHORIZATION,  # type: ignore
 )
 async def reset_password(
     background_tasks: BackgroundTasks,

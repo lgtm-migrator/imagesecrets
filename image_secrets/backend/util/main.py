@@ -5,7 +5,7 @@ import functools as fn
 import math
 import re
 import secrets
-from typing import TYPE_CHECKING, Any, Optional, Type
+from typing import TYPE_CHECKING, Any, Iterable, Optional, Type, TypeVar
 
 from image_secrets.backend.regex import INTEGRITY_FIELD
 
@@ -13,7 +13,10 @@ if TYPE_CHECKING:
     from tortoise.exceptions import IntegrityError
 
 
-def partial_init(cls: Type, *args: Optional[Any], **kwargs: Optional[Any]):
+_T = TypeVar("_T")
+
+
+def partial_init(cls: Type[_T], *args: Optional[Any], **kwargs: Optional[Any]) -> _T:
     """Partially instantiate a class initializer.
 
     :param cls: The class to instantiate
@@ -22,15 +25,15 @@ def partial_init(cls: Type, *args: Optional[Any], **kwargs: Optional[Any]):
 
     """
 
-    class Partial(cls):
+    class Partial(cls):  # type: ignore
         """Partial class with partially initialized initializer."""
 
-        __init__ = fn.partialmethod(cls.__init__, *args, **kwargs)
+        __init__ = fn.partialmethod(cls.__init__, *args, **kwargs)  # type: ignore
 
         # repr with ``Partial`` would be confusing
         __repr__ = cls.__repr__
 
-    return Partial
+    return Partial  # type: ignore
 
 
 class ExcludeUnsetDict(dict):
@@ -59,13 +62,14 @@ def token_url() -> str:
 def parse_unique_integrity(
     *,
     error: IntegrityError,
-) -> Optional[tuple[str, str]]:  # pragma: no cover
+) -> Iterable[str]:  # pragma: no cover
     """Parse a database uniqueness IntegrityError and return the conflicting field and value."""
     err = str(error)
     try:
-        return re.findall(INTEGRITY_FIELD, err)[0]
+        result: Iterable[str] = re.findall(INTEGRITY_FIELD, err)[0]
     except IndexError as e:
         raise ValueError(f"invalid error message: {err!r}") from e
+    return result
 
 
 __all__ = [

@@ -6,7 +6,7 @@ Note: manager dependency is in every route because access to the current user in
 """
 from __future__ import annotations
 
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from fastapi import APIRouter, BackgroundTasks, Depends, Form, HTTPException, status
 from pydantic import EmailStr
@@ -18,11 +18,14 @@ from image_secrets.api.routers.user.main import manager
 from image_secrets.backend.database.user import crud, models, schemas
 from image_secrets.backend.util.main import ExcludeUnsetDict, parse_unique_integrity
 
+if TYPE_CHECKING:
+    ...
+
 router = APIRouter(
     prefix="/users",
     tags=["me"],
     dependencies=[Depends(dependencies.get_config), Depends(manager)],
-    responses=responses.AUTHORIZATION,
+    responses=responses.AUTHORIZATION,  # type: ignore
 )
 
 
@@ -41,7 +44,8 @@ async def get(
     :param current_user: Current user dependency
 
     """
-    return await schemas.User.from_tortoise_orm(current_user)
+    schema: schemas.User = await schemas.User.from_tortoise_orm(current_user)
+    return schema
 
 
 @router.patch(
@@ -49,7 +53,7 @@ async def get(
     response_model=schemas.User,
     status_code=status.HTTP_200_OK,
     summary="Update user credentials",
-    responses=responses.CONFLICT,
+    responses=responses.CONFLICT,  # type: ignore
 )
 async def patch(
     current_user: models.User = Depends(manager),
@@ -82,7 +86,8 @@ async def patch(
     update_dict = ExcludeUnsetDict(username=username, email=email).exclude_unset()
     if not update_dict:
         # no values to update so we can return right away
-        return await schemas.User.from_tortoise_orm(current_user)
+        schema: schemas.User = await schemas.User.from_tortoise_orm(current_user)
+        return schema
 
     try:
         user = await crud.update(current_user.id, **update_dict)
@@ -94,7 +99,8 @@ async def patch(
             field=field,
             value=value,
         ) from e
-    return await schemas.User.from_tortoise_orm(user)
+    schema: schemas.User = await schemas.User.from_tortoise_orm(user)  # type: ignore
+    return schema
 
 
 @router.delete(

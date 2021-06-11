@@ -37,7 +37,7 @@ def main(
     msg_arr, msg_len = array.message_bit(message, delimiter, lsb_n)
     shape, img_arr, unpacked_arr = prepare_image(data, msg_len)
 
-    if (size := img_arr.size * lsb_n) < (msg_len := len(message)):
+    if (size := img_arr.size * lsb_n) < (msg_len := len(message)):  # type: ignore
         raise ValueError(
             f"The image size ({size:,.0f}) is not enough for the message ({msg_len:,.0f})",
         )
@@ -93,7 +93,7 @@ def prepare_image(
     """
     shape, arr = image.data(data)
 
-    arr = arr.ravel()
+    arr = arr.ravel()  # type: ignore
     unpacked_arr = np.unpackbits(
         # unpack only needed ones, instead of millions
         arr[:message_len],

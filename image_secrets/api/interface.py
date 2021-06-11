@@ -25,7 +25,7 @@ app = FastAPI(
     # will be set manually
     docs_url=None,
     redoc_url=None,
-    responses=responses.VALIDATION,
+    responses=responses.VALIDATION,  # type: ignore
 )
 
 # tortoise setup
@@ -59,7 +59,7 @@ async def home(
     }
 
 
-app.openapi = openapi.custom(app, swagger=True, redoc=True)
+app.openapi = openapi.custom(app, swagger=True, redoc=True)  # type: ignore
 
 
 __all__ = [

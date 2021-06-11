@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from io import BytesIO
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 import magic
 import numpy as np
@@ -25,7 +25,8 @@ def png_filetype(data_: bytes, /) -> bool:
     :param data_: Image data to check
 
     """
-    return magic.from_buffer(buffer=data_, mime=True) == "image/png"
+    result: bool = magic.from_buffer(buffer=data_, mime=True) == "image/png"
+    return result
 
 
 def read_bytes(data_: bytes, /) -> TBytesIO:
@@ -45,7 +46,8 @@ def data(file: Union[TBytesIO, Path], /) -> tuple[tuple[int, int, int], ArrayLik
     """
     with Image.open(file).convert("RGB") as img:
         arr = np.asarray(img, dtype=np.uint8)
-    return arr.shape, arr
+    shape = cast(tuple[int, int, int], arr.shape)
+    return shape, arr
 
 
 def save_array(arr: ArrayLike, /, *, image_dir: Path = API_IMAGES) -> Path:
@@ -57,5 +59,5 @@ def save_array(arr: ArrayLike, /, *, image_dir: Path = API_IMAGES) -> Path:
     """
     filename = f"{main.token_hex(16)}.png"
     fp = image_dir / filename
-    Image.fromarray(np.uint8(arr)).convert("RGB").save(str(fp))
+    Image.fromarray(np.uint8(arr)).convert("RGB").save(str(fp))  # type: ignore
     return fp
