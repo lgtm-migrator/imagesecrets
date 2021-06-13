@@ -17,6 +17,9 @@ src_paths = ["image_secrets", "tests"]
 
 [tool.pytest.ini_options]
 filterwarnings = 'ignore::DeprecationWarning:asynctest.*:'
+markers = [
+    "disable_autouse: mark to disable autouse fixtures for the test",
+]
 
 [tool.poetry.dependencies]
 python = "^3.9"

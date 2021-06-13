@@ -89,12 +89,12 @@ async def patch(
     try:
         user = await crud.update(current_user.id, **update_dict)
     except IntegrityError as e:
-        field, value = parse_unique_integrity(error=e)
+        parsed = parse_unique_integrity(error=e)
         raise exceptions.DetailExists(
             status_code=status.HTTP_409_CONFLICT,
             message="account detail already exists",
-            field=field,
-            value=value,
+            field=parsed.field,
+            value=parsed.value,
         ) from e
     schema: schemas.User = await schemas.User.from_tortoise_orm(user)  # type: ignore
     return schema

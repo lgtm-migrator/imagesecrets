@@ -4,7 +4,7 @@ from __future__ import annotations
 import asyncio
 import os
 from pathlib import Path
-from typing import TYPE_CHECKING, Generator
+from typing import TYPE_CHECKING, Generator, Optional
 
 import numpy as np
 import pytest
@@ -25,6 +25,7 @@ if TYPE_CHECKING:
     from image_secrets.api.config import Settings
     from image_secrets.backend.database.image.models import DecodedImage, EncodedImage
     from image_secrets.backend.database.user.models import User
+    from image_secrets.backend.util.main import ParsedIntegrity
 
 
 @pytest.fixture(scope="session")
@@ -34,8 +35,11 @@ def app_name() -> str:
 
 
 @pytest.fixture(scope="function", autouse=True)
-def api_settings(tmpdir: local) -> config_.Settings:
+def api_settings(request, tmpdir: local, monkeypatch) -> Optional[Settings]:
     """Return settings for testing environment."""
+    if "disable_autouse" in set(request.keywords):
+        return
+
     db_url = "sqlite://:memory:"
     # need to construct so there is no field validation
     test_settings = config_.Settings.construct(
@@ -55,29 +59,40 @@ def api_settings(tmpdir: local) -> config_.Settings:
     config_.settings = test_settings
 
     # need to monkey patch specific functions connected to PostgreSQL
-    def sqlite_parsing(error: str) -> list[str]:
+    def sqlite_parsing(error: str) -> ParsedIntegrity:
         """Return parsed sqlite error message."""
-        return str(error).split(":")
+        split = str(error).split(":")
+        try:
+            result = main.ParsedIntegrity(field=split[0], value=split[1])
+        except IndexError as e:
+            raise ValueError(f"invalid error message: {error!r}") from e
+        return result
 
-    main.parse_unique_integrity = sqlite_parsing
+    monkeypatch.setattr(main, "parse_unique_integrity", sqlite_parsing)
 
     return config_.settings
 
 
-@pytest.fixture(autouse=True)
-def patch_tasks(api_settings: Settings) -> None:
+@pytest.fixture(scope="function", autouse=True)
+def patch_tasks(request, monkeypatch, api_settings: Settings) -> None:
     """Patch tasks with dummy functions."""
+    if "disable_autouse" in set(request.keywords):
+        return
+
     from image_secrets.api import tasks
 
     async def clear_tokens():
         """Test function to clear tokens."""
 
-    tasks.clear_tokens = lambda: clear_tokens()
+    monkeypatch.setattr(tasks, "clear_tokens", lambda: clear_tokens())
 
 
-@pytest.fixture(autouse=True)
-def email_client(api_settings: Settings) -> FastMail:
+@pytest.fixture(scope="function", autouse=True)
+def email_client(request, api_settings: Settings) -> Optional[FastMail]:
     """Return test email client."""
+    if "disable_autouse" in set(request.keywords):
+        return
+
     from image_secrets.api import dependencies
 
     fm = dependencies.get_mail()

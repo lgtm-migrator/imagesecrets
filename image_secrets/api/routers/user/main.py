@@ -119,12 +119,12 @@ async def register(
     try:
         db_user = await crud.create(user)
     except IntegrityError as e:
-        field, value = parse_unique_integrity(error=e)
+        parsed = parse_unique_integrity(error=e)
         raise DetailExists(
             status_code=status.HTTP_409_CONFLICT,
             message="account detail already exists",
-            field=field,
-            value=value,
+            field=parsed.field,
+            value=parsed.value,
         ) from e
     background_tasks.add_task(
         email.send_welcome,

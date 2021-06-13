@@ -5,7 +5,7 @@ import functools as fn
 import math
 import re
 import secrets
-from typing import TYPE_CHECKING, Any, Iterable, Optional, Type, TypeVar
+from typing import TYPE_CHECKING, Any, Iterable, NamedTuple, Optional, Type, TypeVar
 
 from image_secrets.backend.regex import INTEGRITY_FIELD
 
@@ -59,17 +59,24 @@ def token_url() -> str:
     return secrets.token_urlsafe()
 
 
+class ParsedIntegrity(NamedTuple):
+    """Representation of field and value collected from Tortoise IntegrityError."""
+
+    field: str
+    value: str
+
+
 def parse_unique_integrity(
     *,
     error: IntegrityError,
-) -> Iterable[str]:  # pragma: no cover
+) -> ParsedIntegrity:
     """Parse a database uniqueness IntegrityError and return the conflicting field and value."""
     err = str(error)
     try:
-        result: Iterable[str] = re.findall(INTEGRITY_FIELD, err)[0]
+        result = re.findall(INTEGRITY_FIELD, err)[0]
     except IndexError as e:
         raise ValueError(f"invalid error message: {err!r}") from e
-    return result
+    return ParsedIntegrity(field=result[0], value=result[1])
 
 
 __all__ = [
