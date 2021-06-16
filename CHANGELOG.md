@@ -1,3 +1,21 @@
+## [0.5.0] 16-06-2021
+
+### Bug Fixes
+
+_None_
+
+### New Features
+
+* API - Improved home endpoint
+
+### Internal Changes
+
+* Codebase is now 100% mypy compliant
+* New mypy check in CI/CD lint stage
+* More reusable test fixtures
+* New shell script for running the application
+* docker-compose for local development
+
 ## [0.4.0] 09-06-2021
 
 ### Bug Fixes
