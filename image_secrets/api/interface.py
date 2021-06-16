@@ -4,7 +4,15 @@ from __future__ import annotations
 from fastapi import Depends, FastAPI, status
 
 import image_secrets
-from image_secrets.api import config, dependencies, handlers, openapi, responses, tasks
+from image_secrets.api import (
+    config,
+    dependencies,
+    handlers,
+    openapi,
+    responses,
+    schemas,
+    tasks,
+)
 from image_secrets.api.routers import decode, encode, user
 from image_secrets.backend.database import base
 
@@ -17,7 +25,7 @@ app = FastAPI(
     # will be set manually
     docs_url=None,
     redoc_url=None,
-    responses=responses.VALIDATION,
+    responses=responses.VALIDATION,  # type: ignore
 )
 
 # tortoise setup
@@ -34,7 +42,7 @@ tasks.init(app)
 
 @app.get(
     "/",
-    response_model=dict[str, str],
+    response_model=schemas.Info,
     status_code=status.HTTP_200_OK,
     summary="Basic information about the API.",
     tags=["home"],
@@ -42,11 +50,16 @@ tasks.init(app)
 async def home(
     settings: config.Settings = Depends(dependencies.get_config),
 ) -> dict[str, str]:
-    """Return basic info about the home route."""
-    return {"app-name": settings.app_name}
+    """Return basic info about the API."""
+    return {
+        "AppName": settings.app_name,
+        "SwaggerUI": settings.swagger_url,
+        "ReDoc": settings.redoc_url,
+        "GitLab": settings.repository_url,
+    }
 
 
-app.openapi = openapi.custom(app, swagger=True, redoc=True)
+app.openapi = openapi.custom(app, swagger=True, redoc=True)  # type: ignore
 
 
 __all__ = [

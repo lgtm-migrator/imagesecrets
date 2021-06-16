@@ -24,13 +24,13 @@ def test_validate_path_patch() -> None:
     assert lib_config.validate_path(...)
 
 
-def test_attributes(api_settings) -> None:
+def test_attributes(api_settings: Settings) -> None:
     """Test the settings attributes."""
     assert settings.app_name == "ImageSecrets"
     assert settings.message_delimiter
     assert isinstance(settings.image_folder, Path)
 
 
-def test_email_config(api_settings) -> None:
+def test_email_config(api_settings: Settings) -> None:
     """Test the email_config method."""
     assert api_settings.email_config()

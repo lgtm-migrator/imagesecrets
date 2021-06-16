@@ -19,6 +19,15 @@ pre-commit:
     tags:
         - docker
 
+mypy:
+    stage: lint
+    before_script:
+        - bash scripts/install.sh
+    script:
+        - poetry run mypy image_secrets
+    tags:
+        - docker
+
 
 pytest:
     stage: test

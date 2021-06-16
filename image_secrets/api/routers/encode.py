@@ -1,5 +1,7 @@
 """Message encoding router."""
-from typing import Optional, Union
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Optional, Union
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 from fastapi.responses import FileResponse, JSONResponse
@@ -12,10 +14,13 @@ from image_secrets.backend.database.user import models
 from image_secrets.backend.util import image
 from image_secrets.settings import MESSAGE_DELIMITER
 
+if TYPE_CHECKING:
+    from image_secrets.backend.database.image.models import Image
+
 router = APIRouter(
     tags=["encode"],
     dependencies=[Depends(dependencies.get_config)],
-    responses=responses.AUTHORIZATION,
+    responses=responses.AUTHORIZATION,  # type: ignore
 )
 
 
@@ -27,7 +32,7 @@ router = APIRouter(
 )
 async def get(
     current_user: models.User = Depends(manager),
-) -> list[Optional[schemas.Image]]:
+) -> list[Optional[Image]]:
     """Return all encoded images.
 
     \f
@@ -43,7 +48,7 @@ async def get(
     status_code=status.HTTP_201_CREATED,
     response_class=FileResponse,
     summary="Encode a message into an image",
-    responses=responses.MEDIA,
+    responses=responses.MEDIA,  # type: ignore
 )
 async def encode_message(
     current_user: models.User = Depends(manager),
@@ -99,9 +104,10 @@ async def encode_message(
         "lsb_amount": repr(lsb_n),
     }
     image_data = await file.read()
+    assert isinstance(image_data, bytes)
 
     if not image.png_filetype(image_data):
-        raise exceptions.UnsupportedMediaType(headers=headers)
+        raise exceptions.UnsupportedMediaType(headers=headers)  # type: ignore
 
     try:
         fp = encode.api(
@@ -136,15 +142,15 @@ async def encode_message(
 
 @router.get(
     "/encode/{image_name}",
-    response_model=Optional[list[schemas.Image]],
+    response_model=list[schemas.Image],
     status_code=status.HTTP_200_OK,
     summary="Encoded image",
-    responses=responses.NOT_FOUND,
+    responses=responses.NOT_FOUND,  # type: ignore
 )
 async def get_images(
     image_name: str,
     current_user: models.User = Depends(manager),
-) -> Optional[list[schemas.Image]]:
+) -> list[Image]:
     """Return encoded image with the specified name.
 
     \f
@@ -158,7 +164,7 @@ async def get_images(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"no encoded image(s) with name {image_name!r} found",
         )
-    return images
+    return images  # type: ignore
 
 
 __all__ = [

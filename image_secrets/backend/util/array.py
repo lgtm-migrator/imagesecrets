@@ -17,9 +17,9 @@ def message_bit(message: str, delimiter: str, bits: int) -> tuple[ArrayLike, int
     :param bits: Amount of bits per pixel
 
     """
-    message = (message + delimiter).encode("utf-8")
+    byte_msg: bytes = (message + delimiter).encode("utf-8")
 
-    msg_arr = np.frombuffer(message, dtype=np.uint8)
+    msg_arr = np.frombuffer(byte_msg, dtype=np.uint8)
     lsbits_arr = np.unpackbits(msg_arr)
     lsbits_arr.resize(  # resize fills with zeros if shape doesn't match fully
         (np.ceil(lsbits_arr.size / bits).astype(int), bits),
@@ -46,9 +46,9 @@ def edit_column(
 
     """
     if start_from_end:
-        base[:, -column_num:] = new
+        base[:, -column_num:] = new  # type: ignore
     else:
-        base[:, :column_num] = new
+        base[:, :column_num] = new  # type: ignore
     return base
 
 
@@ -65,5 +65,5 @@ def pack_and_concatenate(
 
     """
     packed_arr = np.packbits(unpacked)
-    final = np.concatenate((packed_arr, base))
-    return final.reshape(final_shape)
+    final: ArrayLike = np.concatenate((packed_arr, base)).reshape(final_shape)
+    return final

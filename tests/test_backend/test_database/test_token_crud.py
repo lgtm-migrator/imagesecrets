@@ -10,13 +10,16 @@ from tortoise.exceptions import DoesNotExist, IntegrityError
 from image_secrets.backend.database.token import crud
 
 if TYPE_CHECKING:
+    from unittest.mock import AsyncMock
+
     from pytest_mock import MockFixture
 
     from image_secrets.backend.database.token.models import Token
+    from image_secrets.backend.database.user.models import User
 
 
 @pytest.fixture()
-def insert_token(insert_user) -> Token:
+def insert_token(insert_user: User) -> Token:
     """Return an existing ``Token`` in database."""
     from image_secrets.backend.database.token.models import Token
 
@@ -74,7 +77,7 @@ def mock_crud_delete(mocker: MockFixture):
 
 
 @pytest.mark.asyncio
-async def test_create(mock_create_token, token: Token) -> None:
+async def test_create(mock_create_token: AsyncMock, token: Token) -> None:
     """Test the create function."""
     result = await crud.create(token.token_hash, token.id)
 
@@ -86,7 +89,11 @@ async def test_create(mock_create_token, token: Token) -> None:
 
 
 @pytest.mark.asyncio
-async def test_create_new(mocker: MockFixture, mock_crud_create, token: Token) -> None:
+async def test_create_new(
+    mocker: MockFixture,
+    mock_crud_create: AsyncMock,
+    token: Token,
+) -> None:
     token_return = "test_token"
     url_safe = mocker.patch(
         "secrets.token_urlsafe",

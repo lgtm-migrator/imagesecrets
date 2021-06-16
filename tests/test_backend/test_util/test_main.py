@@ -83,7 +83,7 @@ def test_token_url(mocker: MockFixture) -> None:
     assert result == return_val
 
 
-@pytest.mark.xfail
+@pytest.mark.disable_autouse
 def test_parse_unique_integrity() -> None:
     """Test the parse_unique_integrity function."""
     key = "username"
@@ -92,11 +92,11 @@ def test_parse_unique_integrity() -> None:
     err = IntegrityError(f"DETAIL  KEY ({key})=({value}) already exists.")
     result = main.parse_unique_integrity(error=err)
 
-    assert result[0] == key
-    assert result[1] == value
+    assert result.field == key
+    assert result.value == value
 
 
-@pytest.mark.xfail
+@pytest.mark.disable_autouse
 def test_parse_unique_integrity_fail() -> None:
     """Test that the parse_unique_integrity functions raises ValueError if no result found."""
     err = IntegrityError("invalid error")

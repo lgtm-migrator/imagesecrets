@@ -7,8 +7,14 @@ if TYPE_CHECKING:
     from fastapi.testclient import TestClient
     from pytest_mock import MockFixture
 
+    from image_secrets.api.config import Settings
 
-def test_swagger(api_client: TestClient, mocker: MockFixture, api_settings) -> None:
+
+def test_swagger(
+    api_client: TestClient,
+    mocker: MockFixture,
+    api_settings: Settings,
+) -> None:
     """Test the get request on the home route."""
     swagger = mocker.patch(
         "fastapi.openapi.docs.get_swagger_ui_html",
@@ -27,7 +33,11 @@ def test_swagger(api_client: TestClient, mocker: MockFixture, api_settings) -> N
     assert response.json() == "test_swagger"
 
 
-def test_redoc(api_client: TestClient, mocker: MockFixture, api_settings) -> None:
+def test_redoc(
+    api_client: TestClient,
+    mocker: MockFixture,
+    api_settings: Settings,
+) -> None:
     """Test the get request on the home route."""
     redoc = mocker.patch(
         "fastapi.openapi.docs.get_redoc_html",
@@ -46,7 +56,7 @@ def test_redoc(api_client: TestClient, mocker: MockFixture, api_settings) -> Non
     assert response.json() == "test_redoc"
 
 
-def test_openapi_schema(api_settings) -> None:
+def test_openapi_schema(api_settings: Settings) -> None:
     """Test the generated OpenAPI schema."""
     import image_secrets
     from image_secrets.api.interface import app
@@ -59,7 +69,7 @@ def test_openapi_schema(api_settings) -> None:
     assert info["x-logo"] == {"url": api_settings.icon_url}
 
 
-def test_openapi_schema_cached(mocker: MockFixture, api_settings) -> None:
+def test_openapi_schema_cached(mocker: MockFixture, api_settings: Settings) -> None:
     """Test the that OpenAPI schema is generated only once and then cached."""
     from image_secrets.api.interface import app
 

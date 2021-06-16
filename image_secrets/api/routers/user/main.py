@@ -11,7 +11,6 @@ from fastapi import (
     Form,
     HTTPException,
     Query,
-    Response,
     status,
 )
 from fastapi.security import OAuth2PasswordRequestForm
@@ -29,7 +28,7 @@ from image_secrets.backend.database.user import crud, schemas
 from image_secrets.backend.util.main import parse_unique_integrity
 
 if TYPE_CHECKING:
-    from image_secrets.backend.database.user import models
+    from image_secrets.backend.database.user.models import User
 
 config = dependencies.get_config()
 router = APIRouter(
@@ -37,12 +36,12 @@ router = APIRouter(
     tags=["users"],
     dependencies=[Depends(dependencies.get_config)],
 )
-manager = LoginManager(config.secret_key, "/users/login")
+manager = LoginManager(secret=config.secret_key, token_url=f"{router.prefix}/login")
 manager.not_authenticated_exception = NotAuthenticated
 
 
 @manager.user_loader
-async def user_loader(user_id: int) -> Optional[models.User]:
+async def user_loader(user_id: int) -> Optional[User]:
     """Load a user based on current jwt token.
 
     :param user_id: User database id in the sub field of the jwt token
@@ -62,11 +61,11 @@ async def user_loader(user_id: int) -> Optional[models.User]:
     status_code=status.HTTP_200_OK,
     response_model=api_schemas.Token,
     summary="Login for access token",
-    responses=responses.AUTHORIZATION,
+    responses=responses.AUTHORIZATION,  # type: ignore
 )
 async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
-) -> Optional[dict[str, str]]:
+) -> dict[str, str]:
     """Login into an account and obtain access token.
 
     - **username**: Account username
@@ -96,7 +95,7 @@ async def login(
     status_code=status.HTTP_201_CREATED,
     response_model=schemas.User,
     summary="New user registration",
-    responses=responses.CONFLICT,
+    responses=responses.CONFLICT,  # type: ignore
 )
 async def register(
     user: schemas.UserCreate,
@@ -120,12 +119,12 @@ async def register(
     try:
         db_user = await crud.create(user)
     except IntegrityError as e:
-        field, value = parse_unique_integrity(error=e)
+        parsed = parse_unique_integrity(error=e)
         raise DetailExists(
             status_code=status.HTTP_409_CONFLICT,
             message="account detail already exists",
-            field=field,
-            value=value,
+            field=parsed.field,
+            value=parsed.value,
         ) from e
     background_tasks.add_task(
         email.send_welcome,
@@ -133,7 +132,8 @@ async def register(
         recipient=user.email,
         username=user.username,
     )
-    return await schemas.User.from_tortoise_orm(db_user)
+    schema: schemas.User = await schemas.User.from_tortoise_orm(db_user)
+    return schema
 
 
 @router.post(
@@ -181,8 +181,9 @@ async def forgot_password(
 @router.post(
     "/reset-password",
     status_code=status.HTTP_202_ACCEPTED,
+    response_model=api_schemas.Message,
     summary="Reset account password",
-    responses=responses.AUTHORIZATION,
+    responses=responses.AUTHORIZATION,  # type: ignore
 )
 async def reset_password(
     background_tasks: BackgroundTasks,
@@ -197,7 +198,7 @@ async def reset_password(
         min_length=6,
         example="SuperSecret123",
     ),
-) -> Optional[Response]:
+) -> dict[str, str]:
     """Reset account password.
 
     - **token**: Forgot password token received via email
@@ -218,4 +219,4 @@ async def reset_password(
         ) from e
     # password hashing is handled by the update function
     background_tasks.add_task(crud.update, user_id, password_hash=password)
-    return Response(status_code=status.HTTP_202_ACCEPTED)
+    return {"detail": "account password updated"}

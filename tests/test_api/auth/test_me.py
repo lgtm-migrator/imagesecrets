@@ -181,9 +181,7 @@ def test_delete(
     response.raise_for_status()
     assert response.status_code == 202
     assert response.reason == "Accepted"
-    with pytest.raises(JSONDecodeError):
-        response.json()
-    assert not response.headers
+    assert response.json()["detail"] == "account deleted"
 
 
 def test_password_put(
@@ -221,9 +219,7 @@ def test_password_put(
     response.raise_for_status()
     assert response.status_code == 202
     assert response.reason == "Accepted"
-    with pytest.raises(JSONDecodeError):
-        response.json()
-    assert not response.headers
+    assert response.json()["detail"] == "account password updated"
 
 
 def test_password_put_401(

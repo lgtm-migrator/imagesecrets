@@ -10,9 +10,32 @@ from image_secrets.settings import API_IMAGES, MESSAGE_DELIMITER
 
 if TYPE_CHECKING:
     from pathlib import Path
-    from typing import Optional
 
     from numpy.typing import ArrayLike
+
+
+def api(
+    image_data: bytes,
+    delimiter: str,
+    lsb_n: int,
+    reverse: bool,
+    *,
+    image_dir: Path = API_IMAGES,
+) -> tuple[str, Path]:
+    """Function to be used by the corresponding decode API endpoint.
+
+    :param image_data: Data of the image uploaded by user
+    :param delimiter: Message end identifier
+    :param lsb_n: Number of least significant bits to decode
+    :param reverse: Reverse decoding bool
+    :param image_dir: Directory where to save the image
+
+    """
+    data = image.read_bytes(image_data)
+    _, arr = image.data(data)
+    text = main(arr, delimiter, lsb_n, reverse)
+    fp = image.save_array(arr, image_dir=image_dir)
+    return text, fp
 
 
 def main(
@@ -20,7 +43,7 @@ def main(
     delimiter: str = MESSAGE_DELIMITER,
     lsb_n: int = 1,
     reverse: bool = False,
-) -> Optional[str]:
+) -> str:
     """Decode text from an image.
 
     :param array: Numpy array with pixel image data
@@ -34,31 +57,7 @@ def main(
     return text
 
 
-def api(
-    image_data: bytes,
-    delimiter: str,
-    lsb_n: int,
-    reverse: bool,
-    *,
-    image_dir: Path = API_IMAGES,
-) -> tuple[Optional[str], Optional[Path]]:
-    """Function to be used by the corresponding decode API endpoint.
-
-    :param image_data: Data of the image uploaded by user
-    :param delimiter: Message end identifier
-    :param lsb_n: Number of least significant bits to decode
-    :param reverse: Reverse decoding bool
-    :param image_dir: Directory where to save the image
-
-    """
-    data = image.read_bytes(image_data)
-    _, arr = image.data(data)
-    text = main(arr, delimiter, lsb_n, reverse)
-    fp = image.save_array(arr, image_dir=image_dir) if text else None
-    return text, fp
-
-
-def prepare_array(array: ArrayLike, lsb_n: int, reverse: bool) -> Optional[ArrayLike]:
+def prepare_array(array: ArrayLike, lsb_n: int, reverse: bool) -> ArrayLike:
     """Prepare an array into a form from which it is easy to decode text.
 
     :param array: The array to work with
@@ -76,11 +75,11 @@ def prepare_array(array: ArrayLike, lsb_n: int, reverse: bool) -> Optional[Array
         array = np.flip(array)
     arr = np.unpackbits(array).reshape(shape)
     # cut unnecessary bits and pack the rest
-    arr = np.packbits(arr[:, -lsb_n:])
-    return arr
+    return_arr: ArrayLike = np.packbits(arr[:, -lsb_n:])
+    return return_arr
 
 
-def decode_text(array: ArrayLike, delimiter) -> Optional[str]:
+def decode_text(array: ArrayLike, delimiter: str) -> str:
     """Decode text from the given array.
 
     :param array: The array from which to decode the text
@@ -94,8 +93,8 @@ def decode_text(array: ArrayLike, delimiter) -> Optional[str]:
 
     # iterating is faster than vectorizing 'chr' on the whole array,
     # many slow string operation are avoided
-    for num in array:
-        text += chr(num)
+    for num in array:  # type: ignore
+        text += chr(num)  # type: ignore
         if text.endswith(delimiter):
             return text[:-delim_len]
     raise StopIteration("No message found after scanning the whole image.")

@@ -1,6 +1,12 @@
 """Module with settings."""
 from pathlib import Path
 
+URL_KEY_ALIAS = {
+    "swagger_url": "SwaggerUI",
+    "redoc_url": "ReDoc",
+    "gitlab_url": "GitLab",
+}
+
 _parent = Path(__file__).parent
 ENV = _parent.parent / ".env"
 ICON = _parent / "static/favicon.ico"

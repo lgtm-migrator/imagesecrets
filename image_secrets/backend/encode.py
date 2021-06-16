@@ -16,46 +16,6 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
 
-def main(
-    message: str,
-    data: Union[BytesIO, Path],
-    delimiter: str = MESSAGE_DELIMITER,
-    lsb_n: int = 1,
-    reverse: bool = False,
-) -> ArrayLike:
-    """Main encoding interface.
-
-    :param message: Message to encode
-    :param data: Pixel image data which can be converted to numpy array by PIL
-    :param delimiter: Message end identifier, defaults to 'MESSAGE_DELIMITER'
-    :param lsb_n: Number of least significant bits to decode, defaults to 1
-    :param reverse: Reverse decoding bool, defaults to False
-
-    :raises ValueError: if the message is too long for the image
-
-    """
-    msg_arr, msg_len = array.message_bit(message, delimiter, lsb_n)
-    shape, img_arr, unpacked_arr = prepare_image(data, msg_len)
-
-    if (size := img_arr.size * lsb_n) < (msg_len := len(message)):
-        raise ValueError(
-            f"The image size ({size:,.0f}) is not enough for the message ({msg_len:,.0f})",
-        )
-
-    if reverse:  # pragma: no cover
-        msg_arr, img_arr = np.flip(msg_arr), np.flip(img_arr)  # all axes get flipped
-
-    enc_arr = array.edit_column(
-        unpacked_arr,
-        msg_arr,
-        column_num=lsb_n,
-        start_from_end=True,
-    )
-    final_arr = array.pack_and_concatenate(enc_arr, img_arr, shape)
-
-    return final_arr if not reverse else np.flip(final_arr)
-
-
 def api(
     message: str,
     file: bytes,
@@ -81,6 +41,46 @@ def api(
     return fp
 
 
+def main(
+    message: str,
+    data: Union[BytesIO, Path],
+    delimiter: str = MESSAGE_DELIMITER,
+    lsb_n: int = 1,
+    reverse: bool = False,
+) -> ArrayLike:
+    """Main encoding interface.
+
+    :param message: Message to encode
+    :param data: Pixel image data which can be converted to numpy array by PIL
+    :param delimiter: Message end identifier, defaults to 'MESSAGE_DELIMITER'
+    :param lsb_n: Number of least significant bits to decode, defaults to 1
+    :param reverse: Reverse decoding bool, defaults to False
+
+    :raises ValueError: if the message is too long for the image
+
+    """
+    msg_arr, msg_len = array.message_bit(message, delimiter, lsb_n)
+    shape, img_arr, unpacked_arr = prepare_image(data, msg_len)
+
+    if (size := img_arr.size * lsb_n) < (msg_len := len(message)):  # type: ignore
+        raise ValueError(
+            f"The image size ({size:,.0f}) is not enough for the message ({msg_len:,.0f})",
+        )
+
+    if reverse:  # pragma: no cover
+        msg_arr, img_arr = np.flip(msg_arr), np.flip(img_arr)  # all axes get flipped
+
+    enc_arr = array.edit_column(
+        unpacked_arr,
+        msg_arr,
+        column_num=lsb_n,
+        start_from_end=True,
+    )
+    final_arr = array.pack_and_concatenate(enc_arr, img_arr, shape)
+
+    return final_arr if not reverse else np.flip(final_arr)
+
+
 def prepare_image(
     data: BytesIO,
     message_len: int,
@@ -93,7 +93,7 @@ def prepare_image(
     """
     shape, arr = image.data(data)
 
-    arr = arr.ravel()
+    arr = arr.ravel()  # type: ignore
     unpacked_arr = np.unpackbits(
         # unpack only needed ones, instead of millions
         arr[:message_len],

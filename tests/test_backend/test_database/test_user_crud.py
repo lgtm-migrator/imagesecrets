@@ -8,6 +8,8 @@ import pytest
 from image_secrets.backend.database.user import crud
 
 if TYPE_CHECKING:
+    from unittest.mock import AsyncMock
+
     from pytest_mock import MockFixture
 
     from image_secrets.backend.database.user.models import User
@@ -68,7 +70,7 @@ async def test_get_id(insert_user: User) -> None:
 
 
 @pytest.mark.asyncio
-async def test_create(mocker: MockFixture, mock_create, user: User) -> None:
+async def test_create(mocker: MockFixture, mock_create: AsyncMock, user: User) -> None:
     """Test successful create function call."""
     from image_secrets.backend.database.user import schemas
 
@@ -97,7 +99,7 @@ async def test_create(mocker: MockFixture, mock_create, user: User) -> None:
 
 
 @pytest.mark.asyncio
-async def test_delete(insert_user) -> None:
+async def test_delete(insert_user: User) -> None:
     """Test successful delete function call."""
     result = await crud.delete(0)
 
@@ -110,7 +112,7 @@ async def test_delete(insert_user) -> None:
     [("username", "new_test_username"), ("email", "new_test_email")],
 )
 async def test_update_no_password_hash(
-    mock_get,
+    mock_get: AsyncMock,
     user: User,
     insert_user: User,
     column: str,
@@ -129,7 +131,7 @@ async def test_update_no_password_hash(
 @pytest.mark.asyncio
 async def test_update_with_password_hash(
     mocker: MockFixture,
-    mock_get,
+    mock_get: AsyncMock,
     user: User,
     insert_user: User,
 ) -> None:

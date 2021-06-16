@@ -1,12 +1,18 @@
 """Test the user api router without account authentication."""
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 import pytest
 from requests import HTTPError
 
+if TYPE_CHECKING:
+    from fastapi.testclient import TestClient
+
 URL = "/users/me"
 
 
-def test_get(api_client) -> None:
+def test_get(api_client: TestClient) -> None:
     """Test the get request."""
     response = api_client.get(URL)
     with pytest.raises(HTTPError):
@@ -17,7 +23,7 @@ def test_get(api_client) -> None:
     assert response.json()["detail"] == "invalid access token"
 
 
-def test_patch(api_client) -> None:
+def test_patch(api_client: TestClient) -> None:
     """Test the patch request."""
     response = api_client.patch(
         URL,
@@ -31,7 +37,7 @@ def test_patch(api_client) -> None:
     assert response.json()["detail"] == "invalid access token"
 
 
-def test_delete(api_client) -> None:
+def test_delete(api_client: TestClient) -> None:
     """Test the delete request."""
     response = api_client.delete(
         URL,

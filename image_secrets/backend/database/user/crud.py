@@ -43,7 +43,7 @@ async def get_id(identifier: DBIdentifier) -> int:
     :param identifier: DBIdentifier to identify which user to return
 
     """
-    result = await models.User.get(**identifier.to_dict()).only("id")
+    result: models.User = await models.User.get(**identifier.to_dict()).only("id")
     return int(result.id)
 
 
@@ -81,7 +81,9 @@ async def update(user_id: int, **attributes: Any) -> models.User:
         hashed = password.hash_(pwd)
         attributes["password_hash"] = hashed
     await models.User.filter(id=user_id).update(**attributes)
-    return await get(DBIdentifier(column="id", value=user_id))
+    model = await get(DBIdentifier(column="id", value=user_id))
+    assert isinstance(model, models.User)
+    return model
 
 
 async def authenticate(username: str, password_: str) -> bool:
@@ -92,7 +94,9 @@ async def authenticate(username: str, password_: str) -> bool:
 
     """
     try:
-        result = await models.User.get(username=username).only("password_hash")
+        result: models.User = await models.User.get(username=username).only(
+            "password_hash",
+        )
     except DoesNotExist:
         return False
     return password.auth(password_, result.password_hash)

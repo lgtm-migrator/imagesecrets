@@ -55,11 +55,12 @@ async def get_owner_id(token: str) -> int:
 
     """
     tokens = await Token.all().only("token_hash", "owner_id")
-    gen = (t.owner_id for t in tokens if password.auth(token, t.token_hash))
+    gen = (t.owner_id for t in tokens if password.auth(token, t.token_hash))  # type: ignore
     try:
         user_id = next(gen)
     except StopIteration as e:
         raise DoesNotExist(
             f"the token {token!r} does not match any token in database",
         ) from e
+    assert isinstance(user_id, int)
     return user_id

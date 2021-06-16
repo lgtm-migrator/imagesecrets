@@ -1,8 +1,11 @@
 """FastAPI configuration."""
+from __future__ import annotations
+
 import os
+from typing import cast
 
 from fastapi_mail import ConnectionConfig, config
-from pydantic import BaseSettings, DirectoryPath, EmailStr, PostgresDsn
+from pydantic import BaseSettings, DirectoryPath, EmailStr, HttpUrl, PostgresDsn
 
 from image_secrets.settings import API_IMAGES, MESSAGE_DELIMITER, TEMPLATES
 
@@ -18,22 +21,26 @@ class Settings(BaseSettings):
 
     message_delimiter: str = MESSAGE_DELIMITER
     image_folder: DirectoryPath = API_IMAGES
-    icon_url: str = os.getenv("ICON_URL")
 
-    pg_dsn: PostgresDsn = os.getenv("DATABASE_URL")
-    secret_key: str = os.getenv("SECRET_KEY")
+    pg_dsn: PostgresDsn = cast(PostgresDsn, os.getenv("DATABASE_URL"))
+    secret_key: str = cast(str, os.getenv("SECRET_KEY"))
+
+    icon_url: HttpUrl = cast(HttpUrl, os.getenv("ICON_URL"))
+    swagger_url: HttpUrl = cast(HttpUrl, os.getenv("SWAGGER_URL"))
+    redoc_url: HttpUrl = cast(HttpUrl, os.getenv("REDOC_URL"))
+    repository_url: HttpUrl = cast(HttpUrl, os.getenv("REPOSITORY_URL"))
 
     @staticmethod
     def email_config() -> ConnectionConfig:
         """Return email connection configuration."""
         return ConnectionConfig(
-            MAIL_USERNAME=os.getenv("MAIL_USERNAME") or "username",
-            MAIL_PASSWORD=os.getenv("MAIL_PASSWORD") or "password",
-            MAIL_PORT=int(os.getenv("MAIL_PORT") or 0),
-            MAIL_SERVER=os.getenv("MAIL_SERVER") or "server",
+            MAIL_USERNAME=os.getenv("MAIL_USERNAME"),
+            MAIL_PASSWORD=os.getenv("MAIL_PASSWORD"),
+            MAIL_PORT=int(cast(int, os.getenv("MAIL_PORT"))),
+            MAIL_SERVER=os.getenv("MAIL_SERVER"),
             MAIL_TLS=True,
             MAIL_SSL=False,
-            MAIL_FROM=EmailStr(os.getenv("MAIL_FROM") or "string@example.com"),
+            MAIL_FROM=EmailStr(os.getenv("MAIL_FROM")),
             TEMPLATE_FOLDER=str(TEMPLATES),
         )
 

@@ -29,7 +29,11 @@ def client() -> FastMail:
     "recipient, username",
     [("email@example.com", "test_username"), ("email@test.abc", "abc")],
 )
-def test_send_welcome(client: FastMail, recipient: str, username: str) -> None:
+def test_send_welcome(
+    client: FastMail,
+    recipient: str,
+    username: str,
+) -> None:
     """Test the send_welcome function."""
     coro = email.send_welcome(
         client=client,
@@ -42,7 +46,7 @@ def test_send_welcome(client: FastMail, recipient: str, username: str) -> None:
         assert len(outbox) == 1
         out: MIMEMultipart = outbox[0]
 
-    assert out["From"] == "string@example.com"
+    assert out["From"] == client.config.MAIL_FROM
     assert out["To"] == recipient
     assert out["Subject"] == "Welcome to ImageSecrets"
     assert not out.defects
@@ -72,7 +76,7 @@ def test_send_reset(
         assert len(outbox) == 1
         out: MIMEMultipart = outbox[0]
 
-    assert out["From"] == "string@example.com"
+    assert out["From"] == client.config.MAIL_FROM
     assert out["To"] == recipient
     assert out["Subject"] == "Reset Password"
     assert not out.defects
