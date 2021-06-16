@@ -16,4 +16,4 @@ RUN poetry install --no-interaction --no-ansi
 COPY . /app/
 
 EXPOSE $PORT
-CMD ['scripts/run.sh']
+CMD uvicorn image_secrets.api.interface:app --host 0.0.0.0 --port "$PORT"
