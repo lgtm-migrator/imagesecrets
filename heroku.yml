@@ -1,5 +1,3 @@
-build:
-  config:
-    BUILD_ENV: production
+build: 
   docker:
     web: Dockerfile
