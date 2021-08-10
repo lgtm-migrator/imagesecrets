@@ -1,3 +1,18 @@
+## [0.6.0] 10-08-2021
+
+### Bug Fixes
+
+* Incorrect GitLab links have been removed
+
+### New Features
+
+* Repository - GitHub CI/CD pipeline with new badges, coverage and code quality reports
+
+### Internal Changes
+
+* Heroku deployment pipeline with environments
+* GitHub bots - pre-commit, dependabot, codecov, lgtm
+
 ## [0.5.0] 16-06-2021
 
 ### Bug Fixes
