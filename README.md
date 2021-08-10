@@ -1,5 +1,6 @@
 # ImageSecrets
 
+![Heroku](https://pyheroku-badge.herokuapp.com/?app=imagesecrets&path=/&style=flat)
 ![Build](https://github.com/kucera-lukas/imagesecrets/actions/workflows/build.yml/badge.svg)
 ![Test Suite](https://github.com/kucera-lukas/imagesecrets/actions/workflows/test.yml/badge.svg)
 [![codecov](https://codecov.io/gh/kucera-lukas/imagesecrets/branch/master/graph/badge.svg?token=BUUQN2WP9K)](https://codecov.io/gh/kucera-lukas/imagesecrets)
