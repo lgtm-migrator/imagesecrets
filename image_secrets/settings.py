@@ -4,7 +4,7 @@ from pathlib import Path
 URL_KEY_ALIAS = {
     "swagger_url": "SwaggerUI",
     "redoc_url": "ReDoc",
-    "gitlab_url": "GitLab",
+    "github_url": "GitHub",
 }
 
 _parent = Path(__file__).parent

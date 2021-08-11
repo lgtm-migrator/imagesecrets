@@ -55,7 +55,7 @@ async def home(
         "AppName": settings.app_name,
         "SwaggerUI": settings.swagger_url,
         "ReDoc": settings.redoc_url,
-        "GitLab": settings.repository_url,
+        "GitHub": settings.repository_url,
     }
 
 

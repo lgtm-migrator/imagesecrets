@@ -17,7 +17,7 @@ class Info(BaseModel):
     app_name: str
     swagger_url: HttpUrl
     redoc_url: HttpUrl
-    gitlab_url: HttpUrl
+    github_url: HttpUrl
 
     class Config:
         """Model configuration."""

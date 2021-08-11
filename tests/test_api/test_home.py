@@ -19,7 +19,7 @@ def test_get(api_client: TestClient, api_settings: Settings) -> None:
         "AppName": api_settings.app_name,
         "SwaggerUI": api_settings.swagger_url,
         "ReDoc": api_settings.redoc_url,
-        "GitLab": api_settings.repository_url,
+        "GitHub": api_settings.repository_url,
     }
 
 

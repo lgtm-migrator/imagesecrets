@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import pytest
 
-from image_secrets import settings
 from image_secrets.api import schemas
 
 
@@ -13,14 +12,22 @@ from image_secrets.api import schemas
         ("", ""),
         ("a", "A"),
         ("A", "A"),
-        ("testkey", "TestKey"),
         ("camel", "Camel"),
         ("camel_case", "CamelCase"),
     ],
 )
 def test_pretty_key(key: str, result: str) -> None:
     """Test the pretty_key function."""
-    settings.URL_KEY_ALIAS = {"testkey": "TestKey"}
+    output = schemas.pretty_key(key)
+
+    assert output == result
+
+
+def test_pretty_key_in_alias() -> None:
+    """Test the pretty_key function with a key with knows alias."""
+    output = schemas.pretty_key("swagger_url")
+
+    assert output == "SwaggerUI"
 
 
 def test_info_keys() -> None:
@@ -30,7 +37,7 @@ def test_info_keys() -> None:
     assert properties.get("AppName")
     assert properties.get("SwaggerUI")
     assert properties.get("ReDoc")
-    assert properties.get("GitLab")
+    assert properties.get("GitHub")
 
 
 def test_field_inherit() -> None:
