@@ -45,7 +45,7 @@ async def _get(
 
 async def get_decoded(
     user: User,
-    image_name: str | None = None,
+    image_name: Optional[str] = None,
 ) -> list[Optional[models.Image]]:
     """Return User decoded images stored in database.
 
@@ -62,7 +62,7 @@ async def get_decoded(
 
 async def get_encoded(
     user: User,
-    image_name: str | None = None,
+    image_name: Optional[str] = None,
 ) -> list[Optional[models.Image]]:
     """Return User encoded images stored in database.
 

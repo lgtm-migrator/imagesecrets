@@ -48,7 +48,7 @@ def data(
 
     """
     with Image.open(file).convert("RGB") as img:
-        arr = np.asarray(img, dtype=np.uint8)
+        arr = np.array(img, dtype=np.uint8)
     shape = cast(tuple[int, int, int], arr.shape)
     return shape, arr
 

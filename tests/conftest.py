@@ -234,10 +234,11 @@ def api_image_file(
 @pytest.fixture(scope="session")
 def test_image_array(
     test_image_path: Path,
-) -> Generator[ArrayLike, None, None]:
+) -> ArrayLike:
     """Return numpy array of the test image."""
     with Image.open(test_image_path).convert("RGB") as img:
-        yield np.asarray(img, dtype=np.uint8)
+        array = np.array(img, dtype=np.uint8)
+    return array
 
 
 @pytest.fixture(scope="session")
