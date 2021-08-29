@@ -7,9 +7,9 @@ from sqlalchemy.orm import backref, relationship
 class Token(Base):
     """Token model."""
 
-    token_hash = Column(String(128))
+    token_hash = Column(String(128), nullable=False)
 
-    user_id = Column(Integer, ForeignKey("user.id"))
+    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
 
     user = relationship("User", backref=backref("token", uselist=False))
 

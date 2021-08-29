@@ -7,9 +7,9 @@ from sqlalchemy.orm import relationship, validates
 class User(Base):
     """User model."""
 
-    username = Column(String, unique=True)
-    email = Column(String, unique=True)
-    password_hash = Column(String(128))
+    username = Column(String, unique=True, nullable=False)
+    email = Column(String, unique=True, nullable=False)
+    password_hash = Column(String(128), nullable=False)
 
     decoded_images = relationship("DecodedImage")
     encoded_images = relationship("EncodedImage")

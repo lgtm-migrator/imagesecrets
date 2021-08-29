@@ -10,17 +10,17 @@ from sqlalchemy.orm import relationship
 class Image:
     """Base image mixin."""
 
-    image_name = Column(String)
+    image_name = Column(String, nullable=False)
 
-    message = Column(String)
-    delimiter = Column(String, default=MESSAGE_DELIMITER)
-    lsb_amount = Column(SmallInteger, default=1)
+    message = Column(String, nullable=False)
+    delimiter = Column(String, default=MESSAGE_DELIMITER, nullable=False)
+    lsb_amount = Column(SmallInteger, default=1, nullable=False)
 
 
 class DecodedImage(Image, Base):
     """Decoded image model."""
 
-    user_id = Column(Integer, ForeignKey("user.id"))
+    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
 
     parent = relationship("User", back_populates="decodedimage")
 
@@ -28,7 +28,7 @@ class DecodedImage(Image, Base):
 class EncodedImage(Image, Base):
     """Encoded image model."""
 
-    user_id = Column(Integer, ForeignKey("user.id"))
+    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
 
     parent = relationship("User", back_populates="encodedimage")
 
