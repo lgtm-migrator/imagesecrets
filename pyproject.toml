@@ -1,11 +1,11 @@
 [tool.poetry]
-name = "imagesecrets-api"
+name = "imagesecrets"
 version = "0.6.0"
 description = "A tool for encoding and decoding messages into/from images."
-authors = ["Lukas Kucera <lukas.kucera.g@protonmail.com>"]
+authors = ["Lukas Kucera"]
 license = "MIT"
 readme = "README.md"
-repository = "https://gitlab.com/Lkms19/imagesecrets-api"
+repository = "https://github.com/kucera-lukas/imagesecrets"
 
 [tool.black]
 line-length = 79
@@ -42,7 +42,7 @@ python-multipart = "^0.0.5"
 aiofiles = "^0.7.0"
 requests = "^2.26.0"
 uvicorn = "^0.15.0"
-tortoise-orm = { extras = ["asyncpg"], version = "^0.17.2" }
+sqlalchemy = "^1.4.23"
 numpy = "^1.21.1"
 Pillow = "8.2.0"
 bcrypt = "^3.2.0"
@@ -59,7 +59,7 @@ pytest-asyncio = "^0.15.1"
 asynctest = "^0.13.0"
 devtools = "^0.6.1"
 mypy = "^0.910"
-
+sqlalchemy2-stubs = "^0.0.2-alpha.14"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
