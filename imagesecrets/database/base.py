@@ -15,11 +15,13 @@ class Base:
     """SQLAlchemy base class."""
 
     @declared_attr
-    def __tablename__(cls):
+    def __tablename__(cls) -> str:
+        """Return database table name."""
         return cls.__name__.lower()
 
     @declared_attr
-    def __mapper_args__(cls):
+    def __mapper_args__(cls) -> dict[str, bool]:
+        """Return mapper args dictionary."""
         return {"eager_defaults": True}
 
     id = Column(Integer, primary_key=True)
