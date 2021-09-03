@@ -6,6 +6,14 @@ from imagesecrets.database.base import Base
 from sqlalchemy import Column, ForeignKey, Integer, SmallInteger, String
 from sqlalchemy.orm import relationship
 
+_foreign_key_kwargs = {
+    "column": "user.id",
+    "ondelete": "CASCADE",
+}
+_relationship_kwargs = {
+    "nullable": False,
+}
+
 
 class Image:
     """Base image mixin."""
@@ -20,17 +28,25 @@ class Image:
 class DecodedImage(Image, Base):
     """Decoded image model."""
 
-    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
+    user_id = Column(
+        Integer,
+        ForeignKey(**_foreign_key_kwargs),
+        **_relationship_kwargs,
+    )
 
-    parent = relationship("User", back_populates="decodedimage")
+    user = relationship("User", back_populates="decoded_images")
 
 
 class EncodedImage(Image, Base):
     """Encoded image model."""
 
-    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
+    user_id = Column(
+        Integer,
+        ForeignKey(**_foreign_key_kwargs),
+        **_relationship_kwargs,
+    )
 
-    parent = relationship("User", back_populates="encodedimage")
+    user = relationship("User", back_populates="encoded_images")
 
 
 __all__ = [
