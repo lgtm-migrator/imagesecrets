@@ -14,3 +14,6 @@ ICON = _parent / "static/favicon.ico"
 TEMPLATES = _parent / "templates"
 
 MESSAGE_DELIMITER = "<{~stop-here~}>"
+
+API_IMAGES = _parent / "static/images"
+API_IMAGES.mkdir(parents=True, exist_ok=True)
