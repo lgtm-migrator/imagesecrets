@@ -3,6 +3,12 @@ from imagesecrets.database.base import Base
 from sqlalchemy import CheckConstraint, Column, String
 from sqlalchemy.orm import relationship, validates
 
+_relationship_kwargs = {
+    "back_populates": "user",
+    "cascade": "all, delete",
+    "passive_deletes": True,
+}
+
 
 class User(Base):
     """User model."""
@@ -11,8 +17,8 @@ class User(Base):
     email = Column(String, unique=True, nullable=False)
     password_hash = Column(String(128), nullable=False)
 
-    decoded_images = relationship("DecodedImage")
-    encoded_images = relationship("EncodedImage")
+    decoded_images = relationship("DecodedImage", **_relationship_kwargs)
+    encoded_images = relationship("EncodedImage", **_relationship_kwargs)
 
     __table_args__ = (
         CheckConstraint(
