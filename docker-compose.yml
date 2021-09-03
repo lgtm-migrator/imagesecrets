@@ -1,8 +1,28 @@
 services:
+  database:
+    image: postgres:latest
+
+    ports:
+      - "8001:5432"
+
+    environment:
+      POSTGRES_PASSWORD: "password"
+      POSTGRES_USER: "username"
+      POSTGRES_DB: "imagesecrets"
+
+    container_name: database
+
   web:
     build: .
     env_file: .env
-    command: sh -c "poetry run pytest &&
-                    scripts/run.sh"
+
+    links:
+      - "database:database"
+
     ports:
       - "8000:8000"
+
+    depends_on:
+      - database
+
+    container_name: web
