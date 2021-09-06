@@ -24,6 +24,8 @@ class Image:
     delimiter = Column(String, default=MESSAGE_DELIMITER, nullable=False)
     lsb_amount = Column(SmallInteger, default=1, nullable=False)
 
+    filename = Column(String, nullable=False)
+
 
 class DecodedImage(Image, Base):
     """Decoded image model."""
