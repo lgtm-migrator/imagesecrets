@@ -1,11 +1,15 @@
 """User schemas."""
+from __future__ import annotations
+
+from datetime import datetime
 from typing import Optional
 
+from imagesecrets.schemas.base import ModelSchema
 from imagesecrets.schemas.image import Image
-from pydantic import BaseModel, EmailStr, Field, SecretStr, constr
+from pydantic import EmailStr, Field, SecretStr, constr
 
 
-class _BaseUser(BaseModel):
+class _BaseUser(ModelSchema):
     """Base User schema."""
 
     username: constr(min_length=6, max_length=128)
@@ -18,7 +22,7 @@ class UserCreate(_BaseUser):
     password: SecretStr = Field(..., min_length=6)
 
 
-class UserUpdate(BaseModel):
+class UserUpdate(ModelSchema):
     """Schema for User update."""
 
     username: Optional[str] = Field(
@@ -31,6 +35,9 @@ class UserUpdate(BaseModel):
 
 class User(_BaseUser):
     """Full User schema."""
+
+    created: datetime
+    updated: datetime
 
     decoded_images: list[Image]
     encoded_images: list[Image]
