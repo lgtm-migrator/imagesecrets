@@ -4,10 +4,11 @@ from __future__ import annotations
 from datetime import datetime
 
 from imagesecrets.constants import MESSAGE_DELIMITER
-from pydantic import BaseModel, conint
+from imagesecrets.schemas.base import ModelSchema
+from pydantic import conint
 
 
-class _ImageBase(BaseModel):
+class _ImageBase(ModelSchema):
     """Base image schema."""
 
     image_name: str
@@ -31,4 +32,4 @@ class Image(ImageCreate):
     """Main Image schema."""
 
     created: datetime
-    modified: datetime
+    updated: datetime
