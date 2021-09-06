@@ -1,6 +1,7 @@
 """Application Programming Interface."""
 from __future__ import annotations
 
+import imagesecrets
 from fastapi import Depends, FastAPI, status
 from imagesecrets.api import (
     config,
@@ -14,14 +15,12 @@ from imagesecrets.api import (
 from imagesecrets.api.routers import decode, encode, user
 from imagesecrets.database import base
 
-import image_secrets
-
 config_ = dependencies.get_config()
 app = FastAPI(
     dependencies=[Depends(dependencies.get_config)],
     title="ImageSecrets",
     description="Encode and decode messages from images!",
-    version=image_secrets.__version__,
+    version=imagesecrets.__version__,
     # will be set manually
     docs_url=None,
     redoc_url=None,

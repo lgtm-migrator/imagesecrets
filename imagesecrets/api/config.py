@@ -5,6 +5,7 @@ import os
 from typing import cast
 
 from fastapi_mail import ConnectionConfig, config
+from imagesecrets.constants import API_IMAGES, MESSAGE_DELIMITER, TEMPLATES
 from pydantic import (
     BaseSettings,
     DirectoryPath,
@@ -12,8 +13,6 @@ from pydantic import (
     HttpUrl,
     PostgresDsn,
 )
-
-from image_secrets.settings import API_IMAGES, MESSAGE_DELIMITER, TEMPLATES
 
 # monkey patch one of fastapi_mail path validation functions
 # because it is broken when application is not run from parent folder

@@ -6,9 +6,8 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
-
-from image_secrets.backend import decode
-from image_secrets.settings import API_IMAGES
+from imagesecrets.constants import API_IMAGES
+from imagesecrets.core import decode
 
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
