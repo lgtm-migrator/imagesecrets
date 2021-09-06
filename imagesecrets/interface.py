@@ -46,15 +46,13 @@ def create_api(config: Settings) -> FastAPI:
         summary="Basic information about the API.",
         tags=["home"],
     )
-    async def home(
-        settings: Settings = Depends(dependencies.get_config),
-    ) -> dict[str, str]:
+    async def home() -> dict[str, str]:
         """Return basic info about the API."""
         return {
-            "AppName": settings.app_name,
-            "SwaggerUI": settings.swagger_url,
-            "ReDoc": settings.redoc_url,
-            "GitHub": settings.repository_url,
+            "AppName": config.app_name,
+            "SwaggerUI": config.swagger_url,
+            "ReDoc": config.redoc_url,
+            "GitHub": config.repository_url,
         }
 
     api.openapi = openapi.custom(api, swagger=True, redoc=True)  # type: ignore
