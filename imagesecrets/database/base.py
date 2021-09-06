@@ -1,12 +1,13 @@
 """Base database module."""
 from __future__ import annotations
 
+import contextlib
 from typing import TYPE_CHECKING
 
 from imagesecrets.config import settings
-from imagesecrets.database.service import Database
 from sqlalchemy import Column, DateTime, Integer, func
-from sqlalchemy.orm import declarative_base, declared_attr
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import declarative_base, declared_attr, sessionmaker
 
 if TYPE_CHECKING:
     from fastapi import FastAPI
@@ -36,7 +37,20 @@ class Base:
 
 
 Base = declarative_base(cls=Base)
-database = Database(db_url=settings.pg_dsn)
+
+engine = create_async_engine(settings.pg_dsn, future=True, echo=True)
+async_sessionmaker = sessionmaker(
+    engine,
+    expire_on_commit=False,
+    class_=AsyncSession,
+)
+
+
+@contextlib.asynccontextmanager
+async def get_session() -> AsyncSession:
+    """Return database session."""
+    async with async_sessionmaker.begin() as session:
+        yield session
 
 
 def init(app: FastAPI) -> None:
@@ -44,6 +58,6 @@ def init(app: FastAPI) -> None:
 
     @app.on_event("startup")
     async def startup():
-        async with database._engine.begin() as conn:
+        async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.drop_all)
             await conn.run_sync(Base.metadata.create_all)
