@@ -22,7 +22,7 @@ def init(app: FastAPI) -> None:
     @app.on_event("startup")
     async def runner() -> None:
         """Run all tasks."""
-        await clear_tokens()
+        await repeat(seconds=600)(clear_tokens)()
 
 
 _F = Callable[[], Coroutine[Any, Any, None]]
@@ -59,7 +59,6 @@ def repeat(*, seconds: int) -> Callable[[_F], _F]:
     return decorator
 
 
-@repeat(seconds=600)  # 10 minutes
 async def clear_tokens() -> None:
     """Clear all expired tokens in database."""
     async with contextlib.asynccontextmanager(

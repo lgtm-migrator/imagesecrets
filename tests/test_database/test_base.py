@@ -1,11 +1,11 @@
 import pytest
 from pytest_mock import MockFixture
 
-from imagesecrets.database import base
-
 
 @pytest.mark.asyncio
 async def test_get_session(mocker: MockFixture, async_context_manager):
+    from imagesecrets.database import base
+
     begin = mocker.patch(
         "imagesecrets.database.base.async_sessionmaker.begin",
         return_value=async_context_manager,
