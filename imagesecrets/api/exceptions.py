@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from fastapi import HTTPException, status
+
 from imagesecrets.core.util.main import partial_init
 
 UnsupportedMediaType = partial_init(

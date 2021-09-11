@@ -4,11 +4,12 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Optional, Type, TypeVar
 
+from sqlalchemy import select
+
 from imagesecrets.database.base import Base
 from imagesecrets.database.image.models import DecodedImage, EncodedImage
 from imagesecrets.database.service import DatabaseService
 from imagesecrets.schemas import image
-from sqlalchemy import select
 
 _I = TypeVar("_I", bound=Base)
 

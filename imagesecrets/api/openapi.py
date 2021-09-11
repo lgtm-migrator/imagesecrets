@@ -3,8 +3,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Callable
 
-import imagesecrets
 from fastapi.openapi import docs, utils
+
+import imagesecrets
 from imagesecrets.api.dependencies import get_config
 
 if TYPE_CHECKING:

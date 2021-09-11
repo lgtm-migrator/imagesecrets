@@ -6,9 +6,10 @@ from typing import TYPE_CHECKING, cast
 
 import magic
 import numpy as np
+from PIL import Image
+
 from imagesecrets.constants import API_IMAGES
 from imagesecrets.core.util import main
-from PIL import Image
 
 if TYPE_CHECKING:
     from pathlib import Path

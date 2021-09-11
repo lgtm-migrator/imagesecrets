@@ -52,13 +52,13 @@ python-magic = "^0.4.24"
 Jinja2 = "^3.0.1"
 
 [tool.poetry.dev-dependencies]
-pre-commit = "^2.14.0"
-pytest = "^6.2.3"
+pre-commit = "^2.15.0"
+pytest = "^6.2.5"
 pytest-mock = "^3.6.1"
 pytest-cov = "^2.12.0"
 pytest-asyncio = "^0.15.1"
 asynctest = "^0.13.0"
-devtools = "^0.6.1"
+devtools = "^0.7.0"
 mypy = "^0.910"
 sqlalchemy2-stubs = "^0.0.2-alpha.14"
 

@@ -4,9 +4,10 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Optional
 
+from pydantic import EmailStr, Field, SecretStr, constr
+
 from imagesecrets.schemas.base import ModelSchema
 from imagesecrets.schemas.image import Image
-from pydantic import EmailStr, Field, SecretStr, constr
 
 
 class _BaseUser(ModelSchema):

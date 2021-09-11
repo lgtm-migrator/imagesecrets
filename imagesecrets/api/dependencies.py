@@ -5,6 +5,7 @@ import functools
 from typing import TYPE_CHECKING, TypeVar
 
 from fastapi_mail import FastMail
+
 from imagesecrets import config
 from imagesecrets.database.service import DatabaseService
 

@@ -1,7 +1,8 @@
 """Token database models."""
-from imagesecrets.database.base import Base
 from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.orm import backref, relationship
+
+from imagesecrets.database.base import Base
 
 
 class Token(Base):

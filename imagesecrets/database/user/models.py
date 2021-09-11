@@ -1,7 +1,8 @@
 """User database models."""
-from imagesecrets.database.base import Base
 from sqlalchemy import CheckConstraint, Column, String
 from sqlalchemy.orm import relationship, validates
+
+from imagesecrets.database.base import Base
 
 _relationship_kwargs = {
     "back_populates": "user",

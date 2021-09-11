@@ -4,6 +4,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import numpy as np
+
 from imagesecrets.constants import API_IMAGES, MESSAGE_DELIMITER
 from imagesecrets.core.util import image
 

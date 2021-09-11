@@ -3,13 +3,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, NamedTuple, Union
 
+from sqlalchemy import delete, select, update
+from sqlalchemy.orm import selectinload
+from sqlalchemy.orm.attributes import InstrumentedAttribute
+
 from imagesecrets.core import password
 from imagesecrets.database.service import DatabaseService
 from imagesecrets.database.user.models import User
 from imagesecrets.schemas.user import UserCreate
-from sqlalchemy import delete, select, update
-from sqlalchemy.orm import selectinload
-from sqlalchemy.orm.attributes import InstrumentedAttribute
 
 if TYPE_CHECKING:
     from sqlalchemy.sql.elements import BinaryExpression
