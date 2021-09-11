@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import asyncio
-import contextlib
 from pathlib import Path
 from typing import TYPE_CHECKING, Generator, Optional
 
@@ -115,11 +114,20 @@ def api_client(api_settings: Settings) -> Generator[TestClient, None, None]:
 def async_context_manager():
     """Return asynchronous context manager."""
 
-    @contextlib.asynccontextmanager
-    async def func():
-        yield
+    # not using func wrapped in `contextlib.asynccontextmanager`
+    # so we can dynamically specify what should be returned by
+    # __aenter__ (eg. some `Mock` objects).
+    class AsyncContextManager:
+        def __init__(self, obj):
+            self.obj = obj
 
-    return func()
+        async def __aenter__(self):
+            return self.obj
+
+        async def __aexit__(self, exc_type, exc_val, exc_tb):
+            ...
+
+    return AsyncContextManager(obj=None)
 
 
 @pytest.fixture()
