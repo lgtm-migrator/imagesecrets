@@ -33,7 +33,7 @@ class User(Base):
     )
 
     @validates("username")
-    def validate_username(self, key, username) -> str:
+    def validate_username(self, key, username) -> str:  # pragma: no cover
         """Validate the username column."""
         if not 6 <= len(username) <= 128:
             raise ValueError("Invalid username length.")

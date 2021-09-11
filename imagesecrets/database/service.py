@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, AsyncGenerator, Type, TypeVar
 
-from imagesecrets.database.base import get_session
+from imagesecrets.database import base
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
@@ -22,5 +22,6 @@ class DatabaseService:
     @classmethod
     async def from_session(cls: Type[_T]) -> AsyncGenerator[_T]:
         """Return ``DatabaseService`` instance from new database session."""
-        async with get_session() as session:
+
+        async with base.get_session() as session:
             yield cls(session=session)

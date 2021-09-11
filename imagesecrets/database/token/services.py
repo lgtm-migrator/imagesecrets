@@ -8,7 +8,7 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import NoReferenceError
 
 from imagesecrets.core import password
-from imagesecrets.core.util.main import token_url
+from imagesecrets.core.util import main
 from imagesecrets.database.service import DatabaseService
 from imagesecrets.database.token.models import Token
 
@@ -19,7 +19,7 @@ class TokenService(DatabaseService):
     @staticmethod
     def create_token() -> tuple[str, str]:
         """Create a new token."""
-        token = token_url()
+        token = main.token_url()
         token_hash = password.hash_(token)
         return token, token_hash
 
