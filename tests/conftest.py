@@ -10,8 +10,6 @@ import pytest
 from fastapi.testclient import TestClient
 from PIL import Image
 
-from imagesecrets.schemas import UserCreate
-
 if TYPE_CHECKING:
     from _pytest.monkeypatch import MonkeyPatch
     from fastapi_mail import FastMail
@@ -20,10 +18,8 @@ if TYPE_CHECKING:
     from pytest_mock import MockFixture
 
     from imagesecrets.config import Settings
-    from imagesecrets.database.image.models import DecodedImage, EncodedImage
     from imagesecrets.database.image.services import ImageService
     from imagesecrets.database.token.services import TokenService
-    from imagesecrets.database.user.models import User
     from imagesecrets.database.user.services import UserService
 
 
@@ -101,16 +97,6 @@ def email_client(
 
 
 @pytest.fixture()
-def api_client(api_settings: Settings) -> Generator[TestClient, None, None]:
-    """Return api test client connected to fake database."""
-    from imagesecrets.interface import app
-
-    # testclient __enter__ and __exit__ deals with event loop
-    with TestClient(app=app) as client:
-        yield client
-
-
-@pytest.fixture()
 def async_context_manager():
     """Return asynchronous context manager."""
 
@@ -177,78 +163,54 @@ def token_service(database_session) -> TokenService:
     return TokenService(session=database_session)
 
 
-@pytest.fixture(scope="function")
-def insert_user(user_service) -> User:
-    """Return user inserted into a clean database."""
-    user = UserCreate(
-        username="username",
-        email="user@example.com",
-        password="password",
-    )
-
-    user = asyncio.run(user_service.create(user=user))
-
-    return user
-
-
-@pytest.fixture(scope="function")
-def auth_token(
-    api_client: TestClient,
-    insert_user: User,
+@pytest.fixture()
+def api_client(
+    monkeypatch,
     mocker: MockFixture,
-) -> tuple[dict[str, str], User]:
-    """Return authorized user and a token."""
-    mocker.patch("image_secrets.backend.password.auth", return_value=True)
-    response = api_client.post(
-        "/users/login",
-        data={
-            "username": insert_user.username,
-            "password": insert_user.password_hash,
-        },
-    ).json()
+    api_settings: Settings,
+    user_service,
+    token_service,
+    image_service,
+) -> Generator[TestClient, None, None]:
+    """Return api test client connected to fake database."""
+    from imagesecrets.database.image.services import ImageService
+    from imagesecrets.database.token.services import TokenService
+    from imagesecrets.database.user.services import UserService
+    from imagesecrets.interface import app
 
-    token_header = {
-        "authorization": f'{response["token_type"].capitalize()} {response["access_token"]}',
-    }
-    return token_header, insert_user
+    for index, func in enumerate(app.router.on_startup.copy()):
+        if func.__module__ == "imagesecrets.database.base":
+            app.router.on_startup.pop(index)
 
+    for service, fixture in zip(
+        (UserService, ImageService, TokenService),
+        (user_service, image_service, token_service),
+    ):
+        monkeypatch.setattr(
+            service,
+            "from_session",
+            lambda obj=fixture: obj,
+        )
 
-@pytest.fixture(scope="function")
-def insert_decoded(api_client: TestClient, insert_user: User) -> DecodedImage:
-    """Return decoded_image inserted into a clean database."""
-    from imagesecrets.database.image.models import DecodedImage
+        methods = [
+            method
+            for method in dir(service)
+            if not method.startswith("__") and method != "from_session"
+        ]
 
-    img = DecodedImage(
-        filename="test_filename",
-        image_name="test_image_name",
-        message="test_message",
-        delimiter="test_delimiter",
-        lsb_amount=2,
-        owner_id=insert_user.id,
-    )
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(img.save())
+        for method in methods:
+            func = getattr(service, method)
 
-    return img
+            if asyncio.iscoroutinefunction(func=func):
+                mock = mocker.AsyncMock()
+            else:
+                mock = mocker.Mock()
 
+            monkeypatch.setattr(service, method, mock)
 
-@pytest.fixture(scope="function")
-def insert_encoded(api_client: TestClient, insert_user: User) -> EncodedImage:
-    """Return encoded_image inserted into a clean database."""
-    from imagesecrets.database.image.models import EncodedImage
-
-    img = EncodedImage(
-        filename="test_filename",
-        image_name="test_image_name",
-        message="test_message",
-        delimiter="test_delimiter",
-        lsb_amount=2,
-        owner_id=insert_user.id,
-    )
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(img.save())
-
-    return img
+    # testclient __enter__ and __exit__ deals with event loop
+    with TestClient(app=app) as client:
+        yield client
 
 
 @pytest.fixture(scope="session")
