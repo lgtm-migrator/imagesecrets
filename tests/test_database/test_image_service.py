@@ -1,12 +1,13 @@
 import pytest
 from pytest_mock import MockFixture
 
-from imagesecrets.database.image.models import DecodedImage, EncodedImage
 from imagesecrets.schemas import ImageCreate
 
 
 @pytest.mark.asyncio
 async def test_service_get(mocker, image_service):
+    from imagesecrets.database.image.models import DecodedImage
+
     return_value = mocker.Mock()
     return_value.scalars = mocker.Mock(return_value=[1, 2, 3])
     image_service._session.execute.return_value = return_value
@@ -23,6 +24,8 @@ async def test_service_get(mocker, image_service):
 
 @pytest.mark.asyncio
 async def test_service_get_decoded(mocker: MockFixture, image_service):
+    from imagesecrets.database.image.models import DecodedImage
+
     service_get = mocker.patch(
         "imagesecrets.database.image.services.ImageService._get",
         return_value="get called",
@@ -41,6 +44,8 @@ async def test_service_get_decoded(mocker: MockFixture, image_service):
 
 @pytest.mark.asyncio
 async def test_service_get_encoded(mocker: MockFixture, image_service):
+    from imagesecrets.database.image.models import EncodedImage
+
     service_get = mocker.patch(
         "imagesecrets.database.image.services.ImageService._get",
         return_value="get called",
@@ -59,6 +64,8 @@ async def test_service_get_encoded(mocker: MockFixture, image_service):
 
 @pytest.mark.asyncio
 async def test_service_create_decoded(image_service):
+    from imagesecrets.database.image.models import DecodedImage
+
     result = await image_service.create_decoded(
         user_id=0,
         data=ImageCreate(
@@ -74,6 +81,8 @@ async def test_service_create_decoded(image_service):
 
 @pytest.mark.asyncio
 async def test_service_create_encoded(image_service):
+    from imagesecrets.database.image.models import EncodedImage
+
     result = await image_service.create_encoded(
         user_id=0,
         data=ImageCreate(

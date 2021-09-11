@@ -2,10 +2,10 @@ import pytest
 from pytest_mock import MockFixture
 from sqlalchemy.exc import NoReferenceError
 
-from imagesecrets.database.token.services import TokenService
-
 
 def test_create_token(mocker: MockFixture):
+    from imagesecrets.database.token.services import TokenService
+
     token_url = mocker.patch(
         "imagesecrets.core.util.main.token_url",
         return_value="test token",
@@ -23,14 +23,14 @@ def test_create_token(mocker: MockFixture):
 
 
 @pytest.mark.asyncio
-async def test_service_delete(token_service: TokenService):
+async def test_service_delete(token_service):
     await token_service.delete(user_id=0)
 
     token_service._session.execute.assert_called_once()
 
 
 @pytest.mark.asyncio
-async def test_service_create(token_service: TokenService):
+async def test_service_create(token_service):
     await token_service.create(user_id=0, token_hash="test hash")
 
     token_service._session.execute.assert_called_once()
@@ -39,7 +39,7 @@ async def test_service_create(token_service: TokenService):
 @pytest.mark.asyncio
 async def test_service_get_user_id_ok(
     mocker: MockFixture,
-    token_service: TokenService,
+    token_service,
     async_iterator,
 ):
     password_auth = mocker.patch(
@@ -59,7 +59,7 @@ async def test_service_get_user_id_ok(
 
 @pytest.mark.asyncio
 async def test_service_get_user_id_no_ref(
-    token_service: TokenService,
+    token_service,
     async_iterator,
 ):
     async_iterator.objs = []
@@ -72,7 +72,7 @@ async def test_service_get_user_id_no_ref(
 
 
 @pytest.mark.asyncio
-async def test_service_clear(token_service: TokenService):
+async def test_service_clear(token_service):
     await token_service.clear()
 
     token_service._session.execute.assert_called_once()

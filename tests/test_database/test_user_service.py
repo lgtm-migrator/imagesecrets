@@ -1,10 +1,7 @@
 import pytest
 from pytest_mock import MockFixture
-from sqlalchemy.orm import InstrumentedAttribute
 from sqlalchemy.sql.elements import BinaryExpression
 
-from imagesecrets.database.user.models import User
-from imagesecrets.database.user.services import DBIdentifier
 from imagesecrets.schemas import UserCreate
 
 
@@ -17,23 +14,8 @@ from imagesecrets.schemas import UserCreate
     ],
 )
 def test_dbidentifier_to_sqlalchemy_str(column: str, value: str):
-    result = DBIdentifier(column=column, value=value).to_sqlalchemy()
+    from imagesecrets.database.user.services import DBIdentifier
 
-    assert isinstance(result, BinaryExpression)
-
-
-@pytest.mark.parametrize(
-    "column, value",
-    [
-        (User.id, "test_id"),
-        (User.username, "test_username"),
-        (User.email, "test_email"),
-    ],
-)
-def test_dbidentifier_to_sqlalchemy_attribute(
-    column: InstrumentedAttribute,
-    value: str,
-):
     result = DBIdentifier(column=column, value=value).to_sqlalchemy()
 
     assert isinstance(result, BinaryExpression)
@@ -41,6 +23,9 @@ def test_dbidentifier_to_sqlalchemy_attribute(
 
 @pytest.mark.asyncio
 async def test_service_get(mocker, user_service):
+    from imagesecrets.database.user.models import User
+    from imagesecrets.database.user.services import DBIdentifier
+
     return_value = mocker.Mock()
     return_value.scalar_one = mocker.Mock(return_value="get called")
     user_service._session.execute.return_value = return_value
@@ -56,6 +41,9 @@ async def test_service_get(mocker, user_service):
 
 @pytest.mark.asyncio
 async def test_service_get_id(mocker, user_service):
+    from imagesecrets.database.user.models import User
+    from imagesecrets.database.user.services import DBIdentifier
+
     return_value = mocker.Mock()
     return_value.scalar_one = mocker.Mock(return_value="get_id called")
     user_service._session.execute.return_value = return_value
@@ -71,6 +59,8 @@ async def test_service_get_id(mocker, user_service):
 
 @pytest.mark.asyncio
 async def test_service_create(user_service):
+    from imagesecrets.database.user.models import User
+
     result = await user_service.create(
         UserCreate(
             username="test_username",
@@ -92,6 +82,9 @@ async def test_service_delete(user_service):
 
 @pytest.mark.asyncio
 async def test_service_update(mocker: MockFixture, user_service):
+    from imagesecrets.database.user.models import User
+    from imagesecrets.database.user.services import DBIdentifier
+
     service_get = mocker.patch(
         "imagesecrets.database.user.services.UserService.get",
     )
@@ -104,6 +97,9 @@ async def test_service_update(mocker: MockFixture, user_service):
 
 @pytest.mark.asyncio
 async def test_service_update_password(mocker: MockFixture, user_service):
+    from imagesecrets.database.user.models import User
+    from imagesecrets.database.user.services import DBIdentifier
+
     password_hash = mocker.patch("imagesecrets.core.password.hash_")
     service_get = mocker.patch(
         "imagesecrets.database.user.services.UserService.get",
