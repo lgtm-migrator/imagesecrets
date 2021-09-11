@@ -51,6 +51,7 @@ def api_settings(
     monkeypatch.setenv("MAIL_PASSWORD", "test_password")
     monkeypatch.setenv("MAIL_PORT", "0")
     monkeypatch.setenv("MAIL_SERVER", "test_server")
+    monkeypatch.setenv("MAIL_FROM", "test_mail_from@email.com")
 
     from imagesecrets.config import settings
 
