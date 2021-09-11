@@ -18,16 +18,16 @@ from fastapi import (
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_login import LoginManager
 from fastapi_mail import FastMail
+from pydantic import EmailStr
+from sqlalchemy.exc import IntegrityError, NoReferenceError, NoResultFound
+
+from imagesecrets import schemas
 from imagesecrets.api import dependencies, responses
-from imagesecrets.api import schemas as api_schemas
 from imagesecrets.api.exceptions import DetailExists, NotAuthenticated
 from imagesecrets.core import email
 from imagesecrets.core.util.main import parse_asyncpg_integrity
 from imagesecrets.database.token.services import TokenService
 from imagesecrets.database.user.services import DBIdentifier, UserService
-from imagesecrets.schemas import user as schemas
-from pydantic import EmailStr
-from sqlalchemy.exc import IntegrityError, NoReferenceError, NoResultFound
 
 if TYPE_CHECKING:
     from imagesecrets.database.user.models import User
@@ -73,7 +73,7 @@ async def user_loader(user_id: int) -> Optional[User]:
 @router.post(
     "/login",
     status_code=status.HTTP_200_OK,
-    response_model=api_schemas.Token,
+    response_model=schemas.Token,
     summary="Login for access token",
     responses=responses.AUTHORIZATION,  # type: ignore
 )
@@ -158,7 +158,7 @@ async def register(
 @router.post(
     "/forgot-password",
     status_code=status.HTTP_202_ACCEPTED,
-    response_model=api_schemas.Message,
+    response_model=schemas.Message,
     summary="Request a password reset token",
 )
 async def forgot_password(
@@ -209,7 +209,7 @@ async def forgot_password(
 @router.post(
     "/reset-password",
     status_code=status.HTTP_202_ACCEPTED,
-    response_model=api_schemas.Message,
+    response_model=schemas.Message,
     summary="Reset account password",
     responses=responses.AUTHORIZATION,  # type: ignore
 )

@@ -2,6 +2,9 @@ services:
   database:
     image: postgres:latest
 
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+
     ports:
       - "8001:5432"
 
@@ -14,6 +17,10 @@ services:
 
   web:
     build: .
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
     env_file: .env
 
     links:
@@ -26,3 +33,6 @@ services:
       - database
 
     container_name: web
+
+volumes:
+  postgres_data:

@@ -49,8 +49,8 @@ def repeat(*, seconds: int) -> Callable[[_F], _F]:
             async def loop() -> None:
                 """Execute decorated function and sleep for the given amount of seconds."""
                 while 1:
-                    await func()
                     await asyncio.sleep(seconds)
+                    await func()
 
             asyncio.ensure_future(loop())
 

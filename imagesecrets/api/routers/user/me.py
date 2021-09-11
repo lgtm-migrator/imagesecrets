@@ -16,8 +16,11 @@ from fastapi import (
     HTTPException,
     status,
 )
+from pydantic import EmailStr
+from sqlalchemy.exc import IntegrityError
+
+from imagesecrets import schemas
 from imagesecrets.api import dependencies, exceptions, responses
-from imagesecrets.api import schemas as api_schemas
 from imagesecrets.api.routers.user.main import manager
 from imagesecrets.core.util.main import (
     ExcludeUnsetDict,
@@ -25,9 +28,6 @@ from imagesecrets.core.util.main import (
 )
 from imagesecrets.database.user.models import User
 from imagesecrets.database.user.services import UserService
-from imagesecrets.schemas import user as schemas
-from pydantic import EmailStr
-from sqlalchemy.exc import IntegrityError
 
 router = APIRouter(
     prefix="/users",
@@ -117,7 +117,7 @@ async def patch(
 @router.delete(
     "/me",
     status_code=status.HTTP_202_ACCEPTED,
-    response_model=api_schemas.Message,
+    response_model=schemas.Message,
     summary="Delete an Account",
 )
 async def delete(
@@ -139,7 +139,7 @@ async def delete(
 @router.put(
     "/me/password",
     status_code=status.HTTP_202_ACCEPTED,
-    response_model=api_schemas.Message,
+    response_model=schemas.Message,
     summary="Change user password",
 )
 async def password_put(

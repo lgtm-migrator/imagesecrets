@@ -4,10 +4,11 @@ from __future__ import annotations
 import contextlib
 from typing import TYPE_CHECKING
 
-from imagesecrets.config import settings
 from sqlalchemy import Column, DateTime, Integer, func
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import declarative_base, declared_attr, sessionmaker
+
+from imagesecrets.config import settings
 
 if TYPE_CHECKING:
     from fastapi import FastAPI
@@ -59,5 +60,4 @@ def init(app: FastAPI) -> None:
     @app.on_event("startup")
     async def startup():
         async with engine.begin() as conn:
-            await conn.run_sync(Base.metadata.drop_all)
             await conn.run_sync(Base.metadata.create_all)

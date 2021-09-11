@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
+
 from imagesecrets.constants import API_IMAGES
 from imagesecrets.core import decode
 
@@ -75,7 +76,7 @@ def test_main(mocker: MockFixture, delimiter: str, lsb_n: int) -> None:
     """Test the main function."""
     arr = np.fromiter(map(ord, f"Hello{lsb_n}{delimiter}"), dtype=np.uint8)
     mocker.patch(
-        "image_secrets.backend.decode.prepare_array",
+        "imagesecrets.core.decode.prepare_array",
         return_value=arr,
     )
     result = decode.main(
@@ -101,19 +102,19 @@ def test_api(
     tmpdir = Path(tmpdir.mkdir("tmp/"))
 
     read_bytes = mocker.patch(
-        "image_secrets.backend.util.image.read_bytes",
+        "imagesecrets.core.util.image.read_bytes",
         return_value="bytes read",
     )
     data = mocker.patch(
-        "image_secrets.backend.util.image.data",
+        "imagesecrets.core.util.image.data",
         return_value=(..., "array"),
     )
     main = mocker.patch(
-        "image_secrets.backend.decode.main",
+        "imagesecrets.core.decode.main",
         retuen_value="Message",
     )
     save_array = mocker.patch(
-        "image_secrets.backend.util.image.save_array",
+        "imagesecrets.core.util.image.save_array",
         return_value=tmpdir / "image.png",
     )
 

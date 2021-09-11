@@ -3,7 +3,7 @@ import re
 
 import pytest
 
-from image_secrets.backend.regex import INTEGRITY_FIELD, USERNAME
+from imagesecrets.core.regex import INTEGRITY_FIELD, USERNAME
 
 
 def test_regex_compiled() -> None:

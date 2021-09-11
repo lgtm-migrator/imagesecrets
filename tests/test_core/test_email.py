@@ -7,8 +7,8 @@ from typing import TYPE_CHECKING
 import pytest
 from pydantic import EmailStr
 
-from image_secrets.api.dependencies import get_mail
-from image_secrets.backend import email
+from imagesecrets.api.dependencies import get_mail
+from imagesecrets.core import email
 
 if TYPE_CHECKING:
     from email.mime.multipart import MIMEMultipart

@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 import pytest
 
-from image_secrets.backend.util.image import (
+from imagesecrets.core.util.image import (
     data,
     png_filetype,
     read_bytes,

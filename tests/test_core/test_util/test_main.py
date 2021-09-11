@@ -5,9 +5,9 @@ import string
 from typing import TYPE_CHECKING
 
 import pytest
-from tortoise.exceptions import IntegrityError
+from sqlalchemy.dialects.postgresql.asyncpg import AsyncAdapt_asyncpg_dbapi
 
-from image_secrets.backend.util import main
+from imagesecrets.core.util import main
 
 if TYPE_CHECKING:
     from pytest_mock import MockFixture
@@ -28,7 +28,7 @@ def test_partial_init() -> None:
     assert partial.__name__ == "Partial"
     assert partial.mro()[1] is Test
     assert partial.__base__ is Test
-    assert partial.__module__ == "image_secrets.backend.util.main"
+    assert partial.__module__ == "imagesecrets.core.util.main"
 
     initialized = partial("test")
     assert initialized.__repr__() == Test("test", test="test").__repr__()
@@ -86,21 +86,24 @@ def test_token_url(mocker: MockFixture) -> None:
 
 
 @pytest.mark.disable_autouse
-def test_parse_unique_integrity() -> None:
-    """Test the parse_unique_integrity function."""
+def test_parse_asyncpg_integrity() -> None:
+    """Test the parse_asyncpg_integrity function."""
     key = "username"
     value = "123456"
 
-    err = IntegrityError(f"DETAIL  KEY ({key})=({value}) already exists.")
-    result = main.parse_unique_integrity(error=err)
+    err = AsyncAdapt_asyncpg_dbapi.IntegrityError(
+        f"DETAIL  KEY ({key})=({value}) already " f"exists.",
+    )
+    result = main.parse_asyncpg_integrity(error=err)
 
     assert result.field == key
     assert result.value == value
 
 
 @pytest.mark.disable_autouse
-def test_parse_unique_integrity_fail() -> None:
-    """Test that the parse_unique_integrity functions raises ValueError if no result found."""
-    err = IntegrityError("invalid error")
+def test_parse_asyncpg_integrity_fail() -> None:
+    """Test that the parse_async[g_integrity functions raises ValueError if no
+    result found."""
+    err = AsyncAdapt_asyncpg_dbapi.IntegrityError("invalid error")
     with pytest.raises(ValueError):
-        main.parse_unique_integrity(error=err)
+        main.parse_asyncpg_integrity(error=err)

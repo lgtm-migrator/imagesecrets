@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from imagesecrets.api.schemas import Conflict, Field, Message
+from imagesecrets.schemas.base import Conflict, Field, Message
 
 Response = dict[int, dict[str, Any]]
 

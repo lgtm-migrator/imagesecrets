@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 import pytest
 
-from image_secrets.backend.util import array
+from imagesecrets.core.util import array
 
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike

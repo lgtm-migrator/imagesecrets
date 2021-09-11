@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 import pytest
 
-from image_secrets.backend import encode
+from imagesecrets.core import encode
 
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
@@ -22,7 +22,7 @@ def test_prepare_image(
 ) -> None:
     """Test the prepare_image function."""
     mocker.patch(
-        "image_secrets.backend.util.image.data",
+        "imagesecrets.core.util.image.data",
         return_value=(test_image_array.shape, test_image_array),
     )
     shape, base_arr, unpacked_arr = encode.prepare_image(..., message_len)
@@ -48,11 +48,11 @@ def test_api(
     tmpdir = Path(tmpdir.mkdir("tmp/"))
 
     mocker.patch(
-        "image_secrets.backend.util.image.read_bytes",
+        "imagesecrets.core.util.image.read_bytes",
         return_value=...,
     )
     mocker.patch(
-        "image_secrets.backend.encode.main",
+        "imagesecrets.core.encode.main",
         return_value=test_image_array,
     )
 

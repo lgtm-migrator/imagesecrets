@@ -10,48 +10,40 @@ import numpy as np
 import pytest
 from fastapi.testclient import TestClient
 from PIL import Image
-from tortoise.contrib.test import finalizer, initializer
 
-from image_secrets.api import config as config_
-from image_secrets.backend.database import (
-    image_models,
-    token_models,
-    user_models,
-)
-from image_secrets.backend.util import main
+import imagesecrets
+from imagesecrets.schemas import UserCreate
 
 if TYPE_CHECKING:
+    from _pytest.monkeypatch import MonkeyPatch
     from fastapi_mail import FastMail
     from numpy.typing import ArrayLike
     from py.path import local
     from pytest_mock import MockFixture
 
-    from image_secrets.api.config import Settings
-    from image_secrets.backend.database.image.models import (
-        DecodedImage,
-        EncodedImage,
-    )
-    from image_secrets.backend.database.user.models import User
-    from image_secrets.backend.util.main import ParsedIntegrity
+    from imagesecrets.config import Settings
+    from imagesecrets.database.image.models import DecodedImage, EncodedImage
+    from imagesecrets.database.image.services import ImageService
+    from imagesecrets.database.token.services import TokenService
+    from imagesecrets.database.user.models import User
+    from imagesecrets.database.user.services import UserService
 
 
-@pytest.fixture(scope="session")
-def app_name() -> str:
-    """Return the default app name, specified in the Settings BaseModel."""
-    return config_.Settings.__dict__["__fields__"]["app_name"].default
-
-
-@pytest.fixture(scope="function", autouse=True)
-def api_settings(request, tmpdir: local, monkeypatch) -> Optional[Settings]:
+@pytest.fixture(autouse=True)
+def api_settings(
+    request,
+    tmpdir: local,
+    monkeypatch: MonkeyPatch,
+) -> Optional[Settings]:
     """Return settings for testing environment."""
     if "disable_autouse" in set(request.keywords):
         return
 
-    db_url = "sqlite://:memory:"
     # need to construct so there is no field validation
-    test_settings = config_.Settings.construct(
+    test_settings = imagesecrets.config.Settings.construct(
         image_folder=str(Path(tmpdir.mkdir("images/")).absolute()),
-        pg_dsn=db_url,
+        pg_dsn="postgresql+asyncpg://username:password@test_database:5432"
+        "/imagesecrets",
         secret_key="test_secret_key" * 10,
         icon_url="https://www.test_icon_url.com",
         swagger_url="https://www.test_swagger_url.com",
@@ -63,21 +55,16 @@ def api_settings(request, tmpdir: local, monkeypatch) -> Optional[Settings]:
     os.environ["MAIL_PORT"] = "0"
     os.environ["MAIL_SERVER"] = "test_server"
     os.environ["MAIL_FROM"] = "test@email.test"
-    config_.settings = test_settings
 
-    # need to monkey patch specific functions connected to PostgreSQL
-    def sqlite_parsing(error: str) -> ParsedIntegrity:
-        """Return parsed sqlite error message."""
-        split = str(error).split(":")
-        try:
-            result = main.ParsedIntegrity(field=split[0], value=split[1])
-        except IndexError as e:
-            raise ValueError(f"invalid error message: {error!r}") from e
-        return result
+    monkeypatch.setattr(imagesecrets.config, "settings", test_settings)
 
-    monkeypatch.setattr(main, "parse_unique_integrity", sqlite_parsing)
+    return test_settings
 
-    return config_.settings
+
+@pytest.fixture(scope="session")
+def app_name(api_settings) -> str:
+    """Return the default app name, specified in the Settings BaseModel."""
+    return api_settings.app_name
 
 
 @pytest.fixture(scope="function", autouse=True)
@@ -86,7 +73,7 @@ def patch_tasks(request, monkeypatch, api_settings: Settings) -> None:
     if "disable_autouse" in set(request.keywords):
         return
 
-    from image_secrets.api import tasks
+    from imagesecrets.api import tasks
 
     async def clear_tokens():
         """Test function to clear tokens."""
@@ -95,56 +82,69 @@ def patch_tasks(request, monkeypatch, api_settings: Settings) -> None:
 
 
 @pytest.fixture(scope="function", autouse=True)
-def email_client(request, api_settings: Settings) -> FastMail | None:
+def email_client(
+    request,
+    monkeypatch: MonkeyPatch,
+    api_settings: Settings,
+) -> FastMail | None:
     """Return test email client."""
     if "disable_autouse" in set(request.keywords):
         return
 
-    from image_secrets.api import dependencies
+    from imagesecrets.api import dependencies
 
     fm = dependencies.get_mail()
+
     fm.config.SUPPRESS_SEND = 1
     fm.config.USE_CREDENTIALS = False
-    dependencies.get_mail = lambda: fm
+
+    monkeypatch.setattr(dependencies, "get_mail", lambda: fm)
 
     return dependencies.get_mail()
 
 
-@pytest.fixture(scope="function")
-def api_client(
-    request,
-    api_settings: Settings,
-) -> Generator[TestClient, None, None]:
+@pytest.fixture()
+def api_client(api_settings: Settings) -> Generator[TestClient, None, None]:
     """Return api test client connected to fake database."""
-    # settings already patched by fixture
-    from image_secrets.api.interface import app
-
-    initializer(
-        [user_models, image_models, token_models],
-        db_url=api_settings.pg_dsn,
-        app_label="models",
-    )
+    from imagesecrets.interface import app
 
     # testclient __enter__ and __exit__ deals with event loop
     with TestClient(app=app) as client:
         yield client
 
-    request.addfinalizer(finalizer)
+
+@pytest.fixture(scope="session")
+def database_session(mocker: MockFixture):
+    session = mocker.Mock()
+    session.execute = mocker.AsyncMock()
+    return session
+
+
+@pytest.fixture(scope="session")
+def user_service(database_session) -> UserService:
+    return UserService(session=database_session)
+
+
+@pytest.fixture(scope="session")
+def image_service(database_session) -> ImageService:
+    return ImageService(session=database_session)
+
+
+@pytest.fixture(scope="session")
+def token_service(database_session) -> TokenService:
+    return TokenService(session=database_session)
 
 
 @pytest.fixture(scope="function")
-def insert_user(api_client: TestClient) -> User:
+def insert_user(user_service) -> User:
     """Return user inserted into a clean database."""
-    from image_secrets.backend.database.user.models import User
-
-    user = User(
+    user = UserCreate(
         username="username",
         email="user@example.com",
-        password_hash="password",
+        password="password",
     )
 
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(user.save())
+    user = asyncio.run(user_service.create(user=user))
 
     return user
 
@@ -174,7 +174,7 @@ def auth_token(
 @pytest.fixture(scope="function")
 def insert_decoded(api_client: TestClient, insert_user: User) -> DecodedImage:
     """Return decoded_image inserted into a clean database."""
-    from image_secrets.backend.database.image.models import DecodedImage
+    from imagesecrets.database.image.models import DecodedImage
 
     img = DecodedImage(
         filename="test_filename",
@@ -193,7 +193,7 @@ def insert_decoded(api_client: TestClient, insert_user: User) -> DecodedImage:
 @pytest.fixture(scope="function")
 def insert_encoded(api_client: TestClient, insert_user: User) -> EncodedImage:
     """Return encoded_image inserted into a clean database."""
-    from image_secrets.backend.database.image.models import EncodedImage
+    from imagesecrets.database.image.models import EncodedImage
 
     img = EncodedImage(
         filename="test_filename",

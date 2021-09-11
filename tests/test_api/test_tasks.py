@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from image_secrets.api import tasks
+from imagesecrets.api import tasks
 
 if TYPE_CHECKING:
     from unittest.mock import AsyncMock
@@ -26,13 +26,12 @@ def mock_sleep(mocker: MockFixture):
 
 def test_repeat(mock_sleep: AsyncMock) -> None:
     """Test a successful repeat function call."""
-    loop = asyncio.get_event_loop()
 
     @tasks.repeat(seconds=1)
     async def test_coro() -> None:
         """Testing coroutine."""
         raise RuntimeError
 
-    loop.create_task(test_coro())
+    asyncio.run(test_coro())
 
-    mock_sleep.assert_not_called()
+    mock_sleep.assert_called_once_with(1)

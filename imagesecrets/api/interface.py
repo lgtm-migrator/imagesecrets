@@ -1,66 +1,54 @@
 """Application Programming Interface."""
 from __future__ import annotations
 
-import imagesecrets
 from fastapi import Depends, FastAPI, status
-from imagesecrets.api import (
-    config,
-    dependencies,
-    handlers,
-    openapi,
-    responses,
-    schemas,
-    tasks,
-)
+
+import imagesecrets
+from imagesecrets import schemas
+from imagesecrets.api import dependencies, handlers, openapi, responses, tasks
 from imagesecrets.api.routers import decode, encode, user
+from imagesecrets.config import Settings
 from imagesecrets.database import base
 
-config_ = dependencies.get_config()
-app = FastAPI(
-    dependencies=[Depends(dependencies.get_config)],
-    title="ImageSecrets",
-    description="Encode and decode messages from images!",
-    version=imagesecrets.__version__,
-    # will be set manually
-    docs_url=None,
-    redoc_url=None,
-    responses=responses.VALIDATION,  # type: ignore
-)
 
-base.init(app)
+def create_api(config: Settings) -> FastAPI:
+    api = FastAPI(
+        dependencies=[Depends(dependencies.get_config)],
+        title="ImageSecrets",
+        description="Encode and decode messages from images!",
+        version=imagesecrets.__version__,
+        # will be set manually
+        docs_url=None,
+        redoc_url=None,
+        responses=responses.VALIDATION,  # type: ignore
+    )
 
-app.include_router(decode.router)
-app.include_router(encode.router)
-app.include_router(user.main)
-app.include_router(user.me)
+    base.init(api)
 
-handlers.init(app)
-tasks.init(app)
+    api.include_router(decode.router)
+    api.include_router(encode.router)
+    api.include_router(user.main)
+    api.include_router(user.me)
 
+    handlers.init(api)
+    tasks.init(api)
 
-@app.get(
-    "/",
-    response_model=schemas.Info,
-    status_code=status.HTTP_200_OK,
-    summary="Basic information about the API.",
-    tags=["home"],
-)
-async def home(
-    settings: config.Settings = Depends(dependencies.get_config),
-) -> dict[str, str]:
-    """Return basic info about the API."""
-    return {
-        "AppName": settings.app_name,
-        "SwaggerUI": settings.swagger_url,
-        "ReDoc": settings.redoc_url,
-        "GitHub": settings.repository_url,
-    }
+    @api.get(
+        "/",
+        response_model=schemas.base.Info,
+        status_code=status.HTTP_200_OK,
+        summary="Basic information about the API.",
+        tags=["home"],
+    )
+    async def home() -> dict[str, str]:
+        """Return basic info about the API."""
+        return {
+            "AppName": config.app_name,
+            "SwaggerUI": config.swagger_url,
+            "ReDoc": config.redoc_url,
+            "GitHub": config.repository_url,
+        }
 
+    api.openapi = openapi.custom(api, swagger=True, redoc=True)  # type: ignore
 
-app.openapi = openapi.custom(app, swagger=True, redoc=True)  # type: ignore
-
-
-__all__ = [
-    "app",
-    "home",
-]
+    return api
