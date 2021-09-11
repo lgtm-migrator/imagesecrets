@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 from pathlib import Path
 from typing import TYPE_CHECKING, Generator, Optional
 
@@ -110,25 +111,61 @@ def api_client(api_settings: Settings) -> Generator[TestClient, None, None]:
         yield client
 
 
-@pytest.fixture(scope="session")
-def database_session(mocker: MockFixture):
+@pytest.fixture()
+def async_context_manager():
+    """Return asynchronous context manager."""
+
+    @contextlib.asynccontextmanager
+    async def func():
+        yield
+
+    return func()
+
+
+@pytest.fixture()
+def async_iterator():
+    class AsyncIterator:
+        def __init__(self, objs):
+            self.objs = objs
+
+        async def __aiter__(self):
+            for obj in self.objs:
+                yield obj
+
+    return AsyncIterator(objs=range(5))
+
+
+@pytest.fixture()
+def database_session(mocker: MockFixture, async_context_manager):
     session = mocker.Mock()
+
     session.execute = mocker.AsyncMock()
+    session.stream = mocker.AsyncMock()
+
+    session.begin_nested = mocker.Mock(return_value=async_context_manager)
+    session.add = mocker.Mock()
+
     return session
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def user_service(database_session) -> UserService:
+    from imagesecrets.database.user.services import UserService
+
     return UserService(session=database_session)
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def image_service(database_session) -> ImageService:
+    from imagesecrets.database.image.services import ImageService
+
     return ImageService(session=database_session)
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def token_service(database_session) -> TokenService:
+    from imagesecrets.database.token.services import TokenService
+
     return TokenService(session=database_session)
 
 
