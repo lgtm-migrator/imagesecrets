@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import asyncio
-import os
 from pathlib import Path
 from typing import TYPE_CHECKING, Generator, Optional
 
@@ -11,7 +10,6 @@ import pytest
 from fastapi.testclient import TestClient
 from PIL import Image
 
-import imagesecrets
 from imagesecrets.schemas import UserCreate
 
 if TYPE_CHECKING:
@@ -39,28 +37,24 @@ def api_settings(
     if "disable_autouse" in set(request.keywords):
         return
 
-    from imagesecrets import config
-
-    # need to construct so there is no field validation
-    test_settings = config.Settings.construct(
-        image_folder=str(Path(tmpdir.mkdir("images/")).absolute()),
-        pg_dsn="postgresql+asyncpg://username:password@test_database:5432"
-        "/imagesecrets",
-        secret_key="test_secret_key" * 10,
-        icon_url="https://www.test_icon_url.com",
-        swagger_url="https://www.test_swagger_url.com",
-        redoc_url="https://www.test_redoc_url.com",
-        repository_url="https://www.test_repository_url.com",
+    monkeypatch.setenv(
+        "DATABASE_URL",
+        "postgres://username:password@test_database:5432/imagesecrets",
     )
-    os.environ["MAIL_USERNAME"] = "test_username"
-    os.environ["MAIL_PASSWORD"] = "test_password"
-    os.environ["MAIL_PORT"] = "0"
-    os.environ["MAIL_SERVER"] = "test_server"
-    os.environ["MAIL_FROM"] = "test@email.test"
+    monkeypatch.setenv("SECRET_KEY", "test_secret_key" * 10)
+    monkeypatch.setenv("ICON_URL", "https://www.test_icon_url.com")
+    monkeypatch.setenv("SWAGGER_URL", "https://www.test_swagger_url.com")
+    monkeypatch.setenv("REDOC_URL", "https://www.test_redoc_url.com")
+    monkeypatch.setenv("REPOSITORY_URL", "https://www.test_repository_url.com")
 
-    monkeypatch.setattr(imagesecrets.config, "settings", test_settings)
+    monkeypatch.setenv("MAIL_USERNAME", "test_username")
+    monkeypatch.setenv("MAIL_PASSWORD", "test_password")
+    monkeypatch.setenv("MAIL_PORT", "0")
+    monkeypatch.setenv("MAIL_SERVER", "test_server")
 
-    return test_settings
+    from imagesecrets.config import settings
+
+    return settings
 
 
 @pytest.fixture(scope="session")

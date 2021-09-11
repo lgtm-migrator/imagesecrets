@@ -43,7 +43,7 @@ class Settings(BaseSettings):
     redoc_url: HttpUrl = cast(HttpUrl, os.environ["REDOC_URL"])
     repository_url: HttpUrl = cast(HttpUrl, os.environ["REPOSITORY_URL"])
 
-    @validator("pg_dsn")
+    @validator("pg_dsn", allow_reuse=True)
     def postgres_engine(cls, v: str) -> str:
         return asyncpg_engine_dsn(db_url=v)
 
