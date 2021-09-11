@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import numpy as np
+
 from imagesecrets.constants import API_IMAGES, MESSAGE_DELIMITER
 from imagesecrets.core.util import array, image
 

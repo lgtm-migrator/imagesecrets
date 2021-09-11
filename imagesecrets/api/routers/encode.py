@@ -13,6 +13,8 @@ from fastapi import (
     status,
 )
 from fastapi.responses import FileResponse, JSONResponse
+from starlette.background import BackgroundTasks
+
 from imagesecrets.api import dependencies, exceptions, responses
 from imagesecrets.api.routers.user.main import manager
 from imagesecrets.constants import MESSAGE_DELIMITER
@@ -22,7 +24,6 @@ from imagesecrets.database.image import models
 from imagesecrets.database.image.services import ImageService
 from imagesecrets.database.user.models import User
 from imagesecrets.schemas import image as schemas
-from starlette.background import BackgroundTasks
 
 router = APIRouter(
     tags=["encode"],

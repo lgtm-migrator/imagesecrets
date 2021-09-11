@@ -1,10 +1,11 @@
 """Image database models."""
 from __future__ import annotations
 
-from imagesecrets.constants import MESSAGE_DELIMITER
-from imagesecrets.database.base import Base
 from sqlalchemy import Column, ForeignKey, Integer, SmallInteger, String
 from sqlalchemy.orm import relationship
+
+from imagesecrets.constants import MESSAGE_DELIMITER
+from imagesecrets.database.base import Base
 
 _foreign_key_kwargs = {
     "column": "user.id",

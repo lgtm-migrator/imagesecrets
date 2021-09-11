@@ -3,13 +3,14 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta
 
+from sqlalchemy import delete, select
+from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy.exc import NoReferenceError
+
 from imagesecrets.core import password
 from imagesecrets.core.util.main import token_url
 from imagesecrets.database.service import DatabaseService
 from imagesecrets.database.token.models import Token
-from sqlalchemy import delete, select
-from sqlalchemy.dialects.postgresql import insert
-from sqlalchemy.exc import NoReferenceError
 
 
 class TokenService(DatabaseService):

@@ -3,9 +3,10 @@ from __future__ import annotations
 
 from datetime import datetime
 
+from pydantic import conint
+
 from imagesecrets.constants import MESSAGE_DELIMITER
 from imagesecrets.schemas.base import ModelSchema
-from pydantic import conint
 
 
 class _ImageBase(ModelSchema):
