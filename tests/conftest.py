@@ -39,8 +39,10 @@ def api_settings(
     if "disable_autouse" in set(request.keywords):
         return
 
+    from imagesecrets import config
+
     # need to construct so there is no field validation
-    test_settings = imagesecrets.config.Settings.construct(
+    test_settings = config.Settings.construct(
         image_folder=str(Path(tmpdir.mkdir("images/")).absolute()),
         pg_dsn="postgresql+asyncpg://username:password@test_database:5432"
         "/imagesecrets",

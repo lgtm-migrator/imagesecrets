@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING
 import pytest
 from pydantic import EmailStr
 
-from imagesecrets.api.dependencies import get_mail
 from imagesecrets.core import email
 
 if TYPE_CHECKING:
@@ -21,7 +20,8 @@ loop = asyncio.get_event_loop()
 @pytest.fixture(scope="module")
 def client() -> FastMail:
     """Return email client in a test mode."""
-    # already patched by autouse fixture
+    from imagesecrets.api.dependencies import get_mail
+
     return get_mail()
 
 

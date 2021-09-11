@@ -6,8 +6,6 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from imagesecrets.api import tasks
-
 if TYPE_CHECKING:
     from unittest.mock import AsyncMock
 
@@ -26,6 +24,7 @@ def mock_sleep(mocker: MockFixture):
 
 def test_repeat(mock_sleep: AsyncMock) -> None:
     """Test a successful repeat function call."""
+    from imagesecrets.api import tasks
 
     @tasks.repeat(seconds=1)
     async def test_coro() -> None:
