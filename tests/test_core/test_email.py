@@ -14,8 +14,6 @@ if TYPE_CHECKING:
 
     from fastapi_login import FastMail
 
-loop = asyncio.get_event_loop()
-
 
 @pytest.fixture(scope="module")
 def client() -> FastMail:
@@ -35,6 +33,8 @@ def test_send_welcome(
     username: str,
 ) -> None:
     """Test the send_welcome function."""
+    loop = asyncio.get_event_loop()
+
     coro = email.send_welcome(
         client=client,
         recipient=EmailStr(recipient),
@@ -65,6 +65,8 @@ def test_send_reset(
     token: str,
 ) -> None:
     """Test the send_welcome function."""
+    loop = asyncio.get_event_loop()
+
     coro = email.send_reset(
         client=client,
         recipient=EmailStr(recipient),

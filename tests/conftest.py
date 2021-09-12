@@ -186,10 +186,14 @@ def api_client(
         (UserService, ImageService, TokenService),
         (user_service, image_service, token_service),
     ):
+
+        async def func(obj=fixture):
+            yield obj
+
         monkeypatch.setattr(
             service,
             "from_session",
-            lambda obj=fixture: obj,
+            func,
         )
 
         methods = [
