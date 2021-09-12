@@ -9,6 +9,14 @@ if TYPE_CHECKING:
     from imagesecrets.database.user.models import User
 
 
+@pytest.fixture(autouse=True)
+def patch_manager_call(monkeypatch, return_user):
+    monkeypatch.setattr(
+        "fastapi_login.LoginManager.__call__",
+        lambda *a, **kw: return_user,
+    )
+
+
 @pytest.fixture()
 def access_token() -> dict[str, str]:
     return {"authorization": f'{"token_type".capitalize()} {"access_token"}'}

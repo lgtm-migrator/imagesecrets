@@ -17,14 +17,6 @@ if TYPE_CHECKING:
 URL = "/users/me"
 
 
-@pytest.fixture(autouse=True)
-def patch_manager_call(monkeypatch, return_user):
-    monkeypatch.setattr(
-        "fastapi_login.LoginManager.__call__",
-        lambda *a, **kw: return_user,
-    )
-
-
 @pytest.mark.parametrize(
     "username, email",
     [("test-name", "test@example.com"), ("123456", "example@result.com")],
