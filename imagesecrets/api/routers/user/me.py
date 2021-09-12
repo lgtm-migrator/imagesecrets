@@ -22,10 +22,7 @@ from sqlalchemy.exc import IntegrityError
 from imagesecrets import schemas
 from imagesecrets.api import dependencies, exceptions, responses
 from imagesecrets.api.routers.user.main import manager
-from imagesecrets.core.util.main import (
-    ExcludeUnsetDict,
-    parse_asyncpg_integrity,
-)
+from imagesecrets.core.util import main
 from imagesecrets.database.user.models import User
 from imagesecrets.database.user.services import UserService
 
@@ -91,7 +88,7 @@ async def patch(
     :raises DetailExists: if either of the new values are already claimed in the database
 
     """
-    update_dict = ExcludeUnsetDict(
+    update_dict = main.ExcludeUnsetDict(
         username=username if current_user.username != username else None,
         email=email if current_user.email != email else None,
     ).exclude_unset()
@@ -103,7 +100,7 @@ async def patch(
     try:
         user = await user_service.update(current_user.id, **update_dict)
     except IntegrityError as e:
-        parsed = parse_asyncpg_integrity(error=e.orig)
+        parsed = main.parse_asyncpg_integrity(error=e.orig)
         raise exceptions.DetailExists(
             status_code=status.HTTP_409_CONFLICT,
             message="account detail already exists",
