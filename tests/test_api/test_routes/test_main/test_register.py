@@ -47,6 +47,8 @@ def test_ok(
     password: str,
 ) -> None:
     """Test successful post request on the register route."""
+    from imagesecrets.schemas import UserCreate
+
     return_user.username = username
     return_user.email = email
     return_user.password_hash = password
@@ -58,6 +60,9 @@ def test_ok(
         json={"username": username, "email": email, "password": password},
     )
 
+    user_service.create.assert_called_once_with(
+        UserCreate(email=email, password=password, username=username),
+    )
     assert response.status_code == 201
     json_ = response.json()
     assert json_["username"] == username
