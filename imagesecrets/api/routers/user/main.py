@@ -25,7 +25,7 @@ from imagesecrets import schemas
 from imagesecrets.api import dependencies, responses
 from imagesecrets.api.exceptions import DetailExists, NotAuthenticated
 from imagesecrets.core import email
-from imagesecrets.core.util.main import parse_asyncpg_integrity
+from imagesecrets.core.util import main
 from imagesecrets.database.token.services import TokenService
 from imagesecrets.database.user.services import DBIdentifier, UserService
 
@@ -138,7 +138,7 @@ async def register(
     try:
         db_user = await user_service.create(user)
     except IntegrityError as e:
-        parsed = parse_asyncpg_integrity(error=e.orig)
+        parsed = main.parse_asyncpg_integrity(error=e.orig)
         raise DetailExists(
             status_code=status.HTTP_409_CONFLICT,
             message="account detail already exists",
