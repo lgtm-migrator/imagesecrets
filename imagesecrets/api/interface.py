@@ -1,7 +1,7 @@
 """Application Programming Interface."""
 from __future__ import annotations
 
-from fastapi import Depends, FastAPI, status
+from fastapi import APIRouter, Depends, FastAPI, status
 
 import imagesecrets
 from imagesecrets import schemas
@@ -9,6 +9,17 @@ from imagesecrets.api import dependencies, handlers, openapi, responses, tasks
 from imagesecrets.api.routers import decode, encode, user
 from imagesecrets.config import Settings
 from imagesecrets.database import base
+
+
+def create_router() -> APIRouter:
+    router = APIRouter(prefix="/api")
+
+    router.include_router(decode.router)
+    router.include_router(encode.router)
+    router.include_router(user.main)
+    router.include_router(user.me)
+
+    return router
 
 
 def create_api(config: Settings) -> FastAPI:
@@ -25,10 +36,7 @@ def create_api(config: Settings) -> FastAPI:
 
     base.init(api)
 
-    api.include_router(decode.router)
-    api.include_router(encode.router)
-    api.include_router(user.main)
-    api.include_router(user.me)
+    api.include_router(create_router())
 
     handlers.init(api)
     tasks.init(api)
