@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from imagesecrets.database.image.services import ImageService
     from imagesecrets.database.user.models import User
 
-URL = "/decode"
+URL = "api/decode"
 
 
 @pytest.mark.parametrize(

@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
     from imagesecrets.database.user.services import UserService
 
-URL = "/users/login"
+URL = "api/users/login"
 
 
 @pytest.mark.parametrize(

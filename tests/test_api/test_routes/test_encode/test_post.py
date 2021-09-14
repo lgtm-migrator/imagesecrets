@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
     from imagesecrets.database.image.models import DecodedImage  # noqa
 
-URL = "/encode"
+URL = "api/encode"
 
 
 @pytest.mark.parametrize(

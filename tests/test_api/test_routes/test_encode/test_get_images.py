@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from imagesecrets.database.user.models import User
 
 
-URL = "/encode"
+URL = "api/encode"
 
 
 def test_get_images(

@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from imagesecrets.database.user.models import User
     from imagesecrets.database.user.services import UserService
 
-URL = "/users/me"
+URL = "api/users/me"
 
 
 def test_get_ok(
