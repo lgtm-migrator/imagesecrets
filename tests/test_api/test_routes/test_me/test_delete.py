@@ -6,7 +6,7 @@ if TYPE_CHECKING:
     from fastapi.testclient import TestClient
 
 
-URL = "/users/me"
+URL = "api/users/me"
 
 
 def test_delete(

@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
     from imagesecrets.database.token.services import TokenService
 
-URL = "/users/reset-password"
+URL = "api/users/reset-password"
 
 
 def test_ok(

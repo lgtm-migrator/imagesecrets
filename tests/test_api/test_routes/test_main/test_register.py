@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from imagesecrets.database.user.models import User
     from imagesecrets.database.user.services import UserService
 
-URL = "/users/register"
+URL = "api/users/register"
 
 
 @pytest.fixture()
