@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-SRC="image_secrets"
+SRC="imagesecrets"
 
 poetry run mypy $SRC --verbose
 poetry run pytest --verbose --cov=$SRC --cov-report=xml
