@@ -142,5 +142,4 @@ def test_post_415(
     )
 
     assert response.status_code == 415
-    assert response.reason == "Unsupported Media Type"
     assert response.json()["detail"] == "only .png images are supported"
